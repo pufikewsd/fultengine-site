@@ -1,11 +1,34 @@
 (() => {
-  const CATEGORY_LABELS = {
-    roles: "Роли и отряды",
-    scp: "SCP",
-    facility: "Комплекс",
-    gameplay: "Механики",
-    ui: "Интерфейс",
-    admin: "Сервер и админ"
+  const CATEGORY_META = {
+    roles: { label: "Роли и отряды", dot: "dot-cobalt" },
+    scp: { label: "SCP", dot: "dot-orange" },
+    facility: { label: "Комплекс", dot: "dot-emerald" },
+    gameplay: { label: "Механики", dot: "dot-violet" },
+    ui: { label: "Интерфейс", dot: "dot-sky" },
+    admin: { label: "Сервер и админ", dot: "dot-slate" }
+  };
+
+  const LAYERS = {
+    loader: {
+      title: "Единая точка входа в LabAPI",
+      body: "Режим <code>RP</code> включается по умолчанию. Администратор может выключить все модули командой <code>fultmode off</code> и вернуть их обратно командой <code>fultmode rp</code> без перезапуска процесса. Почти каждый модуль наследует <code>BaseModule&lt;Config&gt;</code> из <code>API/EngineCompat</code>.",
+      tags: ["LoaderModule/", "IFultEngineModule", "fultmode rp", "fultmode off"]
+    },
+    gameplay: {
+      title: "Роли, отряды, ранения и КПК",
+      body: "<code>Subclass</code> и <code>RoleDistribution</code> распределяют роли по квотам, выдают снаряжение и имена учёных (включая новых персонажей в v2.0). Внутри работают <code>InjurySystem</code> с кровотечением и переломами по частям тела, КПК с мессенджером (<code>cpc help</code>), <code>BetterCassie</code> и 17 модулей SCP.",
+      tags: ["Subclass", "InjurySystem", "BetterCassie", "cra list", "cpc help"]
+    },
+    admin: {
+      title: "Мониторинг памяти и защита от рейда",
+      body: "<code>MemoryWatch</code> показывает снимки кучи, ассеты и объекты Unity (<code>fmem top</code>, <code>fmem gc</code>), <code>ServerPerf</code> убирает роли-сироты, <code>AntiRaid</code> закрывает вход при тревоге, а <code>TeleportGuard</code> возвращает игроков, провалившихся под карту.",
+      tags: ["fmem top", "antiraid", "AdminToggle", "ServerPerf", "TeleportGuard"]
+    },
+    obf: {
+      title: "Защита релизной сборки ConfuserEx2",
+      body: "Перед публикацией файл <code>Fust-MODULE.dll</code> проходит через <code>_Obfuscation/FultEngine.crproj</code>: запутывание потока управления, шифрование констант, ref proxy и anti-tamper. Переименование отключено, чтобы корректно работали конфиги YamlDotNet, команды и Harmony-патчи.",
+      tags: ["ConfuserEx2", "ctrl flow", "constants", "anti tamper"]
+    }
   };
 
   const MODULES = [
@@ -87,171 +110,157 @@
     { name: "AutoMapLoader", cat: "admin", desc: "Подгружает схематики карты, пока сервер ждёт игроков.", cmds: [] }
   ];
 
-  // Solid header once scrolled past hero top
-  const topbar = document.getElementById("topbar");
-  function syncHeader() {
-    topbar.classList.toggle("is-solid", window.scrollY > 48);
-  }
-  window.addEventListener("scroll", syncHeader, { passive: true });
-  syncHeader();
+  // Architecture layer tabs
+  const expTitle = document.getElementById("expTitle");
+  const expBody = document.getElementById("expBody");
+  const expTags = document.getElementById("expTags");
+  const expTabs = document.querySelectorAll(".exp-tab");
 
-  if (window.location.hash) {
-    const target = document.querySelector(window.location.hash);
-    if (target) {
-      target.scrollIntoView({ behavior: "instant" });
-      syncHeader();
-    }
-  }
-
-  // Editorial chapters accordion
-  document.querySelectorAll(".chapter-trigger").forEach((trigger) => {
-    trigger.addEventListener("click", () => {
-      const item = trigger.closest(".chapter-item");
-      const wasOpen = item.classList.contains("is-open");
-      document.querySelectorAll(".chapter-item").forEach((el) => {
-        el.classList.remove("is-open");
-        el.querySelector(".chapter-trigger").setAttribute("aria-expanded", "false");
+  expTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const layer = LAYERS[tab.dataset.layer];
+      if (!layer) return;
+      expTabs.forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle("is-active", active);
+        t.setAttribute("aria-selected", String(active));
       });
-      if (!wasOpen) {
-        item.classList.add("is-open");
-        trigger.setAttribute("aria-expanded", "true");
-      }
+      expTitle.textContent = layer.title;
+      expBody.innerHTML = layer.body;
+      expTags.innerHTML = layer.tags.map((tag) => `<span>${tag}</span>`).join("");
     });
   });
 
-  // Archival paper registry
-  const registryList = document.getElementById("registryList");
+  // Modules explorer
+  const modulesList = document.getElementById("modulesList");
   const resultsMeta = document.getElementById("resultsMeta");
   const searchInput = document.getElementById("moduleSearch");
-  const tabButtons = document.querySelectorAll(".tab-btn");
+  const catPills = document.querySelectorAll(".cat-pill");
   const countAll = document.getElementById("countAll");
 
   countAll.textContent = String(MODULES.length);
 
   let activeCat = "all";
   let query = "";
-  let showAllInDefault = false;
+  let expandedAll = false;
 
-  function escapeHtml(str) {
+  function esc(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  function renderRegistry() {
+  function renderModules() {
     const q = query.trim().toLowerCase();
-    const filtered = MODULES.map((m, idx) => ({ ...m, num: idx + 1 })).filter((m) => {
+    const filtered = MODULES.filter((m) => {
       if (activeCat !== "all" && m.cat !== activeCat) return false;
       if (!q) return true;
-      const hay = `${m.name} ${m.desc} ${m.cmds.join(" ")} ${CATEGORY_LABELS[m.cat]}`.toLowerCase();
+      const meta = CATEGORY_META[m.cat];
+      const hay = `${m.name} ${m.desc} ${m.cmds.join(" ")} ${meta.label}`.toLowerCase();
       return hay.includes(q);
     });
 
-    const limitDefault = activeCat === "all" && !q && !showAllInDefault;
-    const visible = limitDefault ? filtered.slice(0, 16) : filtered;
+    const limitDefault = activeCat === "all" && !q && !expandedAll;
+    const visible = limitDefault ? filtered.slice(0, 14) : filtered;
 
     resultsMeta.textContent = limitDefault
-      ? `Показано ${visible.length} из ${MODULES.length}`
-      : `Найдено ${filtered.length} из ${MODULES.length}`;
+      ? `Показано ${visible.length} из ${MODULES.length} модулей`
+      : `Найдено ${filtered.length} из ${MODULES.length} модулей`;
 
     if (filtered.length === 0) {
-      registryList.innerHTML = `<div class="reg-empty">Ничего не найдено по запросу «${escapeHtml(q)}». Очистите поле поиска или переключите категорию.</div>`;
+      modulesList.innerHTML = `<div class="mod-empty">Ничего не найдено по запросу «${esc(q)}». Очистите поиск или выберите другую категорию.</div>`;
       return;
     }
 
-    const rowsHtml = visible
+    const cardsHtml = visible
       .map((m) => {
-        const idxStr = String(m.num).padStart(2, "0");
+        const meta = CATEGORY_META[m.cat];
         const cfgPath = `LabAPI/configs/global/FULT-ENGINE/ModuleConfig/${m.name}.yml`;
         const cmdsHtml = m.cmds.length
-          ? `<span class="reg-cmds">${m.cmds.map((c) => `<code>${escapeHtml(c)}</code>`).join("")}</span>`
-          : `<span class="reg-cmds"></span>`;
-
+          ? `<div class="mod-cmds">${m.cmds.map((c) => `<code>${esc(c)}</code>`).join("")}</div>`
+          : "";
         return `
-          <div class="reg-row">
-            <button type="button" class="reg-row-btn" aria-expanded="false">
-              <span class="reg-idx">${idxStr}</span>
-              <span class="reg-name">${escapeHtml(m.name)}</span>
-              <span class="reg-cat">${CATEGORY_LABELS[m.cat]}</span>
-              <span class="reg-desc">${escapeHtml(m.desc)}</span>
+          <article class="mod-row">
+            <button type="button" class="mod-btn" aria-expanded="false">
+              <div class="mod-top">
+                <strong class="mod-name">${esc(m.name)}</strong>
+                <span class="mod-cat"><i class="dot ${meta.dot}" aria-hidden="true"></i>${meta.label}</span>
+              </div>
+              <p class="mod-desc">${esc(m.desc)}</p>
               ${cmdsHtml}
             </button>
-            <div class="reg-detail">
-              <span class="reg-detail-path">Конфиг: ${escapeHtml(cfgPath)}</span>
-              <button type="button" class="reg-copy-btn" data-copy="${escapeHtml(cfgPath)}">Скопировать путь</button>
+            <div class="mod-detail">
+              <span class="mod-path">${esc(cfgPath)}</span>
+              <button type="button" class="mod-copy" data-copy="${esc(cfgPath)}">Скопировать путь</button>
             </div>
-          </div>
+          </article>
         `;
       })
       .join("");
 
     const moreHtml = limitDefault
-      ? `<div class="reg-more-wrap"><button type="button" class="reg-more-btn" id="showAllModulesBtn">Показать все ${MODULES.length} модулей</button></div>`
+      ? `<div class="mod-more-wrap"><button type="button" class="mod-more-btn" id="showAllModulesBtn">Показать все ${MODULES.length} модулей</button></div>`
       : "";
 
-    registryList.innerHTML = rowsHtml + moreHtml;
+    modulesList.innerHTML = cardsHtml + moreHtml;
   }
 
-  registryList.addEventListener("click", async (e) => {
-    const moreBtn = e.target.closest("#showAllModulesBtn");
-    if (moreBtn) {
-      showAllInDefault = true;
-      renderRegistry();
+  modulesList.addEventListener("click", async (e) => {
+    if (e.target.closest("#showAllModulesBtn")) {
+      expandedAll = true;
+      renderModules();
       return;
     }
-
-    const copyBtn = e.target.closest(".reg-copy-btn");
+    const copyBtn = e.target.closest(".mod-copy");
     if (copyBtn) {
       e.stopPropagation();
-      const text = copyBtn.dataset.copy || "";
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(copyBtn.dataset.copy || "");
         copyBtn.textContent = "Скопировано";
         setTimeout(() => {
           copyBtn.textContent = "Скопировать путь";
         }, 1600);
       } catch {
-        copyBtn.textContent = "Ошибка копирования";
+        copyBtn.textContent = "Ошибка";
       }
       return;
     }
-
-    const rowBtn = e.target.closest(".reg-row-btn");
-    if (!rowBtn) return;
-    const row = rowBtn.closest(".reg-row");
-    const isOpen = row.classList.toggle("is-open");
-    rowBtn.setAttribute("aria-expanded", String(isOpen));
+    const btn = e.target.closest(".mod-btn");
+    if (!btn) return;
+    const row = btn.closest(".mod-row");
+    const open = row.classList.toggle("is-open");
+    btn.setAttribute("aria-expanded", String(open));
   });
 
-  tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      activeCat = btn.dataset.cat;
-      tabButtons.forEach((b) => {
-        const active = b === btn;
-        b.classList.toggle("is-active", active);
-        b.setAttribute("aria-selected", String(active));
+  catPills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      activeCat = pill.dataset.cat;
+      catPills.forEach((p) => {
+        const active = p === pill;
+        p.classList.toggle("is-active", active);
+        p.setAttribute("aria-selected", String(active));
       });
-      renderRegistry();
+      renderModules();
     });
   });
 
   searchInput.addEventListener("input", (e) => {
     query = e.target.value;
-    renderRegistry();
+    renderModules();
   });
 
-  renderRegistry();
+  renderModules();
 
-  // Graph view switcher + lightbox
+  // Graph toggle + Lightbox
   const graphImage = document.getElementById("graphImage");
   const graphCaption = document.getElementById("graphCaption");
-  const graphSwitchBtns = document.querySelectorAll(".switch-btn");
+  const segBtns = document.querySelectorAll(".seg-btn");
   const graphZoomBtn = document.getElementById("graphZoomBtn");
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightboxImg");
   const lightboxClose = document.getElementById("lightboxClose");
 
-  graphSwitchBtns.forEach((btn) => {
+  segBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      graphSwitchBtns.forEach((b) => {
+      segBtns.forEach((b) => {
         const active = b === btn;
         b.classList.toggle("is-active", active);
         b.setAttribute("aria-pressed", String(active));
@@ -282,12 +291,11 @@
     if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
   });
 
-  // Inline command copy buttons
-  document.querySelectorAll(".copy-inline").forEach((btn) => {
+  // Copy buttons
+  document.querySelectorAll(".copy-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const text = btn.dataset.copy || "";
       try {
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(btn.dataset.copy || "");
         const orig = btn.textContent;
         btn.textContent = "Скопировано";
         setTimeout(() => {
