@@ -35,16 +35,26 @@
 
       <nav class="site-nav" id="siteNav" aria-label="Разделы">
         <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
-        <a href="#engine" data-section="engine">Движок</a>
+        <a href="#engine" data-section="engine">Конструктор</a>
+        <a href="#sandbox" data-section="sandbox">Песочница</a>
         <a href="#modules" data-section="modules">Модули</a>
         <a href="#topology" data-section="topology">Граф кода</a>
-        <a href="#webpanel" data-section="webpanel">Веб-панель</a>
         <a href="#install" data-section="install">Установка</a>
       </nav>
 
-      <a class="nav-pill magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
-        Релиз v2.0
-      </a>
+      <div class="header-right">
+        <button type="button" class="cmdk-trigger" id="openCmdk" aria-label="Быстрый поиск по модулям и командам (Ctrl+K)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <span class="cmdk-label">Поиск</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <a class="nav-pill magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
+          Релиз v2.0
+        </a>
+      </div>
     </div>
     <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   </header>
@@ -65,8 +75,8 @@
               <a class="btn btn-cobalt magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
                 Скачать v2.0
               </a>
-              <a class="btn btn-outline" href="https://github.com/pufikewsd/FultEngine" target="_blank" rel="noopener noreferrer">
-                Репозиторий GitHub
+              <a class="btn btn-outline" href="#sandbox">
+                Попробовать в песочнице
               </a>
             </div>
           </div>
@@ -100,42 +110,69 @@
       </div>
     </section>
 
-    <!-- BLOCK 2: VIVID COBALT ARCHITECTURE BAND -->
+    <!-- BLOCK 2: VIVID COBALT INTERACTIVE BUILD CONFIGURATOR -->
     <section class="band band-cobalt" id="engine">
       <div class="wrap cobalt-grid">
         <div class="cobalt-lead" data-reveal>
-          <div class="cobalt-num" data-count="65" aria-hidden="true">65</div>
-          <h2>Одна сборка вместо десятков плагинов</h2>
+          <div class="cobalt-num" id="cfgModuleCount" aria-live="polite">65</div>
+          <h2>Конструктор сборки</h2>
           <p>
-            При запуске сервера класс <code>FultEngine</code> в <code>LoaderModule</code> сканирует сборку,
-            находит реализации <code>IFultEngineModule</code>, раскладывает YAML-конфиги по папкам и включает
-            модули по флагам активного режима.
+            Выберите готовый пресет или переключите подсистемы вручную. Справа сразу соберётся
+            конфиг <code>FultEngine.yml</code> с активными модулями, который можно скопировать или скачать.
           </p>
+
+          <div class="preset-bar" role="group" aria-label="Пресеты сервера">
+            <button type="button" class="preset-btn is-active" data-preset="full">Полный RP (65)</button>
+            <button type="button" class="preset-btn" data-preset="event">Ивент / Мини-игры</button>
+            <button type="button" class="preset-btn" data-preset="minimal">Минимальный</button>
+          </div>
+
+          <div class="subsystem-list" id="subsystemList">
+            <label class="sub-toggle">
+              <input type="checkbox" data-sub="roles" checked />
+              <span class="sub-switch" aria-hidden="true"></span>
+              <span class="sub-text"><strong>Роли и отряды</strong><small>5 модулей: Subclass, MtfSquads, CirCodes</small></span>
+            </label>
+            <label class="sub-toggle">
+              <input type="checkbox" data-sub="scp" checked />
+              <span class="sub-switch" aria-hidden="true"></span>
+              <span class="sub-text"><strong>SCP-объекты</strong><small>17 модулей: Scp008, Scp131, BetterSCP, Scramble</small></span>
+            </label>
+            <label class="sub-toggle">
+              <input type="checkbox" data-sub="facility" checked />
+              <span class="sub-switch" aria-hidden="true"></span>
+              <span class="sub-text"><strong>Комплекс и протоколы</strong><small>16 модулей: WarheadCode, BetterCassie, Turrets</small></span>
+            </label>
+            <label class="sub-toggle">
+              <input type="checkbox" data-sub="gameplay" checked />
+              <span class="sub-switch" aria-hidden="true"></span>
+              <span class="sub-text"><strong>Механики игроков</strong><small>15 модулей: InjurySystem, Cpc, RadioWave</small></span>
+            </label>
+            <label class="sub-toggle">
+              <input type="checkbox" data-sub="ui" checked />
+              <span class="sub-switch" aria-hidden="true"></span>
+              <span class="sub-text"><strong>Интерфейс и тема</strong><small>4 модуля: Hud, Theme, WelcomeMessage</small></span>
+            </label>
+            <label class="sub-toggle">
+              <input type="checkbox" data-sub="admin" checked />
+              <span class="sub-switch" aria-hidden="true"></span>
+              <span class="sub-text"><strong>Сервер и защита</strong><small>8 модулей: AntiRaid, MemoryWatch, ServerPerf</small></span>
+            </label>
+          </div>
         </div>
 
-        <div class="studio-explorer" data-reveal style="--rd: 100ms">
-          <div class="explorer-tabs" role="tablist" aria-label="Слои движка">
-            <button type="button" class="exp-tab is-active" data-layer="loader" role="tab" aria-selected="true">Загрузчик</button>
-            <button type="button" class="exp-tab" data-layer="gameplay" role="tab" aria-selected="false">Роли и механики</button>
-            <button type="button" class="exp-tab" data-layer="admin" role="tab" aria-selected="false">Сервер и память</button>
-            <button type="button" class="exp-tab" data-layer="obf" role="tab" aria-selected="false">Защита</button>
-          </div>
-
-          <div class="explorer-card" id="explorerCard" aria-live="polite">
-            <h3 id="expTitle">Единая точка входа в LabAPI</h3>
-            <p id="expBody">
-              Режим <code>RP</code> включается по умолчанию. Администратор может выключить все модули
-              командой <code>fultmode off</code> и вернуть их обратно командой <code>fultmode rp</code>
-              без перезапуска процесса. Почти каждый модуль наследует <code>BaseModule&lt;Config&gt;</code>
-              из <code>API/EngineCompat</code>.
-            </p>
-            <div class="explorer-tags" id="expTags">
-              <span>LoaderModule/</span>
-              <span>IFultEngineModule</span>
-              <span>fultmode rp</span>
-              <span>fultmode off</span>
+        <div class="config-output-card" data-reveal style="--rd: 100ms">
+          <div class="cfg-card-head">
+            <div>
+              <strong>FultEngine.yml</strong>
+              <span class="cfg-meta" id="cfgStats">65 модулей / 6 подсистем / режим RP</span>
+            </div>
+            <div class="cfg-actions">
+              <button type="button" class="cfg-btn" id="copyCfgBtn">Копировать</button>
+              <button type="button" class="cfg-btn cfg-btn-primary" id="downloadCfgBtn">Скачать .yml</button>
             </div>
           </div>
+          <pre class="cfg-pre"><code id="cfgCode"></code></pre>
         </div>
       </div>
     </section>
@@ -144,6 +181,136 @@
     <div class="ticker-band" aria-label="Быстрый переход к популярным модулям">
       <div class="ticker-track" id="tickerTrack"></div>
     </div>
+
+    <!-- BLOCK 2.5: INTERACTIVE SANDBOX (THEME.YML + LIVE COMMAND CONSOLE) -->
+    <section class="band band-studio" id="sandbox">
+      <div class="wrap">
+        <div class="sandbox-head" data-reveal>
+          <div>
+            <h2>Интерактивная песочница</h2>
+            <p class="section-sub">
+              Попробуйте два живых инструмента движка прямо в браузере: соберите палитру <code>Theme.yml</code> с превью хинта или поуправляйте консолью команд <code>LoaderModule</code>.
+            </p>
+          </div>
+
+          <div class="sandbox-tabs" role="tablist" aria-label="Режим песочницы">
+            <button type="button" class="sb-tab is-active" data-sb="theme" role="tab" aria-selected="true">Редактор Theme.yml</button>
+            <button type="button" class="sb-tab" data-sb="console" role="tab" aria-selected="false">Консоль команд</button>
+          </div>
+        </div>
+
+        <!-- TAB 1: THEME.YML LIVE DESIGNER -->
+        <div class="sandbox-panel is-active" id="sbTheme" role="tabpanel">
+          <div class="theme-studio">
+            <div class="theme-controls">
+              <div class="theme-presets" role="group" aria-label="Готовые темы">
+                <button type="button" class="tp-btn is-active" data-tp="studio">Студийная</button>
+                <button type="button" class="tp-btn" data-tp="tactical">Тактическая</button>
+                <button type="button" class="tp-btn" data-tp="contrast">Контрастная</button>
+                <button type="button" class="tp-btn" data-tp="mint">Холодная</button>
+              </div>
+
+              <div class="color-grid">
+                <label class="color-field">
+                  <span><code>@accent</code> акцент</span>
+                  <div class="color-input-wrap">
+                    <input type="color" id="colAccent" value="#2347f2" />
+                    <span class="color-hex" id="hexAccent">#2347F2</span>
+                  </div>
+                </label>
+                <label class="color-field">
+                  <span><code>@good</code> успех</span>
+                  <div class="color-input-wrap">
+                    <input type="color" id="colGood" value="#16a34a" />
+                    <span class="color-hex" id="hexGood">#16A34A</span>
+                  </div>
+                </label>
+                <label class="color-field">
+                  <span><code>@warn</code> внимание</span>
+                  <div class="color-input-wrap">
+                    <input type="color" id="colWarn" value="#ff6428" />
+                    <span class="color-hex" id="hexWarn">#FF6428</span>
+                  </div>
+                </label>
+                <label class="color-field">
+                  <span><code>@bad</code> тревога</span>
+                  <div class="color-input-wrap">
+                    <input type="color" id="colBad" value="#e11d48" />
+                    <span class="color-hex" id="hexBad">#E11D48</span>
+                  </div>
+                </label>
+              </div>
+
+              <label class="token-editor-label" for="hintInput">
+                <span>Текст хинта с токенами <code>&lt;color=@...&gt;</code></span>
+                <textarea id="hintInput" rows="3"><color=@accent>МОГ Ню-7 «Удар молота»</color> вошёл в комплекс. Статус КПП: <color=@good>открыт</color>. Внимание на <color=@warn>сектор тяжёлого содержания</color>, код <color=@bad>Красный</color>.</textarea>
+              </label>
+            </div>
+
+            <div class="theme-preview-col">
+              <div class="hud-screen" aria-label="Живое превью игрового HUD и хинта">
+                <div class="hud-top">
+                  <span class="hud-role-badge" id="hudRoleBadge">Доктор Феликс (Учёный)</span>
+                  <span class="hud-zone">Сектор лёгкого содержания</span>
+                </div>
+                <div class="hud-hint-box" id="hudPreview"></div>
+                <div class="hud-bottom">
+                  <span>HP 100</span>
+                  <span>Рация: канал 3</span>
+                  <span>КПК: 2 сообщения</span>
+                </div>
+              </div>
+
+              <div class="code-card code-card-dark theme-yaml-card">
+                <div class="code-card-top">
+                  <span>Theme.yml</span>
+                  <button type="button" class="copy-btn" id="copyThemeBtn">Копировать YAML</button>
+                </div>
+                <pre><code id="themeYamlOut"></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: INTERACTIVE COMMAND CONSOLE -->
+        <div class="sandbox-panel" id="sbConsole" role="tabpanel" hidden>
+          <div class="console-studio">
+            <div class="console-topbar">
+              <div class="console-status-group">
+                <span class="c-dot" id="cDot" aria-hidden="true"></span>
+                <strong id="cModeLabel">Режим: RP</strong>
+                <span class="c-sep" aria-hidden="true">/</span>
+                <span id="cActiveModules">Активно модулей: 65</span>
+              </div>
+              <div class="console-quick">
+                <button type="button" class="q-cmd" data-run="help">help</button>
+                <button type="button" class="q-cmd" data-run="cra list">cra list</button>
+                <button type="button" class="q-cmd" data-run="cra y 14">cra y 14</button>
+                <button type="button" class="q-cmd" data-run="cas">cas</button>
+                <button type="button" class="q-cmd" data-run="fmem top">fmem top</button>
+                <button type="button" class="q-cmd" data-run="fultmode off">fultmode off</button>
+                <button type="button" class="q-cmd" data-run="fultmode rp">fultmode rp</button>
+                <button type="button" class="q-cmd" data-run="clear">clear</button>
+              </div>
+            </div>
+
+            <div class="cassie-banner" id="cassieBanner" hidden>
+              <span class="cassie-tag">CASSIE</span>
+              <span id="cassieText"></span>
+            </div>
+
+            <div class="console-log" id="consoleLog" aria-live="polite"></div>
+
+            <form class="console-form" id="consoleForm" autocomplete="off">
+              <span class="console-prompt" aria-hidden="true">&gt;</span>
+              <label class="sr-only" for="consoleInput">Введите команду сервера</label>
+              <input id="consoleInput" type="text" placeholder="Введите команду (например: help, cra list, cas, fmem top, fultmode off)..." />
+              <button type="submit" class="console-submit">Выполнить</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- BLOCK 3: CLEAN GALLERY MODULE EXPLORER -->
     <section class="band band-white" id="modules">
@@ -342,9 +509,30 @@ npm start</code></pre>
     </div>
   </footer>
 
+  <!-- FULLSCREEN GRAPH LIGHTBOX -->
   <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Увеличенный граф кода">
     <button type="button" class="lightbox-close" id="lightboxClose">Закрыть (Esc)</button>
     <img id="lightboxImg" src="" alt="Граф зависимостей FULT-ENGINE" />
+  </div>
+
+  <!-- CTRL+K COMMAND PALETTE -->
+  <div class="cmdk-backdrop" id="cmdkModal" hidden role="dialog" aria-modal="true" aria-label="Быстрый поиск по модулям и командам">
+    <div class="cmdk-dialog">
+      <div class="cmdk-input-row">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input id="cmdkInput" type="search" placeholder="Найти модуль, команду или раздел (Esc чтобы закрыть)..." autocomplete="off" />
+        <button type="button" class="cmdk-esc" id="closeCmdk">Esc</button>
+      </div>
+      <div class="cmdk-results" id="cmdkResults" role="listbox"></div>
+      <div class="cmdk-footer">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> выбор</span>
+        <span><kbd>Enter</kbd> перейти</span>
+        <span><kbd>Esc</kbd> закрыть</span>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
