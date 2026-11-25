@@ -4,358 +4,363 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FULT-ENGINE v2.0 | Серверный движок для SCP: Secret Laboratory</title>
-  <meta name="description" content="Модульный серверный движок FULT-ENGINE на базе LabAPI для SCP: Secret Laboratory. 65 модулей в одной сборке Fust-MODULE.dll и веб-панель администрации." />
+  <meta name="description" content="FULT-ENGINE: серверный движок для SCP: Secret Laboratory на базе LabAPI. 65 модулей в одной сборке Fust-MODULE.dll и веб-панель администрации." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0b'/%3E%3Crect x='4' y='4' width='24' height='24' fill='none' stroke='%23f3f1ec' stroke-width='2'/%3E%3Crect x='9' y='14' width='14' height='4' fill='%23c92424'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
 
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" href="#top" aria-label="FULT-ENGINE главная">
-        <span class="brand-mark" aria-hidden="true">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="2" y="2" width="16" height="16" stroke="currentColor" stroke-width="1.75" />
-            <path d="M6 10H14M10 6V14" stroke="#E5A032" stroke-width="1.75" />
-          </svg>
-        </span>
-        <span class="brand-name">FULT-ENGINE</span>
-        <span class="version-pill">v2.0</span>
-      </a>
-
-      <nav class="site-nav" aria-label="Разделы сайта">
-        <a href="#architecture">Архитектура</a>
-        <a href="#modules">Модули</a>
+  <header class="topbar" id="topbar">
+    <div class="wrap topbar-inner">
+      <a class="wordmark" href="#top">FULT-ENGINE</a>
+      <nav class="topnav" aria-label="Разделы">
+        <a href="#system">Устройство</a>
+        <a href="#registry">Реестр модулей</a>
+        <a href="#topology">Топология</a>
         <a href="#webpanel">Веб-панель</a>
         <a href="#install">Установка</a>
       </nav>
-
-      <div class="header-actions">
-        <a class="btn btn-ghost btn-sm" href="https://github.com/pufikewsd/FultEngine" target="_blank" rel="noopener noreferrer">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-          </svg>
-          <span>GitHub</span>
-        </a>
-      </div>
+      <a class="top-release" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">v2.0</a>
     </div>
   </header>
 
   <main id="main">
-    <section id="top" class="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <h1>FULT-ENGINE</h1>
-          <p class="hero-lead">
-            Серверный движок для SCP: Secret Laboratory на базе LabAPI. Все 65 модулей собраны в один файл
-            <code>Fust-MODULE.dll</code> и управляются через конфиги, режимы игры и веб-панель администрации.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              <span>Скачать релиз v2.0</span>
-            </a>
-            <a class="btn btn-secondary" href="#modules">Открыть каталог модулей</a>
-          </div>
-
-          <dl class="spec-strip" aria-label="Ключевые характеристики сборки">
-            <div class="spec-item">
-              <dt>Модулей в сборке</dt>
-              <dd class="mono-num">65</dd>
-            </div>
-            <div class="spec-item">
-              <dt>Платформа</dt>
-              <dd class="mono-num">LabAPI 1.1.4</dd>
-            </div>
-            <div class="spec-item">
-              <dt>Среда</dt>
-              <dd class="mono-num">.NET 4.8.1</dd>
-            </div>
-            <div class="spec-item">
-              <dt>Защита</dt>
-              <dd class="mono-num">ConfuserEx2</dd>
-            </div>
-          </dl>
-        </div>
-
-        <aside class="console-panel" aria-label="Интерактивный пульт LoaderModule">
-          <div class="console-header">
-            <div class="console-title">
-              <span class="status-dot" id="statusDot" aria-hidden="true"></span>
-              <span class="mono-text">LoaderModule / Site-02</span>
-            </div>
-            <div class="mode-switch" role="group" aria-label="Режим движка">
-              <button type="button" class="mode-btn is-active" data-mode="rp" aria-pressed="true">RP</button>
-              <button type="button" class="mode-btn" data-mode="off" aria-pressed="false">OFF</button>
-            </div>
-          </div>
-
-          <div class="console-telemetry">
-            <div>
-              <span class="telemetry-label">Активных модулей</span>
-              <strong class="mono-num" id="activeCount">65 / 65</strong>
-            </div>
-            <div>
-              <span class="telemetry-label">Сборка</span>
-              <strong class="mono-num">Fust-MODULE.dll</strong>
-            </div>
-            <div>
-              <span class="telemetry-label">Статус</span>
-              <strong class="mono-num status-text" id="statusText">ONLINE</strong>
-            </div>
-          </div>
-
-          <div class="console-output" id="consoleOutput" aria-live="polite">
-            <div class="log-line"><span class="log-time">[16:20:04]</span> <span class="log-ok">INFO</span> FULT-ENGINE v2.0 загружен (LabAPI 1.1.4)</div>
-            <div class="log-line"><span class="log-time">[16:20:05]</span> <span class="log-ok">INFO</span> Найдено 65 модулей с интерфейсом IFultEngineModule</div>
-            <div class="log-line"><span class="log-time">[16:20:05]</span> <span class="log-accent">MODE</span> Режим RP включён по умолчанию. Конфиги применены.</div>
-          </div>
-
-          <div class="console-commands" aria-label="Примеры серверных команд">
-            <span class="telemetry-label">Проверить команду в консоли:</span>
-            <div class="cmd-chips">
-              <button type="button" class="cmd-chip" data-cmd="fmem top">fmem top</button>
-              <button type="button" class="cmd-chip" data-cmd="cas">cas</button>
-              <button type="button" class="cmd-chip" data-cmd="cra list">cra list</button>
-              <button type="button" class="cmd-chip" data-cmd="scp131 give">scp131 give</button>
-              <button type="button" class="cmd-chip" data-cmd="antiraid">antiraid</button>
-            </div>
-          </div>
-        </aside>
+    <!-- ACT I: FULL-BLEED CINEMA TITLE SCREEN -->
+    <section class="hero" id="top">
+      <div class="hero-media" aria-hidden="true">
+        <img src="assets/hero-corridor.jpg" alt="" fetchpriority="high" />
+        <div class="hero-scrim"></div>
       </div>
-    </section>
 
-    <section id="architecture" class="section section-border">
-      <div class="container">
-        <div class="section-head">
-          <h2>Как устроен движок</h2>
-          <p>
-            Класс <code>FultEngine</code> в <code>LoaderModule</code> наследует <code>Plugin&lt;Config&gt;</code> из LabAPI.
-            При старте он находит все реализации <code>IFultEngineModule</code>, подгружает их YAML-конфиги и включает нужный набор по флагам режима.
-          </p>
-        </div>
+      <div class="wrap hero-content">
+        <div class="hero-bottom">
+          <div class="hero-title-col">
+            <p class="hero-meta">SCP: Secret Laboratory / LabAPI&nbsp;1.1.4 / .NET&nbsp;4.8.1</p>
+            <h1>FULT&#8209;ENGINE</h1>
+          </div>
 
-        <div class="arch-flow" role="img" aria-label="Схема слоёв: LabAPI передаёт управление LoaderModule, который загружает 65 модулей поверх API, Platform и сервера SCP:SL">
-          <div class="arch-node">
-            <span class="arch-layer">Точка входа</span>
-            <strong>LabAPI 1.1.4</strong>
-            <p>Запускает сборку <code>Fust-MODULE.dll</code> при старте сервера.</p>
+          <div class="hero-side-col">
+            <p class="hero-lead">
+              Модульный серверный движок для SCP: Secret Laboratory. Шестьдесят пять модулей для ролей,
+              SCP-объектов, протоколов комплекса, ранений и администрирования собраны в один файл
+              <code class="nowrap">Fust-MODULE.dll</code>.
+            </p>
+            <div class="hero-cta-row">
+              <a class="action-primary" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
+                Скачать релиз v2.0
+              </a>
+              <a class="action-link" href="https://github.com/pufikewsd/FultEngine" target="_blank" rel="noopener noreferrer">
+                Репозиторий GitHub
+              </a>
+            </div>
           </div>
-          <div class="arch-connector" aria-hidden="true"></div>
-          <div class="arch-node is-highlighted">
-            <span class="arch-layer">Загрузчик</span>
-            <strong>LoaderModule</strong>
-            <p>Ищет модули, читает конфиги и переключает режим командой <code>fultmode</code>.</p>
-          </div>
-          <div class="arch-connector" aria-hidden="true"></div>
-          <div class="arch-node">
-            <span class="arch-layer">Игровая логика</span>
-            <strong>65 модулей</strong>
-            <p>Роли, SCP, протоколы комплекса, медицина, HUD и инструменты админов.</p>
-          </div>
-          <div class="arch-connector" aria-hidden="true"></div>
-          <div class="arch-node">
-            <span class="arch-layer">Общий слой</span>
-            <strong>API и Platform</strong>
-            <p>Обёртки событий, ролей, предметов, звука, хинтов и <code>ProjectMERCompat</code>.</p>
-          </div>
-        </div>
-
-        <div class="folder-table-wrap">
-          <table class="folder-table">
-            <thead>
-              <tr>
-                <th>Каталог</th>
-                <th>Назначение</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>LoaderModule/</code></td>
-                <td>Запускает движок в LabAPI, подгружает модули, конфиги и игровые режимы.</td>
-              </tr>
-              <tr>
-                <td><code>Platform/</code></td>
-                <td>Оборачивает события, игроков, роли, предметы, ключ-карты и серверные настройки.</td>
-              </tr>
-              <tr>
-                <td><code>API/</code></td>
-                <td>Связывает <code>EngineCompat</code>, <code>ProjectMERCompat</code>, звук, хинты и темы оформления.</td>
-              </tr>
-              <tr>
-                <td><code>Module/</code></td>
-                <td>Хранит все 65 игровых модулей, по отдельной папке на каждый модуль.</td>
-              </tr>
-              <tr>
-                <td><code>CustomItems/</code></td>
-                <td>Описывает кастомные предметы, аптечки и оружие.</td>
-              </tr>
-              <tr>
-                <td><code>_WebPanel/</code></td>
-                <td>Веб-панель администрации на Node.js с входом через Steam и базой SQLite.</td>
-              </tr>
-              <tr>
-                <td><code>_Obfuscation/</code></td>
-                <td>Профиль и скрипт ConfuserEx2 для защиты релизной DLL.</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </section>
 
-    <section id="modules" class="section section-border">
-      <div class="container">
-        <div class="section-head">
-          <h2>Каталог модулей</h2>
-          <p>
-            Каждый модуль настраивается отдельным файлом <code>&lt;Имя&gt;.yml</code>. Фильтруйте по разделу или ищите по названию, механике и команде.
+    <!-- ACT II: EDITORIAL MONOGRAPH -->
+    <section class="band band-dark" id="system">
+      <div class="wrap editorial-grid">
+        <div class="editorial-rail">
+          <div class="rail-sticky">
+            <div class="big-figure" aria-hidden="true">65</div>
+            <p class="rail-caption">
+              игровых модулей в одной библиотеке. Без разрозненных сборок и конфликтов версий.
+            </p>
+            <dl class="rail-facts">
+              <div>
+                <dt>Сборка</dt>
+                <dd>Fust-MODULE.dll</dd>
+              </div>
+              <div>
+                <dt>Защита</dt>
+                <dd>ConfuserEx2</dd>
+              </div>
+              <div>
+                <dt>Исходники</dt>
+                <dd>384 файла C#</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="editorial-body">
+          <h2>Один движок вместо десятков плагинов</h2>
+          <p class="editorial-intro">
+            При старте сервера класс <code>FultEngine</code> в <code>LoaderModule</code> сканирует сборку,
+            находит все модули с интерфейсом <code>IFultEngineModule</code>, раскладывает их YAML-конфиги
+            и запускает нужный состав под выбранный режим игры.
           </p>
-        </div>
 
-        <div class="modules-toolbar">
-          <div class="filter-bar" role="group" aria-label="Фильтр по категориям модулей">
-            <button type="button" class="filter-btn is-active" data-cat="all" aria-pressed="true">Все <span class="count-badge" id="countAll">65</span></button>
-            <button type="button" class="filter-btn" data-cat="roles" aria-pressed="false">Роли и отряды</button>
-            <button type="button" class="filter-btn" data-cat="scp" aria-pressed="false">SCP</button>
-            <button type="button" class="filter-btn" data-cat="facility" aria-pressed="false">Комплекс и протоколы</button>
-            <button type="button" class="filter-btn" data-cat="gameplay" aria-pressed="false">Механики игроков</button>
-            <button type="button" class="filter-btn" data-cat="ui" aria-pressed="false">Интерфейс</button>
-            <button type="button" class="filter-btn" data-cat="admin" aria-pressed="false">Администрирование</button>
+          <div class="chapter-list" id="chapterList">
+            <article class="chapter-item is-open">
+              <button type="button" class="chapter-trigger" aria-expanded="true">
+                <span class="chapter-num">01</span>
+                <span class="chapter-title">Загрузчик и переключение режимов</span>
+                <span class="chapter-toggle" aria-hidden="true"></span>
+              </button>
+              <div class="chapter-panel">
+                <p>
+                  По умолчанию сервер стартует в режиме <code>RP</code>. Администратор может выключить все
+                  модули командой <code>fultmode off</code> и вернуть их обратно командой <code>fultmode rp</code>
+                  без перезагрузки процесса. Почти каждый модуль наследует <code>BaseModule&lt;Config&gt;</code>
+                  из <code>API/EngineCompat</code>.
+                </p>
+              </div>
+            </article>
+
+            <article class="chapter-item">
+              <button type="button" class="chapter-trigger" aria-expanded="false">
+                <span class="chapter-num">02</span>
+                <span class="chapter-title">Подклассы, квоты ролей и отряды</span>
+                <span class="chapter-toggle" aria-hidden="true"></span>
+              </button>
+              <div class="chapter-panel">
+                <p>
+                  <code>Subclass</code> и <code>RoleDistribution</code> распределяют роли по квотам, выдают
+                  снаряжение, описания и имена учёных (включая добавленных в v2.0 Доктора Ивана Золо,
+                  Доктора Астольфо и Доктора Феликса). Отряды МОГ Ню-7, Ро-9, Повстанцы Хаоса и Длань Змея
+                  вызываются через отдельные модули и заявки КИР (<code>cra list</code>).
+                </p>
+              </div>
+            </article>
+
+            <article class="chapter-item">
+              <button type="button" class="chapter-trigger" aria-expanded="false">
+                <span class="chapter-num">03</span>
+                <span class="chapter-title">Протоколы комплекса, камеры и CASSIE</span>
+                <span class="chapter-toggle" aria-hidden="true"></span>
+              </button>
+              <div class="chapter-panel">
+                <p>
+                  Внутри комплекса работают диспетчерская (<code>WarheadCode</code>, <code>DispatchHack</code>),
+                  протокол 106-N (<code>KillZone</code>), взлом интеркома и дверей, турели ТЗС,
+                  наблюдение через камеры (<code>CameraWatch</code>) и <code>BetterCassie</code> с английской
+                  озвучкой и русскими субтитрами по команде <code>cas</code>.
+                </p>
+              </div>
+            </article>
+
+            <article class="chapter-item">
+              <button type="button" class="chapter-trigger" aria-expanded="false">
+                <span class="chapter-num">04</span>
+                <span class="chapter-title">Ранения, КПК, звук и единая тема</span>
+                <span class="chapter-toggle" aria-hidden="true"></span>
+              </button>
+              <div class="chapter-panel">
+                <p>
+                  <code>InjurySystem</code> считает кровотечение и переломы по частям тела с учётом обвесов.
+                  Игроки пользуются КПК с мессенджером (<code>cpc help</code>), рацией с каналами, переноской
+                  и обыском тел, а <code>Theme</code> задаёт единую палитру подсказок из <code>Theme.yml</code>.
+                </p>
+              </div>
+            </article>
+
+            <article class="chapter-item">
+              <button type="button" class="chapter-trigger" aria-expanded="false">
+                <span class="chapter-num">05</span>
+                <span class="chapter-title">Защита релиза через ConfuserEx2</span>
+                <span class="chapter-toggle" aria-hidden="true"></span>
+              </button>
+              <div class="chapter-panel">
+                <p>
+                  Перед выкладкой Release-сборка проходит через <code>_Obfuscation/FultEngine.crproj</code>:
+                  включены запутывание потока управления, шифрование констант, ref proxy и anti-tamper.
+                  Переименование символов отключено, чтобы корректно работали конфиги YamlDotNet,
+                  команды и Harmony-патчи.
+                </p>
+              </div>
+            </article>
           </div>
-
-          <div class="search-wrap">
-            <label class="sr-only" for="moduleSearch">Поиск модуля или команды</label>
-            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
-            </svg>
-            <input id="moduleSearch" type="search" placeholder="Поиск по имени или команде (например, cas, scp131, fmem)..." autocomplete="off" />
-          </div>
         </div>
-
-        <p class="results-meta" id="resultsMeta" aria-live="polite">Показано 65 из 65 модулей</p>
-
-        <div class="modules-grid" id="modulesGrid"></div>
       </div>
     </section>
 
-    <section id="webpanel" class="section section-border">
-      <div class="container split-grid">
-        <div>
+    <!-- ACT III: ARCHIVAL PAPER DOSSIER (LIGHT CONTRAST SECTION) -->
+    <section class="band band-paper" id="registry">
+      <div class="wrap">
+        <div class="paper-head">
+          <div>
+            <h2>Реестр модулей</h2>
+            <p class="paper-sub">
+              Полный перечень из 65 модулей сборки v2.0. Нажмите на любую строку, чтобы увидеть путь к конфигу и скопировать команду.
+            </p>
+          </div>
+
+          <div class="paper-search">
+            <label class="sr-only" for="moduleSearch">Поиск по модулям и командам</label>
+            <input id="moduleSearch" type="search" placeholder="Найти модуль или команду..." autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="tab-strip" role="tablist" aria-label="Категории модулей">
+          <button type="button" class="tab-btn is-active" data-cat="all" role="tab" aria-selected="true">Все <span id="countAll">65</span></button>
+          <button type="button" class="tab-btn" data-cat="roles" role="tab" aria-selected="false">Роли и отряды <span>5</span></button>
+          <button type="button" class="tab-btn" data-cat="scp" role="tab" aria-selected="false">SCP <span>17</span></button>
+          <button type="button" class="tab-btn" data-cat="facility" role="tab" aria-selected="false">Комплекс <span>16</span></button>
+          <button type="button" class="tab-btn" data-cat="gameplay" role="tab" aria-selected="false">Механики <span>15</span></button>
+          <button type="button" class="tab-btn" data-cat="ui" role="tab" aria-selected="false">Интерфейс <span>4</span></button>
+          <button type="button" class="tab-btn" data-cat="admin" role="tab" aria-selected="false">Сервер и админ <span>8</span></button>
+        </div>
+
+        <div class="registry-meta-bar">
+          <span id="resultsMeta" aria-live="polite">Показано 65 из 65</span>
+          <span class="registry-hint">Нажмите на строку для пути конфига</span>
+        </div>
+
+        <div class="registry-list" id="registryList"></div>
+      </div>
+    </section>
+
+    <!-- ACT IV: REAL CODE TOPOLOGY -->
+    <section class="band band-dark" id="topology">
+      <div class="wrap">
+        <div class="topology-head">
+          <div>
+            <h2>Топология кодовой базы</h2>
+            <p class="editorial-intro">
+              Реальный граф зависимостей FULT-ENGINE, собранный через graphify: 384 файла кода, 9 345 узлов,
+              21 529 связей и 449 тематических сообществ.
+            </p>
+          </div>
+          <div class="graph-switch" role="group" aria-label="Выбор вида графа">
+            <button type="button" class="switch-btn is-active" data-src="assets/graph-overview.png" data-caption="Общая карта FULT-ENGINE: 449 сообществ и связи между слоями Platform, API и Module." aria-pressed="true">
+              Общая карта
+            </button>
+            <button type="button" class="switch-btn" data-src="assets/graph-detail.png" data-caption="Центр графа: ключевые узлы загрузчика, событий игроков, хинтов и подсистем SCP." aria-pressed="false">
+              Центр графа
+            </button>
+          </div>
+        </div>
+
+        <figure class="graph-stage">
+          <button type="button" class="graph-zoom-trigger" id="graphZoomBtn" aria-label="Открыть граф во весь экран">
+            <img id="graphImage" src="assets/graph-overview.png" alt="Граф зависимостей FULT-ENGINE: 449 сообществ кода" loading="lazy" />
+            <span class="zoom-label">Увеличить</span>
+          </button>
+          <figcaption id="graphCaption">
+            Общая карта FULT-ENGINE: 449 сообществ и связи между слоями Platform, API и Module.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ACT V: WEBPANEL WITH DOCUMENTARY ARTWORK -->
+    <section class="band band-charcoal" id="webpanel">
+      <div class="wrap split-feature">
+        <div class="split-photo">
+          <img src="assets/control-desk.jpg" alt="Пульт наблюдения подземного комплекса" loading="lazy" />
+        </div>
+
+        <div class="split-copy">
           <h2>Веб-панель администрации</h2>
-          <p class="body-copy">
-            В папке <code>_WebPanel/</code> работает отдельный сайт на Node.js (Express, EJS, <code>better-sqlite3</code>) со входом через Steam.
-            Панель ведёт список админов, роли и варны, а роли подтягивает из <code>config_remoteadmin.txt</code> или по HTTP прямо из плагина.
+          <p class="editorial-intro">
+            В каталоге <code>_WebPanel/</code> лежит отдельное веб-приложение на Node.js
+            (Express, EJS, <code>better-sqlite3</code>) с авторизацией через Steam (<code>passport-steam</code>).
+            В панели ведутся карточки админов, роли и варны.
           </p>
-          <ul class="plain-list">
-            <li>Авторизация через Steam OpenID (<code>passport-steam</code>) без лишних паролей.</li>
-            <li>Хранение карточек админов, ролей и истории варнов в локальной базе SQLite.</li>
-            <li>Синхронизация ролей с сервером SCP:SL без ручной правки конфигов.</li>
-          </ul>
-          <div class="code-block">
-            <div class="code-bar">
-              <span>Запуск веб-панели</span>
-              <button type="button" class="copy-btn" data-copy="cd _WebPanel && npm install && npm start">Копировать</button>
+          <p class="body-muted">
+            Список ролей подтягивается напрямую из <code>config_remoteadmin.txt</code> или приходит по HTTP
+            от плагина на сервере. Ручная синхронизация конфигов не требуется.
+          </p>
+
+          <div class="cmd-sheet">
+            <div class="cmd-sheet-head">
+              <span>Запуск _WebPanel локально</span>
+              <button type="button" class="copy-inline" data-copy="cd _WebPanel && npm install && cp .env.example .env && npm run init-db && npm start">Копировать</button>
             </div>
             <pre><code>cd _WebPanel
 npm install
+cp .env.example .env
+npm run init-db
 npm start</code></pre>
-          </div>
-        </div>
-
-        <div class="panel-preview" aria-label="Пример интерфейса веб-панели администрации">
-          <div class="preview-bar">
-            <span class="mono-text">_WebPanel / Состав администрации</span>
-            <span class="sync-pill">Sync OK</span>
-          </div>
-          <div class="preview-rows">
-            <div class="preview-row preview-head">
-              <span>Сотрудник</span>
-              <span>Роль</span>
-              <span>Варны</span>
-            </div>
-            <div class="preview-row">
-              <span><strong>pufikewsd</strong><small class="mono-text">76561198...4102</small></span>
-              <span><span class="role-tag role-owner">Owner</span></span>
-              <span class="mono-num">0 / 3</span>
-            </div>
-            <div class="preview-row">
-              <span><strong>Доктор Иван Золо</strong><small class="mono-text">76561198...8819</small></span>
-              <span><span class="role-tag role-admin">Senior Admin</span></span>
-              <span class="mono-num">0 / 3</span>
-            </div>
-            <div class="preview-row">
-              <span><strong>Доктор Феликс</strong><small class="mono-text">76561198...2390</small></span>
-              <span><span class="role-tag role-mod">Moderator</span></span>
-              <span class="mono-num">1 / 3</span>
-            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="install" class="section section-border">
-      <div class="container">
-        <div class="section-head">
-          <h2>Установка и пакеты</h2>
-          <p>
-            Для запуска на сервере достаточно скачать готовую обфусцированную сборку из релиза или подключить NuGet-пакет из GitHub Packages.
-          </p>
+    <!-- ACT VI: CLEAN ENGINEERING RELEASE & INSTALL SHEET -->
+    <section class="band band-dark" id="install">
+      <div class="wrap install-grid">
+        <div class="install-col">
+          <h2>Установка на сервер</h2>
+          <ol class="ledger-steps">
+            <li>
+              <span class="ledger-num">01</span>
+              <div>
+                <strong>Скачайте готовую сборку</strong>
+                <p>Возьмите обфусцированный файл <code>Fust-MODULE.dll</code> из релиза <code>v2.0</code> и скопируйте его в <code>LabAPI/plugins/global/</code>.</p>
+              </div>
+            </li>
+            <li>
+              <span class="ledger-num">02</span>
+              <div>
+                <strong>Проверьте зависимости</strong>
+                <p>На сервере должны стоять LabAPI <code>1.1.4</code>, <code>ProjectMER</code>, <code>HintServiceMeow</code>, <code>AudioPlayerApi</code> и <code>Harmony</code>.</p>
+              </div>
+            </li>
+            <li>
+              <span class="ledger-num">03</span>
+              <div>
+                <strong>Запустите сервер</strong>
+                <p>При первом старте плагин создаст <code>LabAPI/configs/global/FULT-ENGINE/</code>, разложит конфиги всех модулей в <code>ModuleConfig/</code> и подготовит папки <code>Audio</code>, <code>SSBinds</code> и <code>Security</code>.</p>
+              </div>
+            </li>
+          </ol>
         </div>
 
-        <ol class="steps-grid">
-          <li class="step-card">
-            <span class="step-index">01</span>
-            <h3>Скачайте сборку</h3>
-            <p>Возьмите файл <code>Fust-MODULE.dll</code> из последнего релиза v2.0 на GitHub. Файл уже собран в Release и защищён ConfuserEx2.</p>
-          </li>
-          <li class="step-card">
-            <span class="step-index">02</span>
-            <h3>Положите в LabAPI</h3>
-            <p>Скопируйте DLL в папку <code>LabAPI/plugins/global/</code> вашего сервера SCP: Secret Laboratory (требуется LabAPI <code>1.1.4</code>).</p>
-          </li>
-          <li class="step-card">
-            <span class="step-index">03</span>
-            <h3>Перезапустите сервер</h3>
-            <p>При первом запуске движок создаст YAML-конфиги всех 65 модулей и автоматически включит режим <code>RP</code>.</p>
-          </li>
-        </ol>
+        <div class="install-col install-release-col">
+          <h2>Релиз и GitHub Packages</h2>
+          <p class="body-muted">
+            Текущая стабильная версия <code>v2.0</code> собрана на базе коммита <code>f02ae45</code> под
+            <code>.NET Framework 4.8.1</code> и доступна как прямой файл в релизах и как NuGet-пакет.
+          </p>
 
-        <div class="install-actions">
-          <div class="code-block">
-            <div class="code-bar">
-              <span>NuGet-пакет в GitHub Packages</span>
-              <button type="button" class="copy-btn" data-copy="dotnet add package FultEngine --version 2.0.0 --source https://nuget.pkg.github.com/pufikewsd/index.json">Копировать</button>
+          <div class="cmd-sheet">
+            <div class="cmd-sheet-head">
+              <span>Установка через NuGet (GitHub Packages)</span>
+              <button type="button" class="copy-inline" data-copy="dotnet add package FultEngine --version 2.0.0 --source https://nuget.pkg.github.com/pufikewsd/index.json">Копировать</button>
             </div>
-            <pre><code>dotnet add package FultEngine --version 2.0.0 --source https://nuget.pkg.github.com/pufikewsd/index.json</code></pre>
+            <pre><code>dotnet add package FultEngine --version 2.0.0 \
+  --source https://nuget.pkg.github.com/pufikewsd/index.json</code></pre>
+          </div>
+
+          <div class="release-links">
+            <a class="action-primary" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
+              Открыть релиз v2.0
+            </a>
+            <a class="action-link" href="https://github.com/pufikewsd/FultEngine/packages" target="_blank" rel="noopener noreferrer">
+              Пакет в GitHub Packages
+            </a>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div>
-        <strong>FULT-ENGINE v2.0</strong>
-        <p>Серверный движок для SCP: Secret Laboratory на LabAPI.</p>
+  <footer class="colophon">
+    <div class="wrap colophon-inner">
+      <div class="colophon-left">
+        <span class="wordmark">FULT-ENGINE</span>
+        <span class="colophon-note">v2.0 / pufikewsd</span>
       </div>
-      <div class="footer-links">
-        <a href="https://github.com/pufikewsd/FultEngine" target="_blank" rel="noopener noreferrer">Репозиторий</a>
-        <a href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">Релиз v2.0</a>
+      <div class="colophon-links">
+        <a href="https://github.com/pufikewsd/FultEngine" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/pufikewsd/FultEngine/releases" target="_blank" rel="noopener noreferrer">Релизы</a>
         <a href="https://github.com/pufikewsd/FultEngine/packages" target="_blank" rel="noopener noreferrer">Packages</a>
       </div>
     </div>
   </footer>
+
+  <!-- Lightbox modal for graph -->
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Просмотр графа кода">
+    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Закрыть просмотр">Закрыть (Esc)</button>
+    <img id="lightboxImg" src="" alt="Увеличенный граф зависимостей FULT-ENGINE" />
+  </div>
 
   <script src="app.js"></script>
 </body>

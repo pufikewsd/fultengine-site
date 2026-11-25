@@ -2,10 +2,10 @@
   const CATEGORY_LABELS = {
     roles: "Роли и отряды",
     scp: "SCP",
-    facility: "Комплекс и протоколы",
-    gameplay: "Механики игроков",
+    facility: "Комплекс",
+    gameplay: "Механики",
     ui: "Интерфейс",
-    admin: "Администрирование"
+    admin: "Сервер и админ"
   };
 
   const MODULES = [
@@ -35,10 +35,10 @@
     { name: "DonorScp079", cat: "scp", desc: "Выдаёт SCP-079 донатерам.", cmds: ["aic"] },
     { name: "Scramble", cat: "scp", desc: "Закрывает в ПНВ голову SCP-096 цензурной кляксой и защищает от агра.", cmds: [] },
 
-    // Комплекс и протоколы (16)
+    // Комплекс (16)
     { name: "Protocol", cat: "facility", desc: "Запускает протоколы комплекса с подтверждением.", cmds: ["protocol", "protocolapprove"] },
     { name: "ProtocolPanel", cat: "facility", desc: "Ставит физическую панель протоколов на карте.", cmds: [] },
-    { name: "WarheadCode", cat: "facility", desc: "Управляет пультом диспетчерской и запуском протоколов.", cmds: ["warhead", "cirs", "protocols", "panel_block", "ro9", "cancel"] },
+    { name: "WarheadCode", cat: "facility", desc: "Управляет пультом диспетчерской и запуском протоколов.", cmds: ["warhead", "cirs", "protocols", "ro9"] },
     { name: "WarheadBlast", cat: "facility", desc: "Проигрывает музыку весь 120-секундный отсчёт боеголовки.", cmds: [] },
     { name: "PanelBlock", cat: "facility", desc: "Ставит кодовую панель блокировки на схематике.", cmds: [] },
     { name: "Lockdown", cat: "facility", desc: "Принимает запросы и блокирует КПП и двери.", cmds: [] },
@@ -51,9 +51,9 @@
     { name: "BetterCassie", cat: "facility", desc: "Озвучивает CASSIE на английском и выводит русский субтитр по пресетам.", cmds: ["cas"] },
     { name: "Turrets", cat: "facility", desc: "Ставит и управляет турелями ТЗС.", cmds: ["turret", "ps3", "ps4"] },
     { name: "Camera", cat: "facility", desc: "Включает режим камер у пульта наблюдения.", cmds: ["exit_cam"] },
-    { name: "CameraWatch", cat: "facility", desc: "Даёт смотреть в камеры и блокировать их.", cmds: ["cam look", "cam block", "cam unblock", "cam off"] },
+    { name: "CameraWatch", cat: "facility", desc: "Даёт смотреть в камеры и блокировать их.", cmds: ["cam look", "cam block", "cam off"] },
 
-    // Механики игроков (15)
+    // Механики (15)
     { name: "InjurySystem", cat: "gameplay", desc: "Считает ранения по частям тела: кровотечение, переломы и влияние обвесов.", cmds: [] },
     { name: "Armory", cat: "gameplay", desc: "Задаёт аптечки с разной силой лечения.", cmds: [] },
     { name: "AllyActions", cat: "gameplay", desc: "Позволяет лечить союзника аптечкой по клавише.", cmds: [] },
@@ -76,160 +76,214 @@
     { name: "SpectatorEffects", cat: "ui", desc: "Скрывает выбранные визуальные эффекты от зрителей.", cmds: [] },
     { name: "WelcomeMessage", cat: "ui", desc: "Показывает приветствие при входе на сервер.", cmds: [] },
 
-    // Администрирование и сервер (8)
+    // Сервер и админ (8)
     { name: "AdminToggle", cat: "admin", desc: "Переключает админские режимы прямо в раунде.", cmds: ["breakdoor", "dspl", "instakill", "size"] },
-    { name: "AntiRaid", cat: "admin", desc: "Защищает сервер от рейда и блокирует вход при тревоге.", cmds: ["antiraid", "lockdown", "restore", "revoke"] },
+    { name: "AntiRaid", cat: "admin", desc: "Защищает сервер от рейда и блокирует вход при тревоге.", cmds: ["antiraid", "lockdown", "restore"] },
     { name: "AudioDebug", cat: "admin", desc: "Проверяет работу звуковой подсистемы сервера.", cmds: [] },
-    { name: "MemoryWatch", cat: "admin", desc: "Замеряет память сервера, ассеты, объекты и сборку мусора.", cmds: ["fmem", "fmem top", "fmem assets", "fmem gc"] },
+    { name: "MemoryWatch", cat: "admin", desc: "Замеряет память сервера, ассеты, объекты и сборку мусора.", cmds: ["fmem", "fmem top", "fmem gc"] },
     { name: "ServerPerf", cat: "admin", desc: "Убирает роли-сироты и следит за утечками памяти.", cmds: [] },
     { name: "TeleportGuard", cat: "admin", desc: "Возвращает игроков, провалившихся под карту.", cmds: [] },
     { name: "Protections", cat: "admin", desc: "Защищает в безопасных зонах от боеголовки и тесла-ворот, бережёт двери от стрельбы.", cmds: [] },
     { name: "AutoMapLoader", cat: "admin", desc: "Подгружает схематики карты, пока сервер ждёт игроков.", cmds: [] }
   ];
 
-  // Interactive console simulator
-  const consoleOutput = document.getElementById("consoleOutput");
-  const activeCount = document.getElementById("activeCount");
-  const statusDot = document.getElementById("statusDot");
-  const statusText = document.getElementById("statusText");
-  const modeButtons = document.querySelectorAll(".mode-btn");
-  const cmdChips = document.querySelectorAll(".cmd-chip");
-
-  let currentMode = "rp";
-
-  function nowTime() {
-    const d = new Date();
-    return d.toTimeString().slice(0, 8);
+  // Solid header once scrolled past hero top
+  const topbar = document.getElementById("topbar");
+  function syncHeader() {
+    topbar.classList.toggle("is-solid", window.scrollY > 48);
   }
+  window.addEventListener("scroll", syncHeader, { passive: true });
+  syncHeader();
 
-  function appendLog(levelClass, levelLabel, text) {
-    const line = document.createElement("div");
-    line.className = "log-line";
-    line.innerHTML = `<span class="log-time">[${nowTime()}]</span> <span class="${levelClass}">${levelLabel}</span> ${text}`;
-    consoleOutput.appendChild(line);
-    while (consoleOutput.children.length > 9) {
-      consoleOutput.removeChild(consoleOutput.firstChild);
+  if (window.location.hash) {
+    const target = document.querySelector(window.location.hash);
+    if (target) {
+      target.scrollIntoView({ behavior: "instant" });
+      syncHeader();
     }
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
   }
 
-  modeButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const mode = btn.dataset.mode;
-      if (mode === currentMode) return;
-      currentMode = mode;
-
-      modeButtons.forEach((b) => {
-        const active = b.dataset.mode === mode;
-        b.classList.toggle("is-active", active);
-        b.setAttribute("aria-pressed", String(active));
+  // Editorial chapters accordion
+  document.querySelectorAll(".chapter-trigger").forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      const item = trigger.closest(".chapter-item");
+      const wasOpen = item.classList.contains("is-open");
+      document.querySelectorAll(".chapter-item").forEach((el) => {
+        el.classList.remove("is-open");
+        el.querySelector(".chapter-trigger").setAttribute("aria-expanded", "false");
       });
-
-      if (mode === "rp") {
-        activeCount.textContent = "65 / 65";
-        statusDot.classList.remove("is-off");
-        statusText.classList.remove("is-off");
-        statusText.textContent = "ONLINE";
-        appendLog("log-ok", "MODE", "fultmode rp: включены все 65 модулей FULT-ENGINE.");
-      } else {
-        activeCount.textContent = "0 / 65";
-        statusDot.classList.add("is-off");
-        statusText.classList.add("is-off");
-        statusText.textContent = "STANDBY";
-        appendLog("log-warn", "MODE", "fultmode off: модули остановлены, сервер переведён в базовый режим.");
+      if (!wasOpen) {
+        item.classList.add("is-open");
+        trigger.setAttribute("aria-expanded", "true");
       }
     });
   });
 
-  const CMD_RESPONSES = {
-    "fmem top": ["log-ok", "MEM", "GC Heap: 412 MB | Unity Objects: 14 280 | Топ: MapSchematic (64 MB)"],
-    "cas": ["log-accent", "CASSIE", "Озвучен пресет: «Внимание. В секторе тяжёлого содержания объявлен код Красный»."],
-    "cra list": ["log-ok", "CIR", "Активных заявок КИР: 2 (#14 МОГ Ню-7, #15 Отряд Ро-9)."],
-    "scp131 give": ["log-accent", "SCP-131", "Игроку #7 выдана роль SCP-131-A. Фиксация SCP-173 активна."],
-    "antiraid": ["log-warn", "GUARD", "AntiRaid: активен. Подозрительных подключений за 10 мин: 0."]
-  };
-
-  cmdChips.forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const cmd = chip.dataset.cmd;
-      if (currentMode === "off") {
-        appendLog("log-warn", "DENY", `Команда «${cmd}» недоступна в режиме OFF. Включите RP.`);
-        return;
-      }
-      const [cls, label, msg] = CMD_RESPONSES[cmd] || ["log-ok", "OK", `Выполнена команда ${cmd}`];
-      appendLog(cls, label, msg);
-    });
-  });
-
-  // Modules catalog rendering & filtering
-  const modulesGrid = document.getElementById("modulesGrid");
+  // Archival paper registry
+  const registryList = document.getElementById("registryList");
   const resultsMeta = document.getElementById("resultsMeta");
-  const filterButtons = document.querySelectorAll(".filter-btn");
   const searchInput = document.getElementById("moduleSearch");
+  const tabButtons = document.querySelectorAll(".tab-btn");
   const countAll = document.getElementById("countAll");
 
   countAll.textContent = String(MODULES.length);
 
-  let selectedCat = "all";
-  let searchQuery = "";
+  let activeCat = "all";
+  let query = "";
+  let showAllInDefault = false;
 
-  function renderModules() {
-    const q = searchQuery.trim().toLowerCase();
-    const filtered = MODULES.filter((m) => {
-      const matchCat = selectedCat === "all" || m.cat === selectedCat;
-      if (!matchCat) return false;
+  function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function renderRegistry() {
+    const q = query.trim().toLowerCase();
+    const filtered = MODULES.map((m, idx) => ({ ...m, num: idx + 1 })).filter((m) => {
+      if (activeCat !== "all" && m.cat !== activeCat) return false;
       if (!q) return true;
-      const haystack = `${m.name} ${m.desc} ${m.cmds.join(" ")} ${CATEGORY_LABELS[m.cat]}`.toLowerCase();
-      return haystack.includes(q);
+      const hay = `${m.name} ${m.desc} ${m.cmds.join(" ")} ${CATEGORY_LABELS[m.cat]}`.toLowerCase();
+      return hay.includes(q);
     });
 
-    resultsMeta.textContent = `Показано ${filtered.length} из ${MODULES.length} модулей`;
+    const limitDefault = activeCat === "all" && !q && !showAllInDefault;
+    const visible = limitDefault ? filtered.slice(0, 16) : filtered;
+
+    resultsMeta.textContent = limitDefault
+      ? `Показано ${visible.length} из ${MODULES.length}`
+      : `Найдено ${filtered.length} из ${MODULES.length}`;
 
     if (filtered.length === 0) {
-      modulesGrid.innerHTML = `<div class="empty-state">Ничего не найдено по запросу «${q.replace(/</g, "&lt;")}». Попробуйте очистить поиск или выбрать другую категорию.</div>`;
+      registryList.innerHTML = `<div class="reg-empty">Ничего не найдено по запросу «${escapeHtml(q)}». Очистите поле поиска или переключите категорию.</div>`;
       return;
     }
 
-    modulesGrid.innerHTML = filtered
+    const rowsHtml = visible
       .map((m) => {
+        const idxStr = String(m.num).padStart(2, "0");
+        const cfgPath = `LabAPI/configs/global/FULT-ENGINE/ModuleConfig/${m.name}.yml`;
         const cmdsHtml = m.cmds.length
-          ? `<div class="module-cmds">${m.cmds.map((c) => `<code>${c}</code>`).join("")}</div>`
-          : "";
+          ? `<span class="reg-cmds">${m.cmds.map((c) => `<code>${escapeHtml(c)}</code>`).join("")}</span>`
+          : `<span class="reg-cmds"></span>`;
+
         return `
-          <article class="module-item">
-            <div class="module-item-top">
-              <strong class="module-name">${m.name}</strong>
-              <span class="module-cat">${CATEGORY_LABELS[m.cat]}</span>
+          <div class="reg-row">
+            <button type="button" class="reg-row-btn" aria-expanded="false">
+              <span class="reg-idx">${idxStr}</span>
+              <span class="reg-name">${escapeHtml(m.name)}</span>
+              <span class="reg-cat">${CATEGORY_LABELS[m.cat]}</span>
+              <span class="reg-desc">${escapeHtml(m.desc)}</span>
+              ${cmdsHtml}
+            </button>
+            <div class="reg-detail">
+              <span class="reg-detail-path">Конфиг: ${escapeHtml(cfgPath)}</span>
+              <button type="button" class="reg-copy-btn" data-copy="${escapeHtml(cfgPath)}">Скопировать путь</button>
             </div>
-            <p class="module-desc">${m.desc}</p>
-            ${cmdsHtml}
-          </article>
+          </div>
         `;
       })
       .join("");
+
+    const moreHtml = limitDefault
+      ? `<div class="reg-more-wrap"><button type="button" class="reg-more-btn" id="showAllModulesBtn">Показать все ${MODULES.length} модулей</button></div>`
+      : "";
+
+    registryList.innerHTML = rowsHtml + moreHtml;
   }
 
-  filterButtons.forEach((btn) => {
+  registryList.addEventListener("click", async (e) => {
+    const moreBtn = e.target.closest("#showAllModulesBtn");
+    if (moreBtn) {
+      showAllInDefault = true;
+      renderRegistry();
+      return;
+    }
+
+    const copyBtn = e.target.closest(".reg-copy-btn");
+    if (copyBtn) {
+      e.stopPropagation();
+      const text = copyBtn.dataset.copy || "";
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = "Скопировано";
+        setTimeout(() => {
+          copyBtn.textContent = "Скопировать путь";
+        }, 1600);
+      } catch {
+        copyBtn.textContent = "Ошибка копирования";
+      }
+      return;
+    }
+
+    const rowBtn = e.target.closest(".reg-row-btn");
+    if (!rowBtn) return;
+    const row = rowBtn.closest(".reg-row");
+    const isOpen = row.classList.toggle("is-open");
+    rowBtn.setAttribute("aria-expanded", String(isOpen));
+  });
+
+  tabButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      selectedCat = btn.dataset.cat;
-      filterButtons.forEach((b) => {
+      activeCat = btn.dataset.cat;
+      tabButtons.forEach((b) => {
         const active = b === btn;
         b.classList.toggle("is-active", active);
-        b.setAttribute("aria-pressed", String(active));
+        b.setAttribute("aria-selected", String(active));
       });
-      renderModules();
+      renderRegistry();
     });
   });
 
   searchInput.addEventListener("input", (e) => {
-    searchQuery = e.target.value;
-    renderModules();
+    query = e.target.value;
+    renderRegistry();
   });
 
-  renderModules();
+  renderRegistry();
 
-  // Copy buttons
-  document.querySelectorAll(".copy-btn").forEach((btn) => {
+  // Graph view switcher + lightbox
+  const graphImage = document.getElementById("graphImage");
+  const graphCaption = document.getElementById("graphCaption");
+  const graphSwitchBtns = document.querySelectorAll(".switch-btn");
+  const graphZoomBtn = document.getElementById("graphZoomBtn");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+  const lightboxClose = document.getElementById("lightboxClose");
+
+  graphSwitchBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      graphSwitchBtns.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle("is-active", active);
+        b.setAttribute("aria-pressed", String(active));
+      });
+      graphImage.src = btn.dataset.src;
+      graphCaption.textContent = btn.dataset.caption;
+    });
+  });
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    document.body.style.overflow = "";
+    graphZoomBtn.focus();
+  }
+
+  graphZoomBtn.addEventListener("click", () => {
+    lightboxImg.src = graphImage.src;
+    lightbox.hidden = false;
+    document.body.style.overflow = "hidden";
+    lightboxClose.focus();
+  });
+
+  lightboxClose.addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
+  });
+
+  // Inline command copy buttons
+  document.querySelectorAll(".copy-inline").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const text = btn.dataset.copy || "";
       try {
@@ -238,9 +292,9 @@
         btn.textContent = "Скопировано";
         setTimeout(() => {
           btn.textContent = orig;
-        }, 1800);
+        }, 1600);
       } catch {
-        btn.textContent = "Не удалось скопировать";
+        btn.textContent = "Ошибка";
       }
     });
   });
