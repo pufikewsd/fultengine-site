@@ -10,6 +10,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script>
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.add("motion-on");
+    }
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -19,27 +24,29 @@
       <a class="brand" href="#top" aria-label="FULT-ENGINE главная">
         <span class="brand-glyph" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="2" y="2" width="9" height="9" rx="2.5" fill="#2347F2" />
-            <rect x="13" y="2" width="9" height="9" rx="2.5" fill="#121318" />
-            <rect x="2" y="13" width="9" height="9" rx="2.5" fill="#121318" />
-            <rect x="13" y="13" width="9" height="9" rx="2.5" fill="#FF6428" />
+            <rect class="glyph-cobalt" x="2" y="2" width="9" height="9" rx="2.5" fill="#2347F2" />
+            <rect class="glyph-dark-1" x="13" y="2" width="9" height="9" rx="2.5" fill="#121318" />
+            <rect class="glyph-dark-2" x="2" y="13" width="9" height="9" rx="2.5" fill="#121318" />
+            <rect class="glyph-orange" x="13" y="13" width="9" height="9" rx="2.5" fill="#FF6428" />
           </svg>
         </span>
         <span class="brand-name">FULT-ENGINE</span>
       </a>
 
-      <nav class="site-nav" aria-label="Разделы">
-        <a href="#engine">Движок</a>
-        <a href="#modules">Модули</a>
-        <a href="#topology">Граф кода</a>
-        <a href="#webpanel">Веб-панель</a>
-        <a href="#install">Установка</a>
+      <nav class="site-nav" id="siteNav" aria-label="Разделы">
+        <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
+        <a href="#engine" data-section="engine">Движок</a>
+        <a href="#modules" data-section="modules">Модули</a>
+        <a href="#topology" data-section="topology">Граф кода</a>
+        <a href="#webpanel" data-section="webpanel">Веб-панель</a>
+        <a href="#install" data-section="install">Установка</a>
       </nav>
 
-      <a class="nav-pill" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
+      <a class="nav-pill magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
         Релиз v2.0
       </a>
     </div>
+    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   </header>
 
   <main id="main">
@@ -48,14 +55,14 @@
       <div class="wrap">
         <div class="hero-stage">
           <div class="hero-copy">
-            <h1>FULT&#8209;ENGINE</h1>
-            <p class="hero-lead">
+            <h1 class="hero-anim" style="--d: 0ms">FULT&#8209;ENGINE</h1>
+            <p class="hero-lead hero-anim" style="--d: 90ms">
               Модульный серверный движок для SCP: Secret Laboratory на базе LabAPI.
               Шестьдесят пять игровых и серверных модулей собраны в одну библиотеку
               <code class="nowrap">Fust-MODULE.dll</code>.
             </p>
-            <div class="hero-actions">
-              <a class="btn btn-cobalt" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
+            <div class="hero-actions hero-anim" style="--d: 170ms">
+              <a class="btn btn-cobalt magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
                 Скачать v2.0
               </a>
               <a class="btn btn-outline" href="https://github.com/pufikewsd/FultEngine" target="_blank" rel="noopener noreferrer">
@@ -64,15 +71,18 @@
             </div>
           </div>
 
-          <div class="hero-visual">
-            <img src="assets/hero-sculpture.jpg" alt="Абстрактная модульная 3D-скульптура ядра FULT-ENGINE" fetchpriority="high" />
+          <div class="hero-visual hero-anim-visual" id="heroTilt" data-tilt>
+            <div class="tilt-inner">
+              <img src="assets/hero-sculpture.jpg" alt="Абстрактная модульная 3D-скульптура ядра FULT-ENGINE" fetchpriority="high" />
+              <div class="tilt-sheen" aria-hidden="true"></div>
+            </div>
           </div>
         </div>
 
-        <dl class="hero-metrics" aria-label="Характеристики сборки">
+        <dl class="hero-metrics hero-anim" style="--d: 260ms" aria-label="Характеристики сборки">
           <div>
             <dt>Состав сборки</dt>
-            <dd>65 модулей</dd>
+            <dd><span data-count="65">65</span> модулей</dd>
           </div>
           <div>
             <dt>Платформа</dt>
@@ -93,8 +103,8 @@
     <!-- BLOCK 2: VIVID COBALT ARCHITECTURE BAND -->
     <section class="band band-cobalt" id="engine">
       <div class="wrap cobalt-grid">
-        <div class="cobalt-lead">
-          <div class="cobalt-num" aria-hidden="true">65</div>
+        <div class="cobalt-lead" data-reveal>
+          <div class="cobalt-num" data-count="65" aria-hidden="true">65</div>
           <h2>Одна сборка вместо десятков плагинов</h2>
           <p>
             При запуске сервера класс <code>FultEngine</code> в <code>LoaderModule</code> сканирует сборку,
@@ -103,7 +113,7 @@
           </p>
         </div>
 
-        <div class="studio-explorer">
+        <div class="studio-explorer" data-reveal style="--rd: 100ms">
           <div class="explorer-tabs" role="tablist" aria-label="Слои движка">
             <button type="button" class="exp-tab is-active" data-layer="loader" role="tab" aria-selected="true">Загрузчик</button>
             <button type="button" class="exp-tab" data-layer="gameplay" role="tab" aria-selected="false">Роли и механики</button>
@@ -130,10 +140,15 @@
       </div>
     </section>
 
+    <!-- INTERACTIVE KINETIC MODULE TICKER -->
+    <div class="ticker-band" aria-label="Быстрый переход к популярным модулям">
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+
     <!-- BLOCK 3: CLEAN GALLERY MODULE EXPLORER -->
     <section class="band band-white" id="modules">
       <div class="wrap">
-        <div class="modules-head">
+        <div class="modules-head" data-reveal>
           <div>
             <h2>Каталог модулей</h2>
             <p class="section-sub">
@@ -186,12 +201,15 @@
     <!-- BLOCK 4: DEEP STUDIO DARK SHOWCASE (REAL GRAPH + WEBPANEL 3D) -->
     <section class="band band-dark" id="topology">
       <div class="wrap">
-        <div class="dark-head">
+        <div class="dark-head" data-reveal>
           <div>
             <h2>Топология кодовой базы</h2>
             <p class="dark-sub">
-              Настоящий граф связей FULT-ENGINE, построенный через graphify: 384 файла C#, 9 345 узлов,
-              21 529 зависимостей и 449 сообществ.
+              Настоящий граф связей FULT-ENGINE, построенный через graphify:
+              <strong class="stat-inline" data-count="384">384</strong> файла C#,
+              <strong class="stat-inline" data-count="9345">9 345</strong> узлов,
+              <strong class="stat-inline" data-count="21529">21 529</strong> зависимостей и
+              <strong class="stat-inline" data-count="449">449</strong> сообществ.
             </p>
           </div>
           <div class="seg-switch" role="group" aria-label="Режим графа">
@@ -204,7 +222,7 @@
           </div>
         </div>
 
-        <figure class="graph-frame">
+        <figure class="graph-frame" data-reveal style="--rd: 80ms">
           <button type="button" class="graph-trigger" id="graphZoomBtn" aria-label="Открыть граф во весь экран">
             <img id="graphImage" src="assets/graph-overview.png" alt="Граф зависимостей FULT-ENGINE: 449 сообществ" loading="lazy" />
             <span class="zoom-badge">Открыть полностью</span>
@@ -213,11 +231,14 @@
         </figure>
 
         <div class="webpanel-split" id="webpanel">
-          <div class="webpanel-art">
-            <img src="assets/webpanel-3d.jpg" alt="Абстрактная 3D-композиция модульной веб-панели управления" loading="lazy" />
+          <div class="webpanel-art" data-tilt data-reveal>
+            <div class="tilt-inner">
+              <img src="assets/webpanel-3d.jpg" alt="Абстрактная 3D-композиция модульной веб-панели управления" loading="lazy" />
+              <div class="tilt-sheen tilt-sheen-dark" aria-hidden="true"></div>
+            </div>
           </div>
 
-          <div class="webpanel-copy">
+          <div class="webpanel-copy" data-reveal style="--rd: 90ms">
             <h2>Веб-панель администрации</h2>
             <p class="dark-sub">
               Внутри <code>_WebPanel/</code> работает отдельное приложение на Node.js (Express, EJS,
@@ -247,7 +268,7 @@ npm start</code></pre>
     <!-- BLOCK 5: TWO-TONE INSTALL + VIVID TANGERINE RELEASE -->
     <section class="band band-studio" id="install">
       <div class="wrap install-split">
-        <div class="install-sheet">
+        <div class="install-sheet" data-reveal>
           <h2>Установка на сервер</h2>
           <ol class="step-list">
             <li>
@@ -274,7 +295,7 @@ npm start</code></pre>
           </ol>
         </div>
 
-        <div class="release-poster">
+        <div class="release-poster" data-reveal style="--rd: 100ms">
           <div class="poster-top">
             <span class="poster-ver">v2.0</span>
             <span class="poster-tag">ConfuserEx2 / .NET 4.8.1</span>
@@ -295,7 +316,7 @@ npm start</code></pre>
           </div>
 
           <div class="poster-actions">
-            <a class="btn btn-ink" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
+            <a class="btn btn-ink magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
               Скачать Fust-MODULE.dll
             </a>
             <a class="poster-link" href="https://github.com/pufikewsd/FultEngine/packages" target="_blank" rel="noopener noreferrer">
@@ -325,6 +346,8 @@ npm start</code></pre>
     <button type="button" class="lightbox-close" id="lightboxClose">Закрыть (Esc)</button>
     <img id="lightboxImg" src="" alt="Граф зависимостей FULT-ENGINE" />
   </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <script src="app.js"></script>
 </body>
