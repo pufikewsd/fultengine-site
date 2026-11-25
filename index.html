@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FULT-ENGINE v2.0 | Модульный серверный движок на LabAPI</title>
-  <meta name="description" content="FULT-ENGINE: модульный серверный движок для SCP: Secret Laboratory на базе LabAPI. 65 модулей в одной сборке Fust-MODULE.dll и веб-панель администрации." />
+  <meta name="description" content="FULT-ENGINE: модульный серверный движок для SCP: Secret Laboratory на базе LabAPI. 65 модулей, магазин модулей, генератор CINFO и ключ-карт." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23121318'/%3E%3Crect x='6' y='6' width='10' height='10' rx='3' fill='%232347F2'/%3E%3Crect x='16' y='16' width='10' height='10' rx='3' fill='%23FF6428'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -36,8 +36,8 @@
       <nav class="site-nav" id="siteNav" aria-label="Разделы">
         <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
         <a href="#engine" data-section="engine">Конструктор</a>
-        <a href="#sandbox" data-section="sandbox">Песочница</a>
-        <a href="#modules" data-section="modules">Модули</a>
+        <a href="#sandbox" data-section="sandbox">Генераторы</a>
+        <a href="#modules" data-section="modules">Магазин</a>
         <a href="#topology" data-section="topology">Граф кода</a>
         <a href="#install" data-section="install">Установка</a>
       </nav>
@@ -48,11 +48,21 @@
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <span class="cmdk-label">Поиск</span>
           <kbd>Ctrl K</kbd>
         </button>
+
+        <button type="button" class="cart-trigger" id="openCart" aria-label="Открыть корзину модулей">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="9" cy="21" r="1" />
+            <circle cx="20" cy="21" r="1" />
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+          </svg>
+          <span class="cart-label">Корзина</span>
+          <span class="cart-badge" id="cartCount">0</span>
+        </button>
+
         <a class="nav-pill magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
-          Релиз v2.0
+          v2.0
         </a>
       </div>
     </div>
@@ -72,11 +82,11 @@
               <code class="nowrap">Fust-MODULE.dll</code>.
             </p>
             <div class="hero-actions hero-anim" style="--d: 170ms">
-              <a class="btn btn-cobalt magnetic" href="https://github.com/pufikewsd/FultEngine/releases/tag/v2.0" target="_blank" rel="noopener noreferrer">
-                Скачать v2.0
+              <a class="btn btn-cobalt magnetic" href="#modules">
+                Выбрать модули
               </a>
               <a class="btn btn-outline" href="#sandbox">
-                Попробовать в песочнице
+                Генератор CINFO и карт
               </a>
             </div>
           </div>
@@ -110,7 +120,7 @@
       </div>
     </section>
 
-    <!-- BLOCK 2: VIVID COBALT INTERACTIVE BUILD CONFIGURATOR -->
+    <!-- BLOCK 2: VIVID COBALT BUILD CONFIGURATOR -->
     <section class="band band-cobalt" id="engine">
       <div class="wrap cobalt-grid">
         <div class="cobalt-lead" data-reveal>
@@ -182,25 +192,255 @@
       <div class="ticker-track" id="tickerTrack"></div>
     </div>
 
-    <!-- BLOCK 2.5: INTERACTIVE SANDBOX (THEME.YML + LIVE COMMAND CONSOLE) -->
+    <!-- BLOCK 2.5: INTERACTIVE GENERATORS & SANDBOX -->
     <section class="band band-studio" id="sandbox">
       <div class="wrap">
         <div class="sandbox-head" data-reveal>
           <div>
-            <h2>Интерактивная песочница</h2>
+            <h2>Генераторы и песочница</h2>
             <p class="section-sub">
-              Попробуйте два живых инструмента движка прямо в браузере: соберите палитру <code>Theme.yml</code> с превью хинта или поуправляйте консолью команд <code>LoaderModule</code>.
+              Создавайте готовые бейджи <code>CINFO</code> и ключ-карты <code>ckeycard</code> в стиле <code>Subclass</code>, настраивайте цвета <code>Theme.yml</code> и проверяйте команды сервера.
             </p>
           </div>
 
-          <div class="sandbox-tabs" role="tablist" aria-label="Режим песочницы">
-            <button type="button" class="sb-tab is-active" data-sb="theme" role="tab" aria-selected="true">Редактор Theme.yml</button>
-            <button type="button" class="sb-tab" data-sb="console" role="tab" aria-selected="false">Консоль команд</button>
+          <div class="sandbox-tabs" role="tablist" aria-label="Инструмент песочницы">
+            <button type="button" class="sb-tab is-active" data-sb="cinfo" role="tab" aria-selected="true">Генератор CINFO</button>
+            <button type="button" class="sb-tab" data-sb="keycard" role="tab" aria-selected="false">Карточки (ckeycard)</button>
+            <button type="button" class="sb-tab" data-sb="theme" role="tab" aria-selected="false">Theme.yml</button>
+            <button type="button" class="sb-tab" data-sb="console" role="tab" aria-selected="false">Консоль</button>
           </div>
         </div>
 
-        <!-- TAB 1: THEME.YML LIVE DESIGNER -->
-        <div class="sandbox-panel is-active" id="sbTheme" role="tabpanel">
+        <!-- TAB 1: CINFO GENERATOR -->
+        <div class="sandbox-panel is-active" id="sbCinfo" role="tabpanel">
+          <div class="theme-studio">
+            <div class="theme-controls">
+              <div class="field-group-label">Служба и стиль оформления</div>
+              <div class="theme-presets" id="cinfoPresets" role="group" aria-label="Пресеты служб для CINFO">
+                <button type="button" class="tp-btn is-active" data-cp="science">Научная служба</button>
+                <button type="button" class="tp-btn" data-cp="security">Служба безопасности</button>
+                <button type="button" class="tp-btn" data-cp="mtf">МОГ Ню-7</button>
+                <button type="button" class="tp-btn" data-cp="med">Медицина</button>
+                <button type="button" class="tp-btn" data-cp="classd">Класс D</button>
+                <button type="button" class="tp-btn" data-cp="chaos">Хаос</button>
+              </div>
+
+              <div class="form-grid-2">
+                <label class="studio-field">
+                  <span>Стиль CINFO</span>
+                  <select id="cinfoStyle">
+                    <option value="badge">Служебный бейдж (Subclass v5)</option>
+                    <option value="classic">Классика Subclass</option>
+                    <option value="combat">Боевой (с позывным и группой крови)</option>
+                  </select>
+                </label>
+                <label class="studio-field">
+                  <span>Цвет службы</span>
+                  <div class="color-input-wrap">
+                    <input type="color" id="cinfoColor" value="#58a6ff" />
+                    <span class="color-hex" id="cinfoHex">#58A6FF</span>
+                  </div>
+                </label>
+              </div>
+
+              <div class="form-grid-2">
+                <label class="studio-field">
+                  <span>Имя персонажа (size 21)</span>
+                  <input type="text" id="cinfoName" value="Доктор Феликс" />
+                </label>
+                <label class="studio-field">
+                  <span>Служба / отдел</span>
+                  <input type="text" id="cinfoDept" value="Научная служба" />
+                </label>
+              </div>
+
+              <div class="form-grid-2">
+                <label class="studio-field">
+                  <span>Должность / роль</span>
+                  <input type="text" id="cinfoRole" value="Старший исследователь" />
+                </label>
+                <label class="studio-field">
+                  <span>Доп. метка (позывной / кровь)</span>
+                  <input type="text" id="cinfoExtra" value="A(II)+ | Пропуск 3 ур." />
+                </label>
+              </div>
+
+              <label class="studio-field">
+                <span>Описание внешности (size 12)</span>
+                <input type="text" id="cinfoLook" value="Белый халат | На груди бейдж и КПК" />
+              </label>
+            </div>
+
+            <div class="theme-preview-col">
+              <div class="cinfo-stage" aria-label="Живой предпросмотр бейджа CINFO">
+                <div class="cinfo-stage-top">
+                  <span>Превью над персонажем</span>
+                  <span id="cinfoStyleLabel">Служебный бейдж v5</span>
+                </div>
+                <div class="cinfo-overhead" id="cinfoPreview"></div>
+                <div class="cinfo-silhouette" aria-hidden="true">
+                  <div class="sil-head"></div>
+                  <div class="sil-body"></div>
+                </div>
+              </div>
+
+              <div class="code-card code-card-dark theme-yaml-card">
+                <div class="code-card-top">
+                  <span>Готовый CINFO для Subclass.yml</span>
+                  <div class="cfg-actions">
+                    <button type="button" class="copy-btn" id="copyCinfoRaw">Копировать тег</button>
+                    <button type="button" class="copy-btn" id="copyCinfoYaml">YAML</button>
+                  </div>
+                </div>
+                <pre><code id="cinfoCodeOut"></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: KEYCARD GENERATOR (ckeycard + PNG) -->
+        <div class="sandbox-panel" id="sbKeycard" role="tabpanel" hidden>
+          <div class="theme-studio">
+            <div class="theme-controls">
+              <div class="field-group-label">Шаблон карты доступа</div>
+              <div class="theme-presets" id="kcPresets" role="group" aria-label="Шаблоны ключ-карт">
+                <button type="button" class="tp-btn is-active" data-kc="sb">СБ (MetalCase)</button>
+                <button type="button" class="tp-btn" data-kc="sci">Учёный (Site02)</button>
+                <button type="button" class="tp-btn" data-kc="mtf">МОГ (TaskForce)</button>
+                <button type="button" class="tp-btn" data-kc="admin">Дирекция (Management)</button>
+              </div>
+
+              <div class="form-grid-2">
+                <label class="studio-field">
+                  <span>Тип карты в игре</span>
+                  <select id="kcType">
+                    <option value="KeycardCustomMetalCase">KeycardCustomMetalCase</option>
+                    <option value="KeycardCustomSite02">KeycardCustomSite02</option>
+                    <option value="KeycardCustomTaskForce">KeycardCustomTaskForce</option>
+                    <option value="KeycardCustomManagement">KeycardCustomManagement</option>
+                  </select>
+                </label>
+                <label class="studio-field">
+                  <span>Служба</span>
+                  <input type="text" id="kcDept" value="Служба Безопасности" />
+                </label>
+              </div>
+
+              <div class="form-grid-2">
+                <label class="studio-field">
+                  <span>Должность</span>
+                  <input type="text" id="kcRole" value="Лейтенант СБ" />
+                </label>
+                <label class="studio-field">
+                  <span>Позывной / владелец</span>
+                  <input type="text" id="kcCallsign" value="Агент Рейнольдс" />
+                </label>
+              </div>
+
+              <div class="form-grid-3">
+                <label class="studio-field">
+                  <span>Содерж. (0-3)</span>
+                  <select id="kcPermCont">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                  </select>
+                </label>
+                <label class="studio-field">
+                  <span>Оружейная (0-3)</span>
+                  <select id="kcPermArm">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                  </select>
+                </label>
+                <label class="studio-field">
+                  <span>Админ (0-3)</span>
+                  <select id="kcPermAdm">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2" selected>2</option>
+                    <option value="3">3</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="form-grid-3">
+                <label class="studio-field">
+                  <span>Класс</span>
+                  <select id="kcClass">
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C" selected>C</option>
+                    <option value="D">D</option>
+                  </select>
+                </label>
+                <label class="studio-field">
+                  <span>Корпус</span>
+                  <div class="color-input-wrap">
+                    <input type="color" id="kcBg" value="#262b36" />
+                    <span class="color-hex" id="kcBgHex">#262B36</span>
+                  </div>
+                </label>
+                <label class="studio-field">
+                  <span>Акцент</span>
+                  <div class="color-input-wrap">
+                    <input type="color" id="kcAccent" value="#7cc4ff" />
+                    <span class="color-hex" id="kcAccentHex">#7CC4FF</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="theme-preview-col">
+              <div class="keycard-stage">
+                <div class="visual-keycard" id="visualKeycard">
+                  <div class="vk-stripe" id="vkStripe"></div>
+                  <div class="vk-head">
+                    <span class="vk-kicker">КАРТА ДОСТУПА / FULT-ENGINE</span>
+                    <span class="vk-type" id="vkType">MetalCase</span>
+                  </div>
+                  <div class="vk-dept" id="vkDept">Служба Безопасности</div>
+                  <div class="vk-body">
+                    <div class="vk-avatar" aria-hidden="true">ID</div>
+                    <div class="vk-info">
+                      <strong id="vkRole">Лейтенант СБ</strong>
+                      <div>Допуск: <span id="vkPerms">2 / 2 / 2</span></div>
+                      <div>Класс: <span id="vkClass">C</span></div>
+                    </div>
+                    <div class="vk-qr" aria-hidden="true">
+                      <span></span><span></span><span></span><span></span>
+                      <span></span><span></span><span></span><span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                  <div class="vk-foot">
+                    <span>Срок: до 01.01.2028</span>
+                    <span id="vkCallsign">Агент Рейнольдс</span>
+                  </div>
+                </div>
+
+                <div class="kc-export-row">
+                  <button type="button" class="btn btn-cobalt btn-sm" id="downloadKcPng">Скачать карточку PNG</button>
+                  <button type="button" class="btn btn-outline btn-sm" id="copyKcCmd">Скопировать ckeycard</button>
+                </div>
+              </div>
+
+              <div class="code-card code-card-dark theme-yaml-card">
+                <div class="code-card-top">
+                  <span>Команда ckeycard (Subclass.yml / RA)</span>
+                  <button type="button" class="copy-btn" id="copyKcCmd2">Копировать</button>
+                </div>
+                <pre><code id="kcCmdOut"></code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: THEME.YML LIVE DESIGNER -->
+        <div class="sandbox-panel" id="sbTheme" role="tabpanel" hidden>
           <div class="theme-studio">
             <div class="theme-controls">
               <div class="theme-presets" role="group" aria-label="Готовые темы">
@@ -272,7 +512,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: INTERACTIVE COMMAND CONSOLE -->
+        <!-- TAB 4: INTERACTIVE COMMAND CONSOLE -->
         <div class="sandbox-panel" id="sbConsole" role="tabpanel" hidden>
           <div class="console-studio">
             <div class="console-topbar">
@@ -312,14 +552,14 @@
       </div>
     </section>
 
-    <!-- BLOCK 3: CLEAN GALLERY MODULE EXPLORER -->
+    <!-- BLOCK 3: MODULE STORE & CATALOG -->
     <section class="band band-white" id="modules">
       <div class="wrap">
         <div class="modules-head" data-reveal>
           <div>
-            <h2>Каталог модулей</h2>
+            <h2>Магазин и каталог модулей</h2>
             <p class="section-sub">
-              Все 65 модулей актуальной сборки v2.0. Фильтруйте по категориям, ищите по командам или откройте любую карточку, чтобы скопировать путь к конфигу.
+              Покупайте отдельные модули или готовые наборы. От 5 модулей действует скидка 10%, от 15 модулей скидка 20%.
             </p>
           </div>
 
@@ -331,6 +571,39 @@
             </svg>
             <input id="moduleSearch" type="search" placeholder="Найти модуль или команду..." autocomplete="off" />
           </div>
+        </div>
+
+        <!-- BUNDLES -->
+        <div class="bundles-grid" data-reveal>
+          <article class="bundle-card bundle-featured">
+            <div class="bundle-top">
+              <span class="bundle-tag">Полный доступ</span>
+              <strong class="bundle-price">4 990 ₽</strong>
+            </div>
+            <h3>FULT-ENGINE v2.0 (все 65 модулей)</h3>
+            <p>Полная сборка <code>Fust-MODULE.dll</code>, веб-панель <code>_WebPanel</code>, обновления ветки v2 и помощь с запуском.</p>
+            <button type="button" class="bundle-add" data-bundle="bundle_full">Добавить в корзину</button>
+          </article>
+
+          <article class="bundle-card">
+            <div class="bundle-top">
+              <span class="bundle-tag">17 модулей</span>
+              <strong class="bundle-price">2 490 ₽</strong>
+            </div>
+            <h3>Набор SCP-объектов</h3>
+            <p>Все 17 SCP-модулей: <code>Scp008</code>, <code>Scp131</code>, <code>Scp106Capture</code>, <code>BetterSCP</code>, <code>Scramble</code>, <code>CageContainment</code>.</p>
+            <button type="button" class="bundle-add" data-bundle="bundle_scp">Добавить в корзину</button>
+          </article>
+
+          <article class="bundle-card">
+            <div class="bundle-top">
+              <span class="bundle-tag">20 модулей</span>
+              <strong class="bundle-price">2 790 ₽</strong>
+            </div>
+            <h3>Набор RP, ролей и механик</h3>
+            <p><code>Subclass</code>, <code>RoleDistribution</code>, <code>MtfSquads</code>, <code>InjurySystem</code>, <code>Cpc</code>, <code>RadioWave</code> и все механики игроков.</p>
+            <button type="button" class="bundle-add" data-bundle="bundle_rp">Добавить в корзину</button>
+          </article>
         </div>
 
         <div class="cat-bar" role="tablist" aria-label="Категории модулей">
@@ -365,7 +638,7 @@
       </div>
     </section>
 
-    <!-- BLOCK 4: DEEP STUDIO DARK SHOWCASE (REAL GRAPH + WEBPANEL 3D) -->
+    <!-- BLOCK 4: DEEP STUDIO DARK SHOWCASE -->
     <section class="band band-dark" id="topology">
       <div class="wrap">
         <div class="dark-head" data-reveal>
@@ -508,6 +781,45 @@ npm start</code></pre>
       </div>
     </div>
   </footer>
+
+  <!-- SLIDE-OVER CART DRAWER -->
+  <div class="drawer-backdrop" id="cartDrawer" hidden role="dialog" aria-modal="true" aria-label="Корзина модулей">
+    <aside class="cart-drawer">
+      <div class="drawer-head">
+        <h3>Корзина модулей</h3>
+        <button type="button" class="drawer-close" id="closeCart" aria-label="Закрыть корзину">Закрыть</button>
+      </div>
+
+      <div class="drawer-body" id="cartItems"></div>
+
+      <div class="drawer-foot">
+        <div class="cart-summary">
+          <div class="sum-row"><span>Позиций</span><strong id="cartItemCount">0</strong></div>
+          <div class="sum-row" id="cartDiscountRow" hidden><span>Скидка за объём</span><strong class="sum-discount" id="cartDiscountVal">0 ₽</strong></div>
+          <div class="sum-row sum-total"><span>Итого</span><strong id="cartTotal">0 ₽</strong></div>
+        </div>
+
+        <form class="checkout-form" id="checkoutForm">
+          <label class="studio-field">
+            <span>Ваш Discord или Telegram для связи</span>
+            <input type="text" id="orderContact" placeholder="@username или discord_tag" required />
+          </label>
+          <div class="drawer-actions">
+            <button type="submit" class="btn btn-cobalt" id="submitOrderBtn">Сформировать заказ</button>
+            <button type="button" class="btn btn-outline btn-sm" id="clearCartBtn">Очистить</button>
+          </div>
+        </form>
+
+        <div class="order-receipt" id="orderReceipt" hidden>
+          <div class="receipt-top">
+            <strong id="receiptId">Заказ #FULT-0000</strong>
+            <button type="button" class="mod-copy" id="copyReceiptBtn">Копировать</button>
+          </div>
+          <pre id="receiptText"></pre>
+        </div>
+      </div>
+    </aside>
+  </div>
 
   <!-- FULLSCREEN GRAPH LIGHTBOX -->
   <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Увеличенный граф кода">

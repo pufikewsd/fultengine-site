@@ -11,6 +11,11 @@
     admin: { label: "Сервер и админ", dot: "dot-slate" }
   };
 
+  const PRO_MODULES = new Set([
+    "Subclass", "RoleDistribution", "Scp106Capture", "BetterSCP", "WarheadCode",
+    "BetterCassie", "Turrets", "CameraWatch", "InjurySystem", "Cpc", "AntiRaid", "MemoryWatch"
+  ]);
+
   const MODULES = [
     // Роли и отряды (5)
     { name: "Subclass", cat: "roles", desc: "Выдаёт подклассы ролей: состав, предметы, имена учёных и описание персонажа.", cmds: ["Configs/subclasses.yml"] },
@@ -88,10 +93,23 @@
     { name: "TeleportGuard", cat: "admin", desc: "Возвращает игроков, провалившихся под карту.", cmds: [] },
     { name: "Protections", cat: "admin", desc: "Защищает в безопасных зонах от боеголовки и тесла-ворот, бережёт двери от стрельбы.", cmds: [] },
     { name: "AutoMapLoader", cat: "admin", desc: "Подгружает схематики карты, пока сервер ждёт игроков.", cmds: [] }
-  ];
+  ].map((m) => ({
+    ...m,
+    price: PRO_MODULES.has(m.name) ? 790 : m.cat === "ui" ? 290 : 490
+  }));
+
+  const BUNDLES = {
+    bundle_full: { id: "bundle_full", name: "FULT-ENGINE v2.0 (все 65 модулей + WebPanel)", price: 4990, desc: "Полный набор" },
+    bundle_scp: { id: "bundle_scp", name: "Набор SCP-объектов (17 модулей)", price: 2490, desc: "Категория SCP" },
+    bundle_rp: { id: "bundle_rp", name: "Набор RP, ролей и механик (20 модулей)", price: 2790, desc: "Роли + Механики" }
+  };
 
   function esc(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function formatRub(val) {
+    return `${new Intl.NumberFormat("ru-RU").format(val)} ₽`;
   }
 
   // Toast helper
@@ -101,12 +119,10 @@
     toastEl.textContent = message;
     toastEl.classList.add("is-shown");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-      toastEl.classList.remove("is-shown");
-    }, 2200);
+    toastTimer = setTimeout(() => { toastEl.classList.remove("is-shown"); }, 2200);
   }
 
-  // Scroll progress & header nav indicator
+  // Scroll progress & nav indicator
   const siteHeader = document.getElementById("siteHeader");
   const scrollProgress = document.getElementById("scrollProgress");
   let scrollRaf = 0;
@@ -187,7 +203,7 @@
         entry.target.classList.add("is-in");
         obs.unobserve(entry.target);
       });
-    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    }, { threshold: 0.1, rootMargin: "0px 0px -30px 0px" });
     document.querySelectorAll("[data-reveal]").forEach((el) => revealObs.observe(el));
 
     const countObs = new IntersectionObserver((entries, obs) => {
@@ -202,7 +218,7 @@
     document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-in"));
   }
 
-  // Smooth 3D tilt + magnetic buttons
+  // 3D tilt + magnetic buttons
   if (!prefersReduced && finePointer) {
     const tiltEls = Array.from(document.querySelectorAll("[data-tilt]"));
     const states = tiltEls.map((el, i) => ({
@@ -264,7 +280,7 @@
   }
 
   // ======================================================
-  // 1. INTERACTIVE BUILD CONFIGURATOR (COBALT BAND)
+  // 1. BUILD CONFIGURATOR
   // ======================================================
   const PRESETS = {
     full: { roles: true, scp: true, facility: true, gameplay: true, ui: true, admin: true },
@@ -278,14 +294,9 @@
   const presetBtns = document.querySelectorAll(".preset-btn");
   const subCheckboxes = Array.from(document.querySelectorAll("#subsystemList input[data-sub]"));
 
-  function getSelectedSubs() {
-    const map = {};
-    subCheckboxes.forEach((cb) => { map[cb.dataset.sub] = cb.checked; });
-    return map;
-  }
-
   function renderBuildConfig() {
-    const sel = getSelectedSubs();
+    const sel = {};
+    subCheckboxes.forEach((cb) => { sel[cb.dataset.sub] = cb.checked; });
     const enabledCats = Object.keys(sel).filter((k) => sel[k]);
     const activeMods = MODULES.filter((m) => sel[m.cat]);
     const modeName = activeMods.length === 0 ? "off" : "rp";
@@ -305,13 +316,9 @@
     if (activeMods.length === 0) {
       lines.push("  [] # все модули выключены");
     } else {
-      const preview = activeMods.slice(0, 14);
-      preview.forEach((m) => lines.push(`  - ${m.name}`));
-      if (activeMods.length > preview.length) {
-        lines.push(`  # ... и ещё ${activeMods.length - preview.length} модулей`);
-      }
+      activeMods.slice(0, 14).forEach((m) => lines.push(`  - ${m.name}`));
+      if (activeMods.length > 14) lines.push(`  # ... и ещё ${activeMods.length - 14} модулей`);
     }
-
     cfgCode.textContent = lines.join("\n");
   }
 
@@ -333,12 +340,8 @@
   });
 
   document.getElementById("copyCfgBtn").addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(cfgCode.textContent);
-      showToast("FultEngine.yml скопирован");
-    } catch {
-      showToast("Не удалось скопировать");
-    }
+    try { await navigator.clipboard.writeText(cfgCode.textContent); showToast("FultEngine.yml скопирован"); }
+    catch { showToast("Не удалось скопировать"); }
   });
 
   document.getElementById("downloadCfgBtn").addEventListener("click", () => {
@@ -357,27 +360,307 @@
   renderBuildConfig();
 
   // ======================================================
-  // 2. INTERACTIVE SANDBOX: THEME.YML + COMMAND CONSOLE
+  // 2. SANDBOX TABS (CINFO / KEYCARD / THEME / CONSOLE)
   // ======================================================
   const sbTabs = document.querySelectorAll(".sb-tab");
-  const sbTheme = document.getElementById("sbTheme");
-  const sbConsole = document.getElementById("sbConsole");
+  const sbPanels = {
+    cinfo: document.getElementById("sbCinfo"),
+    keycard: document.getElementById("sbKeycard"),
+    theme: document.getElementById("sbTheme"),
+    console: document.getElementById("sbConsole")
+  };
 
   sbTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
-      const isTheme = tab.dataset.sb === "theme";
+      const target = tab.dataset.sb;
       sbTabs.forEach((t) => {
         const active = t === tab;
         t.classList.toggle("is-active", active);
         t.setAttribute("aria-selected", String(active));
       });
-      sbTheme.hidden = !isTheme;
-      sbConsole.hidden = isTheme;
-      if (!isTheme) document.getElementById("consoleInput").focus();
+      Object.entries(sbPanels).forEach(([key, panel]) => {
+        if (panel) panel.hidden = key !== target;
+      });
+      if (target === "console") document.getElementById("consoleInput").focus();
     });
   });
 
-  // Theme.yml Live Studio
+  // --- 2A. CINFO GENERATOR (Subclass Service Badge v5 + Classic + Combat) ---
+  const CINFO_PRESETS = {
+    science: { name: "Доктор Феликс", dept: "Научная служба", role: "Старший исследователь", extra: "A(II)+ | Пропуск 3 ур.", look: "Белый халат | На груди бейдж и КПК", color: "#58a6ff" },
+    security: { name: "Агент Рейнольдс", dept: "Служба безопасности", role: "Лейтенант СБ", extra: "O(I)+ | Мини-камера", look: "Тактический бронежилет | На груди жетон СБ", color: "#a8c7fa" },
+    mtf: { name: "Командир Вудс", dept: "МОГ Ню-7", role: "Удар молота", extra: "Позывной «Молот-1»", look: "Тяжёлая броня МОГ | Шлем с ПНВ", color: "#3b82f6" },
+    med: { name: "Доктор Иван Золо", dept: "Медицинская служба", role: "Травматолог", extra: "Медблок Сектора А", look: "Халат с красным крестом | Полевая аптечка", color: "#34d399" },
+    classd: { name: "D-4821", dept: "Класс D", role: "Испытуемый", extra: "Сектор D-блока", look: "Оранжевый комбинезон | Номерной бейдж", color: "#f97316" },
+    chaos: { name: "Разведчик Хаоса", dept: "Повстанцы Хаоса", role: "Передовой отряд", extra: "Маскировка снята", look: "Тёмно-зелёная форма | Противогаз и рация", color: "#22c55e" }
+  };
+
+  const cinfoStyle = document.getElementById("cinfoStyle");
+  const cinfoColor = document.getElementById("cinfoColor");
+  const cinfoHex = document.getElementById("cinfoHex");
+  const cinfoName = document.getElementById("cinfoName");
+  const cinfoDept = document.getElementById("cinfoDept");
+  const cinfoRole = document.getElementById("cinfoRole");
+  const cinfoExtra = document.getElementById("cinfoExtra");
+  const cinfoLook = document.getElementById("cinfoLook");
+  const cinfoPreview = document.getElementById("cinfoPreview");
+  const cinfoStyleLabel = document.getElementById("cinfoStyleLabel");
+  const cinfoCodeOut = document.getElementById("cinfoCodeOut");
+  const cinfoPresetBtns = document.querySelectorAll("#cinfoPresets .tp-btn");
+
+  let lastCinfoRaw = "";
+
+  function renderCinfo() {
+    const st = cinfoStyle.value;
+    const col = cinfoColor.value.toUpperCase();
+    const name = cinfoName.value.trim() || "Персонаж";
+    const dept = cinfoDept.value.trim();
+    const role = cinfoRole.value.trim();
+    const extra = cinfoExtra.value.trim();
+    const look = cinfoLook.value.trim();
+    cinfoHex.textContent = col;
+
+    let raw = "";
+    let previewHtml = "";
+
+    if (st === "badge") {
+      cinfoStyleLabel.textContent = "Служебный бейдж v5";
+      const line2 = [dept, role].filter(Boolean).join(" | ");
+      raw = `<size=15><color=${col}>${line2}</color></size>\n<size=12><color=#E2E8F0>« ${look} »</color></size>`;
+      previewHtml = `
+        <div style="font-size:21px;font-weight:700;color:#ffffff">${esc(name)}</div>
+        <div style="font-size:15px;font-weight:600;color:${col};margin-top:2px">${esc(line2)}</div>
+        <div style="font-size:12px;color:#e2e8f0;margin-top:3px">« ${esc(look)} »</div>
+      `;
+    } else if (st === "classic") {
+      cinfoStyleLabel.textContent = "Классика Subclass";
+      raw = `<size=15><color=#FFFFFF>« ${look} »</color>\n<color=${col}>${role || dept}</color></size>`;
+      previewHtml = `
+        <div style="font-size:19px;font-weight:600;color:#ffffff">${esc(name)}</div>
+        <div style="font-size:14px;color:#ffffff;margin-top:3px">« ${esc(look)} »</div>
+        <div style="font-size:15px;font-weight:700;color:${col};margin-top:2px">${esc(role || dept)}</div>
+      `;
+    } else {
+      cinfoStyleLabel.textContent = "Боевой / СБ";
+      const line2 = [dept, role, extra].filter(Boolean).join(" | ");
+      raw = `<size=15><color=${col}><b>${line2}</b></color></size>\n<size=12><color=#CBD5E1>« ${look} »</color></size>`;
+      previewHtml = `
+        <div style="font-size:21px;font-weight:700;color:#ffffff">${esc(name)}</div>
+        <div style="font-size:15px;font-weight:700;color:${col};margin-top:2px">${esc(line2)}</div>
+        <div style="font-size:12px;color:#cbd5e1;margin-top:3px">« ${esc(look)} »</div>
+      `;
+    }
+
+    lastCinfoRaw = raw;
+    cinfoPreview.innerHTML = previewHtml;
+    cinfoCodeOut.textContent = `custom_info: "${raw.replace(/\n/g, "\\n").replace(/"/g, '\\"')}"`;
+  }
+
+  [cinfoStyle, cinfoColor, cinfoName, cinfoDept, cinfoRole, cinfoExtra, cinfoLook].forEach((el) => {
+    el.addEventListener("input", renderCinfo);
+    el.addEventListener("change", renderCinfo);
+  });
+
+  cinfoPresetBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const p = CINFO_PRESETS[btn.dataset.cp];
+      if (!p) return;
+      cinfoPresetBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+      cinfoName.value = p.name;
+      cinfoDept.value = p.dept;
+      cinfoRole.value = p.role;
+      cinfoExtra.value = p.extra;
+      cinfoLook.value = p.look;
+      cinfoColor.value = p.color;
+      renderCinfo();
+    });
+  });
+
+  document.getElementById("copyCinfoRaw").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(lastCinfoRaw); showToast("CINFO тег скопирован"); }
+    catch { showToast("Не удалось скопировать"); }
+  });
+
+  document.getElementById("copyCinfoYaml").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(cinfoCodeOut.textContent); showToast("Строка YAML скопирована"); }
+    catch { showToast("Не удалось скопировать"); }
+  });
+
+  renderCinfo();
+
+  // --- 2B. KEYCARD GENERATOR (ckeycard + PNG export) ---
+  const KC_PRESETS = {
+    sb: { type: "KeycardCustomMetalCase", dept: "Служба Безопасности", role: "Лейтенант СБ", callsign: "Агент Рейнольдс", c: "2", a: "2", m: "2", cls: "C", bg: "#262b36", acc: "#7cc4ff" },
+    sci: { type: "KeycardCustomSite02", dept: "Научная служба", role: "Доктор Феликс", callsign: "Сектор B-04", c: "3", a: "0", m: "1", cls: "B", bg: "#1e293b", acc: "#facc15" },
+    mtf: { type: "KeycardCustomTaskForce", dept: "МОГ Ню-7", role: "Командир отряда", callsign: "Молот-1", c: "3", a: "3", m: "2", cls: "A", bg: "#172038", acc: "#3b82f6" },
+    admin: { type: "KeycardCustomManagement", dept: "Администрация комплекса", role: "Директор Зоны", callsign: "O5-Допуск", c: "3", a: "3", m: "3", cls: "A", bg: "#1c1917", acc: "#ff6428" }
+  };
+
+  const kcType = document.getElementById("kcType");
+  const kcDept = document.getElementById("kcDept");
+  const kcRole = document.getElementById("kcRole");
+  const kcCallsign = document.getElementById("kcCallsign");
+  const kcPermCont = document.getElementById("kcPermCont");
+  const kcPermArm = document.getElementById("kcPermArm");
+  const kcPermAdm = document.getElementById("kcPermAdm");
+  const kcClass = document.getElementById("kcClass");
+  const kcBg = document.getElementById("kcBg");
+  const kcAccent = document.getElementById("kcAccent");
+  const kcBgHex = document.getElementById("kcBgHex");
+  const kcAccentHex = document.getElementById("kcAccentHex");
+
+  const visualKeycard = document.getElementById("visualKeycard");
+  const vkStripe = document.getElementById("vkStripe");
+  const vkType = document.getElementById("vkType");
+  const vkDept = document.getElementById("vkDept");
+  const vkRole = document.getElementById("vkRole");
+  const vkPerms = document.getElementById("vkPerms");
+  const vkClass = document.getElementById("vkClass");
+  const vkCallsign = document.getElementById("vkCallsign");
+  const kcCmdOut = document.getElementById("kcCmdOut");
+  const kcPresetBtns = document.querySelectorAll("#kcPresets .tp-btn");
+
+  function renderKeycard() {
+    const bg = kcBg.value.toUpperCase();
+    const acc = kcAccent.value.toUpperCase();
+    const type = kcType.value;
+    const shortType = type.replace("KeycardCustom", "");
+    const dept = kcDept.value.trim() || "Служба";
+    const role = kcRole.value.trim() || "Сотрудник";
+    const call = kcCallsign.value.trim() || "Позывной";
+    const pC = kcPermCont.value;
+    const pA = kcPermArm.value;
+    const pM = kcPermAdm.value;
+    const cls = kcClass.value;
+
+    kcBgHex.textContent = bg;
+    kcAccentHex.textContent = acc;
+
+    visualKeycard.style.background = bg;
+    vkStripe.style.background = acc;
+    vkDept.style.color = acc;
+    vkType.textContent = shortType;
+    vkDept.textContent = dept;
+    vkRole.textContent = role;
+    vkPerms.textContent = `${pC} / ${pA} / ${pM}`;
+    vkClass.textContent = cls;
+    vkCallsign.textContent = call;
+
+    const u = (s) => s.replace(/\s+/g, "_");
+    const maxP = Math.max(Number(pC), Number(pA), Number(pM));
+    const permCol = maxP >= 3 ? "#FF6428" : maxP === 2 ? "#FFFF00" : "#00FF00";
+
+    const cmd = `ckeycard {id} ${type} <size=10>КАРТА_ДОСТУПА</size><br><size=15><color=${acc}>${u(dept)}</color></size><br><size=10><align=left><pos=5%>┌──┐<pos=20%>${u(role)}<pos=75%>▛▗▘▜<br><pos=5%>│_ID_│<pos=20%>Допуск:<pos=35%><color=${permCol}>_${pC}/${pA}/${pM}</color><pos=75%>▖▚▝▘<br><pos=5%>└──┘<pos=20%>Класс:<pos=35%><color=#FFFF00>_${cls}</color><pos=75%>▙▝▞▝<br><br>СРОК_ДЕЙСТВИЯ:_до_01.01.2028___Позывной:_${u(call)}</size> ${pC} ${pA} ${pM} ${bg} ${acc} <align=left><size=28%>Ключ-Карта</size> white _ 0`;
+    kcCmdOut.textContent = cmd;
+  }
+
+  [kcType, kcDept, kcRole, kcCallsign, kcPermCont, kcPermArm, kcPermAdm, kcClass, kcBg, kcAccent].forEach((el) => {
+    el.addEventListener("input", renderKeycard);
+    el.addEventListener("change", renderKeycard);
+  });
+
+  kcPresetBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const p = KC_PRESETS[btn.dataset.kc];
+      if (!p) return;
+      kcPresetBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+      kcType.value = p.type;
+      kcDept.value = p.dept;
+      kcRole.value = p.role;
+      kcCallsign.value = p.callsign;
+      kcPermCont.value = p.c;
+      kcPermArm.value = p.a;
+      kcPermAdm.value = p.m;
+      kcClass.value = p.cls;
+      kcBg.value = p.bg;
+      kcAccent.value = p.acc;
+      renderKeycard();
+    });
+  });
+
+  async function copyKc() {
+    try { await navigator.clipboard.writeText(kcCmdOut.textContent); showToast("Команда ckeycard скопирована"); }
+    catch { showToast("Не удалось скопировать"); }
+  }
+  document.getElementById("copyKcCmd").addEventListener("click", copyKc);
+  document.getElementById("copyKcCmd2").addEventListener("click", copyKc);
+
+  // PNG export via Canvas
+  document.getElementById("downloadKcPng").addEventListener("click", () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 960;
+    canvas.height = 560;
+    const ctx = canvas.getContext("2d");
+    const bg = kcBg.value;
+    const acc = kcAccent.value;
+
+    // Rounded card background
+    ctx.fillStyle = bg;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, 960, 560, 32);
+    ctx.fill();
+
+    // Accent left bar
+    ctx.fillStyle = acc;
+    ctx.fillRect(0, 0, 20, 560);
+
+    // Header
+    ctx.fillStyle = "rgba(255,255,255,0.68)";
+    ctx.font = "600 22px monospace";
+    ctx.fillText("КАРТА ДОСТУПА / FULT-ENGINE", 54, 68);
+    ctx.textAlign = "right";
+    ctx.fillText(kcType.value.replace("KeycardCustom", ""), 906, 68);
+    ctx.textAlign = "left";
+
+    // Department
+    ctx.fillStyle = acc;
+    ctx.font = "700 42px sans-serif";
+    ctx.fillText(kcDept.value.trim() || "Служба", 54, 140);
+
+    // Avatar box
+    ctx.strokeStyle = "rgba(255,255,255,0.28)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(54, 190, 120, 140);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 32px monospace";
+    ctx.fillText("ID", 92, 272);
+
+    // Role & permissions
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 34px sans-serif";
+    ctx.fillText(kcRole.value.trim() || "Сотрудник", 206, 232);
+    ctx.fillStyle = "#d1d5db";
+    ctx.font = "500 26px monospace";
+    ctx.fillText(`Допуск: ${kcPermCont.value} / ${kcPermArm.value} / ${kcPermAdm.value}`, 206, 282);
+    ctx.fillText(`Класс:  ${kcClass.value}`, 206, 322);
+
+    // Decorative matrix block
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 4; c++) {
+        ctx.fillStyle = (r + c) % 2 === 0 ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.18)";
+        ctx.fillRect(770 + c * 32, 196 + r * 32, 24, 24);
+      }
+    }
+
+    // Footer rule
+    ctx.fillStyle = "rgba(255,255,255,0.16)";
+    ctx.fillRect(54, 444, 852, 2);
+    ctx.fillStyle = "rgba(255,255,255,0.78)";
+    ctx.font = "500 24px monospace";
+    ctx.fillText("Срок: до 01.01.2028", 54, 500);
+    ctx.textAlign = "right";
+    ctx.fillText(kcCallsign.value.trim() || "Позывной", 906, 500);
+
+    const a = document.createElement("a");
+    a.download = `fult-keycard-${(kcRole.value || "card").toLowerCase().replace(/[^a-zа-я0-9]+/gi, "-")}.png`;
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+    showToast("Карточка сохранена в PNG");
+  });
+
+  renderKeycard();
+
+  // --- 2C. THEME.YML DESIGNER ---
   const THEME_PRESETS = {
     studio: { accent: "#2347f2", good: "#16a34a", warn: "#ff6428", bad: "#e11d48" },
     tactical: { accent: "#38bdf8", good: "#22c55e", warn: "#f59e0b", bad: "#ef4444" },
@@ -397,7 +680,7 @@
   const hudPreview = document.getElementById("hudPreview");
   const hudRoleBadge = document.getElementById("hudRoleBadge");
   const themeYamlOut = document.getElementById("themeYamlOut");
-  const tpBtns = document.querySelectorAll(".tp-btn");
+  const tpBtns = document.querySelectorAll("#sbTheme .tp-btn");
 
   function renderThemePreview() {
     const colors = {
@@ -406,7 +689,6 @@
       warn: colWarn.value.toUpperCase(),
       bad: colBad.value.toUpperCase()
     };
-
     hexAccent.textContent = colors.accent;
     hexGood.textContent = colors.good;
     hexWarn.textContent = colors.warn;
@@ -414,11 +696,10 @@
     hudRoleBadge.style.borderLeft = `3px solid ${colors.accent}`;
 
     const raw = esc(hintInput.value);
-    const rendered = raw.replace(
+    hudPreview.innerHTML = raw.replace(
       /&lt;color=@(accent|good|warn|bad)&gt;([\s\S]*?)&lt;\/color&gt;/gi,
       (_, key, inner) => `<span style="color:${colors[key.toLowerCase()]};font-weight:600">${inner}</span>`
-    );
-    hudPreview.innerHTML = rendered || "<span style='opacity:0.5'>Введите текст хинта слева...</span>";
+    ) || "<span style='opacity:0.5'>Введите текст хинта слева...</span>";
 
     themeYamlOut.textContent = [
       "# LabAPI/configs/global/FULT-ENGINE/ModuleConfig/Theme.yml",
@@ -437,9 +718,7 @@
       renderThemePreview();
     });
   });
-
   hintInput.addEventListener("input", renderThemePreview);
-
   tpBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
       const p = THEME_PRESETS[btn.dataset.tp];
@@ -452,19 +731,13 @@
       renderThemePreview();
     });
   });
-
   document.getElementById("copyThemeBtn").addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(themeYamlOut.textContent);
-      showToast("Theme.yml скопирован в буфер");
-    } catch {
-      showToast("Не удалось скопировать");
-    }
+    try { await navigator.clipboard.writeText(themeYamlOut.textContent); showToast("Theme.yml скопирован в буфер"); }
+    catch { showToast("Не удалось скопировать"); }
   });
-
   renderThemePreview();
 
-  // Interactive Command Console
+  // --- 2D. INTERACTIVE COMMAND CONSOLE ---
   const consoleLog = document.getElementById("consoleLog");
   const consoleForm = document.getElementById("consoleForm");
   const consoleInput = document.getElementById("consoleInput");
@@ -482,23 +755,17 @@
     ],
     cassieIdx: 0
   };
-
   const CASSIE_PRESETS = [
     "Внимание. В секторе тяжёлого содержания объявлен код Красный.",
     "Отряд МОГ Ню-7 «Удар молота» прибыл на КПП. Всем сотрудникам оставаться на местах.",
     "Протокол 106-N активирован. Зачистка сектора начнётся через 15 секунд."
   ];
-
   let cassieHideTimer = 0;
-
-  function logTime() {
-    return new Date().toTimeString().slice(0, 8);
-  }
 
   function pushLog(cls, tag, text) {
     const div = document.createElement("div");
     div.className = "clog-row";
-    div.innerHTML = `<span class="clog-time">[${logTime()}]</span> <span class="${cls}">${tag}</span> ${esc(text)}`;
+    div.innerHTML = `<span class="clog-time">[${new Date().toTimeString().slice(0, 8)}]</span> <span class="${cls}">${tag}</span> ${esc(text)}`;
     consoleLog.appendChild(div);
     consoleLog.scrollTop = consoleLog.scrollHeight;
   }
@@ -517,70 +784,31 @@
     const parts = cmd.toLowerCase().split(/\s+/);
     const base = parts[0];
 
-    if (base === "clear") {
-      consoleLog.innerHTML = "";
-      cassieBanner.hidden = true;
-      return;
-    }
-
-    if (base === "help") {
-      pushLog("clog-accent", "HELP", "Доступно: fultmode rp | fultmode off | cra list | cra y <№> | cas | fmem top | antiraid | clear");
-      return;
-    }
-
+    if (base === "clear") { consoleLog.innerHTML = ""; cassieBanner.hidden = true; return; }
+    if (base === "help") { pushLog("clog-accent", "HELP", "Доступно: fultmode rp | fultmode off | cra list | cra y <№> | cas | fmem top | antiraid | clear"); return; }
     if (base === "fultmode") {
-      if (parts[1] === "off") {
-        simState.mode = "off";
-        syncConsoleHeader();
-        pushLog("clog-warn", "MODE", "Все 65 модулей остановлены. Сервер переведён в базовый режим.");
-      } else if (parts[1] === "rp") {
-        simState.mode = "rp";
-        syncConsoleHeader();
-        pushLog("clog-ok", "MODE", "Режим RP включён. Загружено 65 модулей FULT-ENGINE.");
-      } else {
-        pushLog("clog-warn", "USAGE", "Укажите режим: fultmode rp или fultmode off");
-      }
+      if (parts[1] === "off") { simState.mode = "off"; syncConsoleHeader(); pushLog("clog-warn", "MODE", "Все 65 модулей остановлены."); }
+      else if (parts[1] === "rp") { simState.mode = "rp"; syncConsoleHeader(); pushLog("clog-ok", "MODE", "Режим RP включён. Активно 65 модулей."); }
+      else pushLog("clog-warn", "USAGE", "Укажите режим: fultmode rp или fultmode off");
       return;
     }
-
-    if (simState.mode === "off") {
-      pushLog("clog-warn", "DENY", `Модули выключены. Сначала выполните «fultmode rp».`);
-      return;
-    }
-
+    if (simState.mode === "off") { pushLog("clog-warn", "DENY", "Модули выключены. Сначала выполните «fultmode rp»."); return; }
     if (base === "cra") {
       if (parts[1] === "list") {
-        if (simState.requests.length === 0) {
-          pushLog("clog-ok", "CIR", "Активных заявок КИР нет.");
-        } else {
-          simState.requests.forEach((r) => {
-            pushLog("clog-accent", `CIR #${r.id}`, `${r.squad} (запросил ${r.author}). Одобрить: cra y ${r.id}`);
-          });
-        }
+        if (simState.requests.length === 0) pushLog("clog-ok", "CIR", "Активных заявок КИР нет.");
+        else simState.requests.forEach((r) => pushLog("clog-accent", `CIR #${r.id}`, `${r.squad} (запросил ${r.author}). Одобрить: cra y ${r.id}`));
         return;
       }
       if (parts[1] === "y" || parts[1] === "n") {
-        const id = Number(parts[2]);
-        const idx = simState.requests.findIndex((r) => r.id === id);
-        if (idx === -1) {
-          pushLog("clog-warn", "CIR", `Заявка #${parts[2] || "?"} не найдена. Посмотрите список: cra list`);
-          return;
-        }
+        const idx = simState.requests.findIndex((r) => r.id === Number(parts[2]));
+        if (idx === -1) { pushLog("clog-warn", "CIR", `Заявка #${parts[2] || "?"} не найдена.`); return; }
         const [item] = simState.requests.splice(idx, 1);
-        if (parts[1] === "y") {
-          pushLog("clog-ok", "CIR", `Заявка #${item.id} (${item.squad}) одобрена. Отряд вызван.`);
-        } else {
-          pushLog("clog-warn", "CIR", `Заявка #${item.id} (${item.squad}) отклонена.`);
-        }
+        pushLog(parts[1] === "y" ? "clog-ok" : "clog-warn", "CIR", `Заявка #${item.id} (${item.squad}) ${parts[1] === "y" ? "одобрена" : "отклонена"}.`);
         return;
       }
-      pushLog("clog-warn", "USAGE", "Используйте: cra list, cra y <№> или cra n <№>");
-      return;
     }
-
     if (base === "cas") {
-      const msg = CASSIE_PRESETS[simState.cassieIdx % CASSIE_PRESETS.length];
-      simState.cassieIdx += 1;
+      const msg = CASSIE_PRESETS[simState.cassieIdx++ % CASSIE_PRESETS.length];
       cassieText.textContent = msg;
       cassieBanner.hidden = false;
       clearTimeout(cassieHideTimer);
@@ -588,34 +816,182 @@
       pushLog("clog-accent", "CASSIE", `Отправлено объявление: ${msg}`);
       return;
     }
-
-    if (base === "fmem") {
-      pushLog("clog-ok", "MEM", "GC Heap: 412 MB | Unity Objects: 14 280 | Топ ассетов: MapSchematic (64 MB), AudioClips (28 MB)");
-      return;
-    }
-
-    if (base === "antiraid") {
-      pushLog("clog-ok", "GUARD", "AntiRaid активен. Блокировок за последние 10 минут: 0.");
-      return;
-    }
-
-    pushLog("clog-warn", "ERR", `Неизвестная команда «${cmd}». Введите help для списка команд.`);
+    if (base === "fmem") { pushLog("clog-ok", "MEM", "GC Heap: 412 MB | Unity Objects: 14 280 | Топ: MapSchematic (64 MB)"); return; }
+    if (base === "antiraid") { pushLog("clog-ok", "GUARD", "AntiRaid активен. Блокировок за последние 10 минут: 0."); return; }
+    pushLog("clog-warn", "ERR", `Неизвестная команда «${cmd}». Введите help.`);
   }
 
   pushLog("clog-ok", "BOOT", "FULT-ENGINE v2.0 готов (LabAPI 1.1.4). Введите help или нажмите кнопку выше.");
+  consoleForm.addEventListener("submit", (e) => { e.preventDefault(); runCommand(consoleInput.value); consoleInput.value = ""; });
+  document.querySelectorAll(".q-cmd").forEach((btn) => btn.addEventListener("click", () => runCommand(btn.dataset.run)));
 
-  consoleForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    runCommand(consoleInput.value);
-    consoleInput.value = "";
+  // ======================================================
+  // 3. MODULE SHOP & CART DRAWER
+  // ======================================================
+  const CART_KEY = "fult_engine_cart_v2";
+  let cart = [];
+  try { cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch { cart = []; }
+
+  const cartCountEl = document.getElementById("cartCount");
+  const cartDrawer = document.getElementById("cartDrawer");
+  const cartItemsEl = document.getElementById("cartItems");
+  const cartItemCountEl = document.getElementById("cartItemCount");
+  const cartDiscountRow = document.getElementById("cartDiscountRow");
+  const cartDiscountVal = document.getElementById("cartDiscountVal");
+  const cartTotalEl = document.getElementById("cartTotal");
+  const orderReceipt = document.getElementById("orderReceipt");
+  const receiptId = document.getElementById("receiptId");
+  const receiptText = document.getElementById("receiptText");
+
+  function saveCart() {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch {}
+  }
+
+  function isInCart(id) {
+    return cart.some((item) => item.id === id);
+  }
+
+  function calcCart() {
+    const subtotal = cart.reduce((acc, it) => acc + it.price, 0);
+    const singleModCount = cart.filter((it) => it.type === "module").length;
+    const discRate = singleModCount >= 15 ? 0.2 : singleModCount >= 5 ? 0.1 : 0;
+    const discount = Math.round(
+      cart.filter((it) => it.type === "module").reduce((a, b) => a + b.price, 0) * discRate
+    );
+    return { subtotal, discount, discRate, total: Math.max(0, subtotal - discount) };
+  }
+
+  function syncShopButtons() {
+    document.querySelectorAll(".bundle-add").forEach((btn) => {
+      const added = isInCart(btn.dataset.bundle);
+      btn.classList.toggle("is-added", added);
+      btn.textContent = added ? "В корзине (убрать)" : "Добавить в корзину";
+    });
+    document.querySelectorAll(".mod-buy-btn").forEach((btn) => {
+      const added = isInCart(btn.dataset.buy);
+      btn.classList.toggle("is-in-cart", added);
+      btn.textContent = added ? "В корзине" : "+ В корзину";
+    });
+  }
+
+  function renderCart() {
+    cartCountEl.textContent = String(cart.length);
+    cartItemCountEl.textContent = String(cart.length);
+    const { discount, discRate, total } = calcCart();
+
+    if (discount > 0) {
+      cartDiscountRow.hidden = false;
+      cartDiscountVal.textContent = `-${formatRub(discount)} (${Math.round(discRate * 100)}%)`;
+    } else {
+      cartDiscountRow.hidden = true;
+    }
+    cartTotalEl.textContent = formatRub(total);
+
+    if (cart.length === 0) {
+      cartItemsEl.innerHTML = `<div class="cart-empty">Корзина пуста. Выберите модули или готовый набор в каталоге ниже.</div>`;
+    } else {
+      cartItemsEl.innerHTML = cart
+        .map((item) => `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <strong>${esc(item.name)}</strong>
+              <small>${esc(item.desc)}</small>
+            </div>
+            <div class="cart-item-right">
+              <span>${formatRub(item.price)}</span>
+              <button type="button" class="cart-remove" data-rm="${esc(item.id)}" aria-label="Удалить ${esc(item.name)}">×</button>
+            </div>
+          </div>
+        `)
+        .join("");
+    }
+    syncShopButtons();
+  }
+
+  function toggleCartItem(item) {
+    const idx = cart.findIndex((i) => i.id === item.id);
+    if (idx >= 0) {
+      cart.splice(idx, 1);
+      showToast(`Убрано: ${item.name}`);
+    } else {
+      cart.push(item);
+      showToast(`Добавлено: ${item.name}`);
+    }
+    orderReceipt.hidden = true;
+    saveCart();
+    renderCart();
+  }
+
+  document.querySelectorAll(".bundle-add").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const b = BUNDLES[btn.dataset.bundle];
+      if (b) toggleCartItem({ ...b, type: "bundle" });
+    });
   });
 
-  document.querySelectorAll(".q-cmd").forEach((btn) => {
-    btn.addEventListener("click", () => runCommand(btn.dataset.run));
+  document.getElementById("openCart").addEventListener("click", () => {
+    cartDrawer.hidden = false;
+    document.body.style.overflow = "hidden";
+    renderCart();
+  });
+
+  function closeCartDrawer() {
+    cartDrawer.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  document.getElementById("closeCart").addEventListener("click", closeCartDrawer);
+  cartDrawer.addEventListener("click", (e) => { if (e.target === cartDrawer) closeCartDrawer(); });
+
+  cartItemsEl.addEventListener("click", (e) => {
+    const rm = e.target.closest(".cart-remove");
+    if (!rm) return;
+    cart = cart.filter((i) => i.id !== rm.dataset.rm);
+    orderReceipt.hidden = true;
+    saveCart();
+    renderCart();
+  });
+
+  document.getElementById("clearCartBtn").addEventListener("click", () => {
+    cart = [];
+    orderReceipt.hidden = true;
+    saveCart();
+    renderCart();
+    showToast("Корзина очищена");
+  });
+
+  document.getElementById("checkoutForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (cart.length === 0) {
+      showToast("Сначала добавьте хотя бы один модуль");
+      return;
+    }
+    const contact = document.getElementById("orderContact").value.trim();
+    const { discount, total } = calcCart();
+    const code = `FULT-${Math.floor(1000 + Math.random() * 9000)}`;
+    const lines = [
+      `Заказ: #${code}`,
+      `Контакт: ${contact}`,
+      `Позиции (${cart.length}):`,
+      ...cart.map((it) => `  - ${it.name} (${formatRub(it.price)})`),
+      discount > 0 ? `Скидка за объём: -${formatRub(discount)}` : null,
+      `Итого: ${formatRub(total)}`,
+      `Отправьте эту заявку автору pufikewsd для выдачи сборки.`
+    ].filter(Boolean);
+
+    receiptId.textContent = `Заказ #${code}`;
+    receiptText.textContent = lines.join("\n");
+    orderReceipt.hidden = false;
+    showToast(`Заявка #${code} сформирована`);
+  });
+
+  document.getElementById("copyReceiptBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(receiptText.textContent); showToast("Заявка скопирована в буфер"); }
+    catch { showToast("Не удалось скопировать"); }
   });
 
   // ======================================================
-  // 3. KINETIC TICKER & MODULE CATALOG
+  // 4. KINETIC TICKER & MODULE CATALOG
   // ======================================================
   const tickerTrack = document.getElementById("tickerTrack");
   const FEATURED = [
@@ -667,6 +1043,7 @@
         const cmdsHtml = m.cmds.length
           ? `<div class="mod-cmds">${m.cmds.map((c) => `<code>${esc(c)}</code>`).join("")}</div>`
           : "";
+        const inCart = isInCart(m.name);
         const enterCls = animate && !prefersReduced ? " mod-enter" : "";
         const delayStyle = animate && !prefersReduced ? ` style="--md: ${Math.min(idx * 18, 180)}ms"` : "";
         return `
@@ -684,6 +1061,10 @@
               <p class="mod-desc">${esc(m.desc)}</p>
               ${cmdsHtml}
             </button>
+            <div class="mod-footer-bar">
+              <span class="mod-price">${formatRub(m.price)}</span>
+              <button type="button" class="mod-buy-btn${inCart ? " is-in-cart" : ""}" data-buy="${esc(m.name)}">${inCart ? "В корзине" : "+ В корзину"}</button>
+            </div>
             <div class="mod-detail-wrap">
               <div class="mod-detail-inner">
                 <div class="mod-detail">
@@ -728,11 +1109,16 @@
   });
 
   modulesList.addEventListener("click", async (e) => {
-    if (e.target.closest("#showAllModulesBtn")) {
-      expandedAll = true;
-      renderModules(true);
+    if (e.target.closest("#showAllModulesBtn")) { expandedAll = true; renderModules(true); return; }
+
+    const buyBtn = e.target.closest(".mod-buy-btn");
+    if (buyBtn) {
+      e.stopPropagation();
+      const mod = MODULES.find((m) => m.name === buyBtn.dataset.buy);
+      if (mod) toggleCartItem({ id: mod.name, name: mod.name, price: mod.price, desc: CATEGORY_META[mod.cat].label, type: "module" });
       return;
     }
+
     const copyBtn = e.target.closest(".mod-copy");
     if (copyBtn) {
       e.stopPropagation();
@@ -746,6 +1132,7 @@
       }
       return;
     }
+
     const btn = e.target.closest(".mod-btn");
     if (!btn) return;
     const row = btn.closest(".mod-row");
@@ -765,15 +1152,12 @@
     });
   });
 
-  searchInput.addEventListener("input", (e) => {
-    query = e.target.value;
-    renderModules(false);
-  });
-
+  searchInput.addEventListener("input", (e) => { query = e.target.value; renderModules(false); });
   renderModules(false);
+  renderCart();
 
   // ======================================================
-  // 4. CTRL+K COMMAND PALETTE
+  // 5. CTRL+K COMMAND PALETTE
   // ======================================================
   const cmdkModal = document.getElementById("cmdkModal");
   const cmdkInput = document.getElementById("cmdkInput");
@@ -782,10 +1166,10 @@
   const closeCmdkBtn = document.getElementById("closeCmdk");
 
   const SECTION_ITEMS = [
-    { type: "section", title: "Конструктор сборки", sub: "Собрать FultEngine.yml из пресетов и тумблеров", badge: "#engine", target: "#engine" },
-    { type: "section", title: "Песочница Theme.yml и команд", sub: "Живой редактор цветов и консоль команд", badge: "#sandbox", target: "#sandbox" },
-    { type: "section", title: "Топология кодовой базы", sub: "Граф graphify: 9 345 узлов и 449 сообществ", badge: "#topology", target: "#topology" },
-    { type: "section", title: "Установка и NuGet", sub: "Релиз v2.0 и GitHub Packages", badge: "#install", target: "#install" }
+    { type: "section", title: "Генератор CINFO и карточек", sub: "Служебные бейджи Subclass и ключ-карты ckeycard", badge: "#sandbox", target: "#sandbox" },
+    { type: "section", title: "Магазин и каталог модулей", sub: "65 модулей, наборы и корзина", badge: "#modules", target: "#modules" },
+    { type: "section", title: "Конструктор FultEngine.yml", sub: "Собрать конфиг из пресетов и тумблеров", badge: "#engine", target: "#engine" },
+    { type: "section", title: "Топология кодовой базы", sub: "Граф graphify: 9 345 узлов и 449 сообществ", badge: "#topology", target: "#topology" }
   ];
 
   let cmdkList = [];
@@ -800,7 +1184,7 @@
         type: "module",
         title: m.name,
         sub: m.desc,
-        badge: m.cmds[0] || CATEGORY_META[m.cat].label,
+        badge: m.cmds[0] || formatRub(m.price),
         dot: CATEGORY_META[m.cat].dot
       }));
 
@@ -843,19 +1227,13 @@
     const item = cmdkList[index];
     if (!item) return;
     closeCmdk();
-    if (item.type === "module") {
-      focusModuleInCatalog(item.title);
-    } else if (item.target) {
-      document.querySelector(item.target)?.scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth" });
-    }
+    if (item.type === "module") focusModuleInCatalog(item.title);
+    else if (item.target) document.querySelector(item.target)?.scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth" });
   }
 
   openCmdkBtn.addEventListener("click", openCmdk);
   closeCmdkBtn.addEventListener("click", closeCmdk);
-  cmdkModal.addEventListener("click", (e) => {
-    if (e.target === cmdkModal) closeCmdk();
-  });
-
+  cmdkModal.addEventListener("click", (e) => { if (e.target === cmdkModal) closeCmdk(); });
   cmdkInput.addEventListener("input", renderCmdk);
   cmdkResults.addEventListener("click", (e) => {
     const item = e.target.closest(".cmdk-item");
@@ -869,8 +1247,12 @@
       else closeCmdk();
       return;
     }
+    if (e.key === "Escape") {
+      if (!cartDrawer.hidden) { closeCartDrawer(); return; }
+      if (!cmdkModal.hidden) { closeCmdk(); return; }
+      if (!lightbox.hidden) { closeLightbox(); return; }
+    }
     if (!cmdkModal.hidden) {
-      if (e.key === "Escape") { closeCmdk(); return; }
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
         if (cmdkList.length === 0) return;
@@ -935,9 +1317,6 @@
 
   lightboxClose.addEventListener("click", closeLightbox);
   lightbox.addEventListener("click", (e) => { if (e.target === lightbox) closeLightbox(); });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
-  });
 
   // Generic copy buttons
   document.querySelectorAll(".copy-btn[data-copy]").forEach((btn) => {
