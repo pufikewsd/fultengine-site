@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FULT-ENGINE v2.0 | Модульная платформа для серверов SCP:SL</title>
-  <meta name="description" content="FULT-ENGINE: 65 готовых модулей для серверов SCP: Secret Laboratory, магазин модулей, студия CINFO и ключ-карт, место отдыха с Red Dragon и яйцами дракона." />
+  <meta name="description" content="FULT-ENGINE: 65 готовых модулей для серверов SCP: Secret Laboratory, магазин модулей, студия CINFO и ключ-карт, накажи своего дракошу плёткой и собери яйца дракона." />
   <link rel="icon" type="image/png" href="assets/worm-badge.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Rubik:wght@700;800;900&family=Sofia+Sans+Condensed:wght@700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261126f" />
+  <link rel="stylesheet" href="styles.css?v=20261126g" />
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -23,14 +23,14 @@
 
       <nav class="site-nav" id="siteNav" aria-label="Разделы">
         <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
-        <a href="#bubbles" data-section="bubbles">Место отдыха</a>
+        <a href="#bubbles" data-section="bubbles">Накажи дракошу</a>
         <a href="#sandbox" data-section="sandbox">Студия</a>
         <a href="#modules" data-section="modules">Магазин</a>
         <a href="#webpanel" data-section="webpanel">Веб-панель</a>
       </nav>
 
       <div class="header-right">
-        <a class="hdr-egg-pill" href="#bubbles" title="Перейти в Место отдыха и выбить яйца дракона">
+        <a class="hdr-egg-pill" href="#bubbles" title="Наказать дракошу и выбить яйца дракона">
           <svg width="15" height="18" viewBox="0 0 20 24" fill="none" aria-hidden="true">
             <path d="M10 1C5 1 1.5 8.5 1.5 14.5 1.5 20 5.2 23 10 23s8.5-3 8.5-8.5C18.5 8.5 15 1 10 1Z" fill="#DA3832" />
             <circle cx="7" cy="11" r="2" fill="#F2B743" />
@@ -116,8 +116,8 @@
       </div>
     </section>
 
-    <!-- SPREAD 2: МЕСТО ОТДЫХА — RED DRAGON + ANIMATED WHIP + DRAGON EGGS -->
-    <section class="blobs-stage" id="bubbles" aria-label="Место отдыха: Red Dragon, плётка и яйца дракона">
+    <!-- SPREAD 2: НАКАЖИ СВОЕГО ДРАКОШУ — RED DRAGON + ANIMATED WHIP + DRAGON EGGS -->
+    <section class="blobs-stage" id="bubbles" aria-label="Накажи своего дракошу: плётка, Red Dragon и яйца дракона">
       <canvas class="blobs-canvas" id="blobsCanvas"></canvas>
 
       <!-- Hidden preload images & audio for canvas/SFX -->
@@ -133,7 +133,7 @@
       <div class="wrap blobs-overlay">
         <div class="blobs-head-bar">
           <div class="blobs-top">
-            <h2>МЕСТО ОТДЫХА</h2>
+            <h2>НАКАЖИ СВОЕГО ДРАКОШУ</h2>
             <p>
               Хлестните плёткой по медальону <strong>Red Dragon</strong> кликом или швырните в него фигуру,
               чтобы выбить яйца дракона. Проведите по яйцам, чтобы собрать их!
@@ -667,7 +667,7 @@
         <span>v2.0</span>
       </div>
       <div class="footer-links">
-        <a href="#bubbles">Место отдыха</a>
+        <a href="#bubbles">Накажи дракошу</a>
         <a href="#sandbox">Студия CINFO</a>
         <a href="#modules">Магазин</a>
         <a href="#webpanel">Веб-панель</a>
@@ -689,7 +689,7 @@
         <div class="cart-summary">
           <div class="sum-row"><span>Позиций</span><strong id="cartItemCount">0</strong></div>
           <div class="sum-row" id="cartDiscountRow" hidden><span>Скидка за объём</span><strong class="sum-discount" id="cartDiscountVal">0 ₽</strong></div>
-          <div class="sum-row" id="cartDragonRow" hidden><span>Бонус Red Dragon (-10%)</span><strong class="sum-discount" id="cartDragonVal">0 ₽</strong></div>
+          <div class="sum-row" id="cartDragonRow" hidden><span>Бонус от VEX (-10%)</span><strong class="sum-discount" id="cartDragonVal">0 ₽</strong></div>
           <div class="sum-row sum-total"><span>Итого</span><strong id="cartTotal">0 ₽</strong></div>
         </div>
 
@@ -737,6 +737,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="app.js?v=20261126f"></script>
+  <script src="app.js?v=20261126g"></script>
 </body>
 </html>

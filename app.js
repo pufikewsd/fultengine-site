@@ -1040,7 +1040,7 @@
     syncDragonHud();
     playEggChime(true);
     renderCart();
-    showToast("Бонус Red Dragon активирован: скидка -10% в корзине!");
+    showToast("Бонус от VEX активирован: скидка -10% в корзине!");
   });
 
   window.addEventListener("resize", () => {
@@ -1592,7 +1592,7 @@
       `Позиции (${cart.length}):`,
       ...cart.map((it) => `  - ${it.name} (${formatRub(it.price)})`),
       discount > 0 ? `Скидка за объём: -${formatRub(discount)}` : null,
-      dragonDiscount > 0 ? `Бонус Red Dragon (-10%): -${formatRub(dragonDiscount)}` : null,
+      dragonDiscount > 0 ? `Бонус от VEX (-10%): -${formatRub(dragonDiscount)}` : null,
       `Итого: ${formatRub(total)}`,
       `Отправьте эту заявку менеджеру FULT-ENGINE для получения сборки.`
     ].filter(Boolean);
@@ -1723,7 +1723,7 @@
   const closeCmdkBtn = document.getElementById("closeCmdk");
 
   const SECTION_ITEMS = [
-    { type: "section", title: "Место отдыха (Red Dragon)", sub: "Хлестните плёткой по Red Dragon и соберите яйца дракона", badge: "#bubbles", target: "#bubbles" },
+    { type: "section", title: "Накажи своего дракошу", sub: "Хлестните плёткой по Red Dragon и соберите яйца дракона", badge: "#bubbles", target: "#bubbles" },
     { type: "section", title: "Студия CINFO и карточек", sub: "Служебные бейджи Subclass и ключ-карты PNG", badge: "#sandbox", target: "#sandbox" },
     { type: "section", title: "Магазин модулей", sub: "65 модулей, наборы и скидки", badge: "#modules", target: "#modules" },
     { type: "section", title: "Веб-панель администрации", sub: "Вход через Steam, роли и варны", badge: "#webpanel", target: "#webpanel" }
