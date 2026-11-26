@@ -3,12 +3,12 @@
   const finePointer = window.matchMedia("(pointer: fine)").matches;
 
   const CATEGORY_META = {
-    roles: { label: "Роли и отряды", dot: "dot-cobalt" },
-    scp: { label: "SCP", dot: "dot-orange" },
+    roles: { label: "Роли и отряды", dot: "dot-coral" },
+    scp: { label: "SCP", dot: "dot-amber" },
     facility: { label: "Комплекс", dot: "dot-emerald" },
     gameplay: { label: "Механики", dot: "dot-violet" },
     ui: { label: "Интерфейс", dot: "dot-sky" },
-    admin: { label: "Сервер и админ", dot: "dot-slate" }
+    admin: { label: "Сервер и админ", dot: "dot-rose" }
   };
 
   const PRO_MODULES = new Set([
@@ -295,13 +295,71 @@
       { hi: "#f5b04f", mid: "#bf741b", lo: "#5f3208", rim: "rgba(255, 198, 110, 0.30)" },
       { hi: "#f0855e", mid: "#b94a24", lo: "#591d0e", rim: "rgba(255, 152, 115, 0.28)" }
     ],
-    studio: [
-      { hi: "#789bff", mid: "#2347f2", lo: "#0e1d7a", rim: "rgba(140, 175, 255, 0.35)" },
-      { hi: "#ff9568", mid: "#f2581d", lo: "#7a2308", rim: "rgba(255, 168, 128, 0.32)" },
-      { hi: "#8bb8ff", mid: "#3b65ff", lo: "#172a82", rim: "rgba(165, 196, 255, 0.30)" },
-      { hi: "#ffb088", mid: "#e05526", lo: "#6b2109", rim: "rgba(255, 185, 145, 0.28)" }
+    amber: [
+      { hi: "#ffd185", mid: "#e08c26", lo: "#6e3809", rim: "rgba(255, 214, 138, 0.36)" },
+      { hi: "#ff9b62", mid: "#d65d24", lo: "#69220a", rim: "rgba(255, 168, 118, 0.32)" },
+      { hi: "#ffe0a3", mid: "#c78622", lo: "#593506", rim: "rgba(255, 224, 160, 0.30)" },
+      { hi: "#f2a461", mid: "#b85c22", lo: "#54220a", rim: "rgba(255, 180, 122, 0.28)" }
+    ],
+    ruby: [
+      { hi: "#ff8c9e", mid: "#d63854", lo: "#631022", rim: "rgba(255, 150, 170, 0.34)" },
+      { hi: "#ff7a66", mid: "#bf2e2e", lo: "#590e14", rim: "rgba(255, 138, 124, 0.32)" },
+      { hi: "#f5a078", mid: "#c44b36", lo: "#5e1a12", rim: "rgba(255, 174, 138, 0.30)" },
+      { hi: "#e8788a", mid: "#a62442", lo: "#4f0c1d", rim: "rgba(255, 136, 160, 0.28)" }
     ]
   };
+
+  const PALETTE_ORDER = ["lava", "amber", "ruby"];
+  const PALETTE_NAMES = { lava: "Оттенок: Лава", amber: "Оттенок: Янтарь", ruby: "Оттенок: Рубин" };
+
+  // Ambient Hero Blobs (matching unified lava-lamp style)
+  const heroCanvas = document.getElementById("heroBlobsCanvas");
+  const heroSection = document.getElementById("top");
+  let heroW = 1200;
+  let heroH = 680;
+  let heroBlobs = [];
+  let heroVisible = true;
+
+  if ("IntersectionObserver" in window && heroSection) {
+    new IntersectionObserver((entries) => {
+      heroVisible = entries[0]?.isIntersecting ?? true;
+    }).observe(heroSection);
+  }
+
+  function initHeroBlobs() {
+    if (!heroCanvas || !heroSection) return;
+    const rect = heroSection.getBoundingClientRect();
+    heroW = Math.max(320, rect.width);
+    heroH = Math.max(520, rect.height);
+    const hdpr = Math.min(window.devicePixelRatio || 1, 2);
+    heroCanvas.width = Math.round(heroW * hdpr);
+    heroCanvas.height = Math.round(heroH * hdpr);
+    const sc = heroW < 640 ? 0.52 : 1;
+    heroBlobs = [
+      { x: heroW * 0.80, y: heroH * 0.56, vx: 0, vy: 0, r: 175 * sc, pal: 0, wobble: 0.11, seed: 1.1, speed: 0.58, squash: 0, squashAngle: 0 },
+      { x: heroW * 0.64, y: heroH * 0.22, vx: 0, vy: 0, r: 62 * sc, pal: 1, wobble: 0.12, seed: 3.4, speed: 0.72, squash: 0, squashAngle: 0 },
+      { x: heroW * 0.91, y: heroH * 0.22, vx: 0, vy: 0, r: 32 * sc, pal: 2, wobble: 0.13, seed: 5.2, speed: 0.82, squash: 0, squashAngle: 0 },
+      { x: heroW * 0.54, y: heroH * 0.80, vx: 0, vy: 0, r: 42 * sc, pal: 3, wobble: 0.12, seed: 7.0, speed: 0.65, squash: 0, squashAngle: 0 }
+    ];
+  }
+
+  function stepHeroBlobs(now) {
+    if (!heroCanvas) return;
+    const ctx = heroCanvas.getContext("2d");
+    if (heroVisible && ctx) {
+      const hdpr = Math.min(window.devicePixelRatio || 1, 2);
+      const t = prefersReduced ? 1.1 : now * 0.001;
+      ctx.setTransform(hdpr, 0, 0, hdpr, 0, 0);
+      ctx.clearRect(0, 0, heroW, heroH);
+      const pal = BLOB_PALETTES[blobPaletteKey] || BLOB_PALETTES.lava;
+      for (const b of heroBlobs) {
+        const bx = b.x + (prefersReduced ? 0 : Math.sin(t * 0.55 + b.seed) * 14);
+        const by = b.y + (prefersReduced ? 0 : Math.cos(t * 0.45 + b.seed) * 12);
+        drawOrganicBlob(ctx, { ...b, x: bx, y: by }, t, pal);
+      }
+    }
+    requestAnimationFrame(stepHeroBlobs);
+  }
 
   let blobPaletteKey = "lava";
   let blobs = [];
@@ -581,13 +639,16 @@
   });
 
   paletteBlobsBtn.addEventListener("click", () => {
-    blobPaletteKey = blobPaletteKey === "lava" ? "studio" : "lava";
-    blobsStage.classList.toggle("is-studio-pal", blobPaletteKey === "studio");
-    paletteBlobsBtn.textContent = blobPaletteKey === "lava" ? "Палитра: Лава" : "Палитра: Студия";
+    const idx = (PALETTE_ORDER.indexOf(blobPaletteKey) + 1) % PALETTE_ORDER.length;
+    blobPaletteKey = PALETTE_ORDER[idx];
+    blobsStage.classList.toggle("is-amber-pal", blobPaletteKey === "amber");
+    blobsStage.classList.toggle("is-ruby-pal", blobPaletteKey === "ruby");
+    paletteBlobsBtn.textContent = PALETTE_NAMES[blobPaletteKey];
   });
 
   resetBlobsBtn.addEventListener("click", createBlobs);
   window.addEventListener("resize", () => {
+    initHeroBlobs();
     resizeBlobsCanvas();
     const scale = cw < 640 ? 0.56 : 1;
     for (const b of blobs) {
@@ -597,6 +658,8 @@
     }
   });
 
+  initHeroBlobs();
+  requestAnimationFrame(stepHeroBlobs);
   createBlobs();
   requestAnimationFrame(stepBlobs);
 
@@ -889,7 +952,7 @@
 
   // 2C. THEME.YML DESIGNER
   const THEME_PRESETS = {
-    studio: { accent: "#2347f2", good: "#16a34a", warn: "#ff6428", bad: "#e11d48" },
+    lava: { accent: "#f26849", good: "#34d399", warn: "#e59838", bad: "#fb7185" },
     tactical: { accent: "#38bdf8", good: "#22c55e", warn: "#f59e0b", bad: "#ef4444" },
     contrast: { accent: "#facc15", good: "#4ade80", warn: "#fb923c", bad: "#f43f5e" },
     mint: { accent: "#2dd4bf", good: "#34d399", warn: "#a78bfa", bad: "#fb7185" }
@@ -1259,7 +1322,7 @@
   const closeCmdkBtn = document.getElementById("closeCmdk");
 
   const SECTION_ITEMS = [
-    { type: "section", title: "Арена пузырей модулей", sub: "Хватайте и раскидывайте модули с физикой", badge: "#bubbles", target: "#bubbles" },
+    { type: "section", title: "Место отдыха", sub: "Хватайте и раскидывайте органичные 3D-пузыри", badge: "#bubbles", target: "#bubbles" },
     { type: "section", title: "Генератор CINFO и карточек", sub: "Служебные бейджи Subclass и ключ-карты PNG", badge: "#sandbox", target: "#sandbox" },
     { type: "section", title: "Магазин модулей", sub: "65 модулей, наборы и скидки за объём", badge: "#modules", target: "#modules" },
     { type: "section", title: "Веб-панель администрации", sub: "Вход через Steam, роли и варны", badge: "#webpanel", target: "#webpanel" }

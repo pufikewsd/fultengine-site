@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FULT-ENGINE v2.0 | Платформа модулей для серверов SCP:SL</title>
   <meta name="description" content="FULT-ENGINE: 65 готовых модулей для серверов SCP: Secret Laboratory, магазин модулей, генератор CINFO и ключ-карт, веб-панель администрации." />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23121318'/%3E%3Crect x='6' y='6' width='10' height='10' rx='3' fill='%232347F2'/%3E%3Crect x='16' y='16' width='10' height='10' rx='3' fill='%23FF6428'/%3E%3C/svg%3E" />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230c0708'/%3E%3Ccircle cx='12' cy='12' r='6' fill='%23f26849'/%3E%3Ccircle cx='21' cy='20' r='5' fill='%23e59838'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261126b" />
+  <link rel="stylesheet" href="styles.css?v=20261126c" />
   <script>
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("motion-on");
@@ -24,10 +24,10 @@
       <a class="brand" href="#top" aria-label="FULT-ENGINE главная">
         <span class="brand-glyph" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect class="glyph-cobalt" x="2" y="2" width="9" height="9" rx="2.5" fill="#2347F2" />
-            <rect class="glyph-dark-1" x="13" y="2" width="9" height="9" rx="2.5" fill="#121318" />
-            <rect class="glyph-dark-2" x="2" y="13" width="9" height="9" rx="2.5" fill="#121318" />
-            <rect class="glyph-orange" x="13" y="13" width="9" height="9" rx="2.5" fill="#FF6428" />
+            <rect class="glyph-cobalt" x="2" y="2" width="9" height="9" rx="3" fill="#F26849" />
+            <rect class="glyph-dark-1" x="13" y="2" width="9" height="9" rx="3" fill="#2A1C1F" />
+            <rect class="glyph-dark-2" x="2" y="13" width="9" height="9" rx="3" fill="#2A1C1F" />
+            <rect class="glyph-orange" x="13" y="13" width="9" height="9" rx="3" fill="#E59838" />
           </svg>
         </span>
         <span class="brand-name">FULT-ENGINE</span>
@@ -35,7 +35,7 @@
 
       <nav class="site-nav" id="siteNav" aria-label="Разделы">
         <span class="nav-indicator" id="navIndicator" aria-hidden="true"></span>
-        <a href="#bubbles" data-section="bubbles">Пузыри</a>
+        <a href="#bubbles" data-section="bubbles">Место отдыха</a>
         <a href="#sandbox" data-section="sandbox">Генераторы</a>
         <a href="#modules" data-section="modules">Магазин</a>
         <a href="#webpanel" data-section="webpanel">Веб-панель</a>
@@ -66,31 +66,23 @@
   </header>
 
   <main id="main">
-    <!-- BLOCK 1: BRIGHT SCULPTURAL MARKETING HERO -->
+    <!-- BLOCK 1: DARK VELVET HERO WITH LIVE AMBIENT 3D BLOBS -->
     <section class="hero" id="top">
-      <div class="wrap">
-        <div class="hero-stage">
-          <div class="hero-copy">
-            <h1 class="hero-anim" style="--d: 0ms">FULT&#8209;ENGINE</h1>
-            <p class="hero-lead hero-anim" style="--d: 90ms">
-              Флагманская платформа из 65 готовых модулей для серверов SCP: Secret Laboratory.
-              Уникальные роли, SCP-механики, протоколы комплекса, медицина и отдельная веб-панель администрации.
-            </p>
-            <div class="hero-actions hero-anim" style="--d: 170ms">
-              <a class="btn btn-cobalt magnetic" href="#modules">
-                Перейти в магазин
-              </a>
-              <a class="btn btn-outline" href="#sandbox">
-                Генератор CINFO и карт
-              </a>
-            </div>
-          </div>
-
-          <div class="hero-visual hero-anim-visual" id="heroTilt" data-tilt>
-            <div class="tilt-inner">
-              <img src="assets/hero-sculpture.jpg" alt="Абстрактная модульная 3D-скульптура платформы FULT-ENGINE" fetchpriority="high" />
-              <div class="tilt-sheen" aria-hidden="true"></div>
-            </div>
+      <canvas class="hero-blobs-canvas" id="heroBlobsCanvas" aria-hidden="true"></canvas>
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <h1 class="hero-anim" style="--d: 0ms">FULT&#8209;ENGINE</h1>
+          <p class="hero-lead hero-anim" style="--d: 90ms">
+            Флагманская платформа из 65 готовых модулей для серверов SCP: Secret Laboratory.
+            Уникальные роли, SCP-механики, протоколы комплекса, медицина и отдельная веб-панель администрации.
+          </p>
+          <div class="hero-actions hero-anim" style="--d: 170ms">
+            <a class="btn btn-coral magnetic" href="#modules">
+              Перейти в магазин
+            </a>
+            <a class="btn btn-glass" href="#sandbox">
+              Генератор CINFO и карт
+            </a>
           </div>
         </div>
 
@@ -115,28 +107,28 @@
       </div>
     </section>
 
-    <!-- BLOCK 2: ORGANIC 3D LIQUID BLOBS STAGE -->
-    <section class="blobs-stage" id="bubbles" aria-label="Интерактивная сцена с органичными пузырями">
+    <!-- BLOCK 2: МЕСТО ОТДЫХА (INTERACTIVE ORGANIC BLOBS) -->
+    <section class="blobs-stage" id="bubbles" aria-label="Место отдыха с интерактивными пузырями">
       <canvas class="blobs-canvas" id="blobsCanvas"></canvas>
       <div class="wrap blobs-overlay">
         <div class="blobs-top" data-reveal>
-          <h2>Живая модульная среда</h2>
+          <h2>Место отдыха</h2>
           <p>
-            Проведите курсором, чтобы разогнать пузыри, или схватите любой и бросьте его через экран.
-            Клик по свободному месту создаёт мягкую волну.
+            Небольшая пауза между настройкой сервера. Проведите курсором, чтобы мягко разогнать капли,
+            схватите любую и бросьте через экран или кликните в пустоту для волны.
           </p>
         </div>
 
         <div class="blobs-controls">
           <button type="button" class="blob-ctrl-btn" id="scatterBlobsBtn">Раскидать</button>
-          <button type="button" class="blob-ctrl-btn" id="paletteBlobsBtn">Палитра: Лава</button>
+          <button type="button" class="blob-ctrl-btn" id="paletteBlobsBtn">Оттенок: Лава</button>
           <button type="button" class="blob-ctrl-btn" id="resetBlobsBtn">Сбросить</button>
         </div>
       </div>
     </section>
 
     <!-- BLOCK 3: INTERACTIVE GENERATORS STUDIO -->
-    <section class="band band-studio" id="sandbox">
+    <section class="band band-deep" id="sandbox">
       <div class="wrap">
         <div class="sandbox-head" data-reveal>
           <div>
@@ -240,7 +232,7 @@
           </div>
         </div>
 
-        <!-- TAB 2: KEYCARD GENERATOR (ckeycard + PNG) -->
+        <!-- TAB 2: KEYCARD GENERATOR -->
         <div class="sandbox-panel" id="sbKeycard" role="tabpanel" hidden>
           <div class="theme-studio">
             <div class="theme-controls">
@@ -322,15 +314,15 @@
                 <label class="studio-field">
                   <span>Корпус</span>
                   <div class="color-input-wrap">
-                    <input type="color" id="kcBg" value="#262b36" />
-                    <span class="color-hex" id="kcBgHex">#262B36</span>
+                    <input type="color" id="kcBg" value="#261c1f" />
+                    <span class="color-hex" id="kcBgHex">#261C1F</span>
                   </div>
                 </label>
                 <label class="studio-field">
                   <span>Акцент</span>
                   <div class="color-input-wrap">
-                    <input type="color" id="kcAccent" value="#7cc4ff" />
-                    <span class="color-hex" id="kcAccentHex">#7CC4FF</span>
+                    <input type="color" id="kcAccent" value="#f26849" />
+                    <span class="color-hex" id="kcAccentHex">#F26849</span>
                   </div>
                 </label>
               </div>
@@ -365,8 +357,8 @@
                 </div>
 
                 <div class="kc-export-row">
-                  <button type="button" class="btn btn-cobalt btn-sm" id="downloadKcPng">Скачать карточку PNG</button>
-                  <button type="button" class="btn btn-outline btn-sm" id="copyKcCmd">Скопировать ckeycard</button>
+                  <button type="button" class="btn btn-coral btn-sm" id="downloadKcPng">Скачать карточку PNG</button>
+                  <button type="button" class="btn btn-glass btn-sm" id="copyKcCmd">Скопировать ckeycard</button>
                 </div>
               </div>
 
@@ -381,12 +373,12 @@
           </div>
         </div>
 
-        <!-- TAB 3: THEME.YML LIVE DESIGNER -->
+        <!-- TAB 3: THEME.YML DESIGNER -->
         <div class="sandbox-panel" id="sbTheme" role="tabpanel" hidden>
           <div class="theme-studio">
             <div class="theme-controls">
               <div class="theme-presets" role="group" aria-label="Готовые темы">
-                <button type="button" class="tp-btn is-active" data-tp="studio">Студийная</button>
+                <button type="button" class="tp-btn is-active" data-tp="lava">Лава</button>
                 <button type="button" class="tp-btn" data-tp="tactical">Тактическая</button>
                 <button type="button" class="tp-btn" data-tp="contrast">Контрастная</button>
                 <button type="button" class="tp-btn" data-tp="mint">Холодная</button>
@@ -396,29 +388,29 @@
                 <label class="color-field">
                   <span><code>@accent</code> акцент</span>
                   <div class="color-input-wrap">
-                    <input type="color" id="colAccent" value="#2347f2" />
-                    <span class="color-hex" id="hexAccent">#2347F2</span>
+                    <input type="color" id="colAccent" value="#f26849" />
+                    <span class="color-hex" id="hexAccent">#F26849</span>
                   </div>
                 </label>
                 <label class="color-field">
                   <span><code>@good</code> успех</span>
                   <div class="color-input-wrap">
-                    <input type="color" id="colGood" value="#16a34a" />
-                    <span class="color-hex" id="hexGood">#16A34A</span>
+                    <input type="color" id="colGood" value="#34d399" />
+                    <span class="color-hex" id="hexGood">#34D399</span>
                   </div>
                 </label>
                 <label class="color-field">
                   <span><code>@warn</code> внимание</span>
                   <div class="color-input-wrap">
-                    <input type="color" id="colWarn" value="#ff6428" />
-                    <span class="color-hex" id="hexWarn">#FF6428</span>
+                    <input type="color" id="colWarn" value="#e59838" />
+                    <span class="color-hex" id="hexWarn">#E59838</span>
                   </div>
                 </label>
                 <label class="color-field">
                   <span><code>@bad</code> тревога</span>
                   <div class="color-input-wrap">
-                    <input type="color" id="colBad" value="#e11d48" />
-                    <span class="color-hex" id="hexBad">#E11D48</span>
+                    <input type="color" id="colBad" value="#fb7185" />
+                    <span class="color-hex" id="hexBad">#FB7185</span>
                   </div>
                 </label>
               </div>
@@ -457,7 +449,7 @@
     </section>
 
     <!-- BLOCK 4: MODULE STORE & BUNDLES -->
-    <section class="band band-white" id="modules">
+    <section class="band band-void" id="modules">
       <div class="wrap">
         <div class="modules-head" data-reveal>
           <div>
@@ -515,10 +507,10 @@
             Все <span id="countAll">65</span>
           </button>
           <button type="button" class="cat-pill" data-cat="roles" role="tab" aria-selected="false">
-            <i class="dot dot-cobalt" aria-hidden="true"></i>Роли и отряды <span>5</span>
+            <i class="dot dot-coral" aria-hidden="true"></i>Роли и отряды <span>5</span>
           </button>
           <button type="button" class="cat-pill" data-cat="scp" role="tab" aria-selected="false">
-            <i class="dot dot-orange" aria-hidden="true"></i>SCP <span>17</span>
+            <i class="dot dot-amber" aria-hidden="true"></i>SCP <span>17</span>
           </button>
           <button type="button" class="cat-pill" data-cat="facility" role="tab" aria-selected="false">
             <i class="dot dot-emerald" aria-hidden="true"></i>Комплекс <span>16</span>
@@ -530,7 +522,7 @@
             <i class="dot dot-sky" aria-hidden="true"></i>Интерфейс <span>4</span>
           </button>
           <button type="button" class="cat-pill" data-cat="admin" role="tab" aria-selected="false">
-            <i class="dot dot-slate" aria-hidden="true"></i>Сервер и админ <span>8</span>
+            <i class="dot dot-rose" aria-hidden="true"></i>Сервер и админ <span>8</span>
           </button>
         </div>
 
@@ -543,19 +535,19 @@
     </section>
 
     <!-- BLOCK 5: WEBPANEL MARKETING SHOWCASE -->
-    <section class="band band-dark" id="webpanel">
+    <section class="band band-deep" id="webpanel">
       <div class="wrap">
-        <div class="webpanel-split webpanel-solo">
+        <div class="webpanel-split">
           <div class="webpanel-art" data-tilt data-reveal>
             <div class="tilt-inner">
               <img src="assets/webpanel-3d.jpg" alt="Абстрактная 3D-композиция веб-панели администрации FULT-ENGINE" loading="lazy" />
-              <div class="tilt-sheen tilt-sheen-dark" aria-hidden="true"></div>
+              <div class="tilt-sheen" aria-hidden="true"></div>
             </div>
           </div>
 
           <div class="webpanel-copy" data-reveal style="--rd: 90ms">
             <h2>Веб-панель администрации в комплекте</h2>
-            <p class="dark-sub">
+            <p class="section-sub">
               Управляйте составом администрации прямо из браузера без ручной правки текстовых файлов. Вход через Steam, учёт ролей, история варнов и автоматическая синхронизация с игровым сервером.
             </p>
             <ul class="perk-list">
@@ -563,7 +555,7 @@
               <li>Единая база админов, должностей и предупреждений</li>
               <li>Мгновенная синхронизация прав с сервером SCP:SL</li>
             </ul>
-            <button type="button" class="btn btn-cobalt magnetic" id="addFullFromWebpanel">
+            <button type="button" class="btn btn-coral magnetic" id="addFullFromWebpanel">
               Забрать полный пакет с панелью
             </button>
           </div>
@@ -571,8 +563,8 @@
       </div>
     </section>
 
-    <!-- BLOCK 6: PURE MARKETING CLOSING CTA -->
-    <section class="band band-studio" id="order-cta">
+    <!-- BLOCK 6: WARM LAVA CLOSING CTA -->
+    <section class="band band-void" id="order-cta">
       <div class="wrap">
         <div class="closing-poster" data-reveal>
           <div class="closing-copy">
@@ -603,7 +595,7 @@
         <span>v2.0 / Платформа модулей для SCP:SL</span>
       </div>
       <div class="footer-links">
-        <a href="#bubbles">Пузыри</a>
+        <a href="#bubbles">Место отдыха</a>
         <a href="#sandbox">Генератор CINFO</a>
         <a href="#modules">Магазин</a>
         <a href="#webpanel">Веб-панель</a>
@@ -634,8 +626,8 @@
             <input type="text" id="orderContact" placeholder="@username или discord_tag" required />
           </label>
           <div class="drawer-actions">
-            <button type="submit" class="btn btn-cobalt" id="submitOrderBtn">Сформировать заказ</button>
-            <button type="button" class="btn btn-outline btn-sm" id="clearCartBtn">Очистить</button>
+            <button type="submit" class="btn btn-coral" id="submitOrderBtn">Сформировать заказ</button>
+            <button type="button" class="btn btn-glass btn-sm" id="clearCartBtn">Очистить</button>
           </div>
         </form>
 
@@ -672,6 +664,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="app.js?v=20261126b"></script>
+  <script src="app.js?v=20261126c"></script>
 </body>
 </html>
