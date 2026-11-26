@@ -280,239 +280,325 @@
   }
 
   // ======================================================
-  // 1. THROWABLE PHYSICS BUBBLES ARENA
+  // 1. ORGANIC 3D LIQUID BLOBS CANVAS (LAVA-LAMP STYLE)
   // ======================================================
-  const arena = document.getElementById("bubbleArena");
-  const toggleGravityBtn = document.getElementById("toggleGravityBtn");
-  const shakeBubblesBtn = document.getElementById("shakeBubblesBtn");
-  const resetBubblesBtn = document.getElementById("resetBubblesBtn");
-  const spotlight = document.getElementById("bubbleSpotlight");
-  const spotName = document.getElementById("spotName");
-  const spotDesc = document.getElementById("spotDesc");
-  const spotPrice = document.getElementById("spotPrice");
-  const spotBuyBtn = document.getElementById("spotBuyBtn");
+  const blobsStage = document.getElementById("bubbles");
+  const blobsCanvas = document.getElementById("blobsCanvas");
+  const scatterBlobsBtn = document.getElementById("scatterBlobsBtn");
+  const paletteBlobsBtn = document.getElementById("paletteBlobsBtn");
+  const resetBlobsBtn = document.getElementById("resetBlobsBtn");
 
-  const BUBBLE_COLORS = {
-    roles: "bub-white",
-    scp: "bub-orange",
-    facility: "bub-emerald",
-    gameplay: "bub-violet",
-    ui: "bub-sky",
-    admin: "bub-ink"
+  const BLOB_PALETTES = {
+    lava: [
+      { hi: "#f39d82", mid: "#d46f3c", lo: "#7c3718", rim: "rgba(255, 168, 130, 0.35)" },
+      { hi: "#ff7262", mid: "#c74322", lo: "#6e1b10", rim: "rgba(255, 132, 114, 0.32)" },
+      { hi: "#f5b04f", mid: "#bf741b", lo: "#5f3208", rim: "rgba(255, 198, 110, 0.30)" },
+      { hi: "#f0855e", mid: "#b94a24", lo: "#591d0e", rim: "rgba(255, 152, 115, 0.28)" }
+    ],
+    studio: [
+      { hi: "#789bff", mid: "#2347f2", lo: "#0e1d7a", rim: "rgba(140, 175, 255, 0.35)" },
+      { hi: "#ff9568", mid: "#f2581d", lo: "#7a2308", rim: "rgba(255, 168, 128, 0.32)" },
+      { hi: "#8bb8ff", mid: "#3b65ff", lo: "#172a82", rim: "rgba(165, 196, 255, 0.30)" },
+      { hi: "#ffb088", mid: "#e05526", lo: "#6b2109", rim: "rgba(255, 185, 145, 0.28)" }
+    ]
   };
 
-  const BUBBLE_NAMES = [
-    "Subclass", "InjurySystem", "BetterCassie", "Scp106Capture",
-    "WarheadCode", "Cpc", "Turrets", "AntiRaid",
-    "RoleDistribution", "Scramble", "KillZone", "BackGun",
-    "RadioWave", "CameraWatch", "MemoryWatch", "BetterSCP"
-  ];
+  let blobPaletteKey = "lava";
+  let blobs = [];
+  let cw = 1200;
+  let ch = 600;
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let draggedBlob = null;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+  let lastPtrX = 0;
+  let lastPtrY = 0;
+  let pointer = { x: -9999, y: -9999, vx: 0, vy: 0, active: false };
+  let stageVisible = true;
 
-  let gravityOn = true;
-  let activeSpotMod = null;
-  const bodies = [];
-
-  function initBubbles() {
-    arena.querySelectorAll(".phys-bubble").forEach((n) => n.remove());
-    bodies.length = 0;
-    const rect = arena.getBoundingClientRect();
-    const w = Math.max(320, rect.width);
-    const h = Math.max(320, rect.height);
-    const isSmall = w < 640;
-
-    const list = isSmall ? BUBBLE_NAMES.slice(0, 10) : BUBBLE_NAMES;
-    list.forEach((name, idx) => {
-      const mod = MODULES.find((m) => m.name === name);
-      if (!mod) return;
-      const baseR = PRO_MODULES.has(name) ? (isSmall ? 46 : 56) : (isSmall ? 40 : 48);
-      const r = baseR;
-      const cols = Math.max(3, Math.floor(w / (r * 2.2)));
-      const col = idx % cols;
-      const row = Math.floor(idx / cols);
-      const x = Math.min(w - r - 8, Math.max(r + 8, (col + 0.5) * (w / cols) + (Math.random() - 0.5) * 24));
-      const y = Math.min(h - r - 8, Math.max(r + 8, 30 + row * (r * 2.1)));
-
-      const el = document.createElement("div");
-      el.className = `phys-bubble ${BUBBLE_COLORS[mod.cat] || "bub-ink"}`;
-      el.style.width = `${r * 2}px`;
-      el.style.height = `${r * 2}px`;
-      el.innerHTML = `<strong>${esc(mod.name)}</strong><span>${formatRub(mod.price)}</span>`;
-      arena.appendChild(el);
-
-      const body = {
-        el,
-        mod,
-        r,
-        x,
-        y,
-        vx: (Math.random() - 0.5) * 4,
-        vy: (Math.random() - 0.5) * 2,
-        dragging: false,
-        pointerId: null,
-        lastX: x,
-        lastY: y,
-        downX: 0,
-        downY: 0,
-        moved: false
-      };
-
-      el.addEventListener("pointerdown", (e) => {
-        e.preventDefault();
-        el.setPointerCapture(e.pointerId);
-        const aRect = arena.getBoundingClientRect();
-        body.dragging = true;
-        body.pointerId = e.pointerId;
-        body.downX = e.clientX;
-        body.downY = e.clientY;
-        body.moved = false;
-        body.x = e.clientX - aRect.left;
-        body.y = e.clientY - aRect.top;
-        body.lastX = body.x;
-        body.lastY = body.y;
-        body.vx = 0;
-        body.vy = 0;
-        el.classList.add("is-dragging");
-      });
-
-      el.addEventListener("pointermove", (e) => {
-        if (!body.dragging || e.pointerId !== body.pointerId) return;
-        const aRect = arena.getBoundingClientRect();
-        const nx = Math.min(aRect.width - body.r, Math.max(body.r, e.clientX - aRect.left));
-        const ny = Math.min(aRect.height - body.r, Math.max(body.r, e.clientY - aRect.top));
-        if (Math.hypot(e.clientX - body.downX, e.clientY - body.downY) > 6) body.moved = true;
-        body.vx = (nx - body.lastX) * 0.85;
-        body.vy = (ny - body.lastY) * 0.85;
-        body.lastX = body.x;
-        body.lastY = body.y;
-        body.x = nx;
-        body.y = ny;
-      });
-
-      const release = (e) => {
-        if (!body.dragging || e.pointerId !== body.pointerId) return;
-        body.dragging = false;
-        body.pointerId = null;
-        el.classList.remove("is-dragging");
-        // Clamp throw speed
-        body.vx = Math.max(-28, Math.min(28, body.vx * 1.35));
-        body.vy = Math.max(-28, Math.min(28, body.vy * 1.35));
-        if (!body.moved) {
-          showBubbleSpotlight(body.mod);
-        }
-      };
-
-      el.addEventListener("pointerup", release);
-      el.addEventListener("pointercancel", release);
-      bodies.push(body);
-    });
+  if ("IntersectionObserver" in window && blobsStage) {
+    new IntersectionObserver((entries) => {
+      stageVisible = entries[0]?.isIntersecting ?? true;
+    }).observe(blobsStage);
   }
 
-  function showBubbleSpotlight(mod) {
-    activeSpotMod = mod;
-    spotName.textContent = mod.name;
-    spotDesc.textContent = mod.desc;
-    spotPrice.textContent = formatRub(mod.price);
-    spotBuyBtn.textContent = isInCart(mod.name) ? "В корзине (убрать)" : "+ В корзину";
-    spotlight.hidden = false;
+  function resizeBlobsCanvas() {
+    if (!blobsCanvas || !blobsStage) return;
+    const rect = blobsStage.getBoundingClientRect();
+    cw = Math.max(320, rect.width);
+    ch = Math.max(460, rect.height);
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    blobsCanvas.width = Math.round(cw * dpr);
+    blobsCanvas.height = Math.round(ch * dpr);
   }
 
-  spotBuyBtn.addEventListener("click", () => {
-    if (!activeSpotMod) return;
-    toggleCartItem({
-      id: activeSpotMod.name,
-      name: activeSpotMod.name,
-      price: activeSpotMod.price,
-      desc: CATEGORY_META[activeSpotMod.cat].label,
-      type: "module"
-    });
-    spotBuyBtn.textContent = isInCart(activeSpotMod.name) ? "В корзине (убрать)" : "+ В корзину";
-  });
+  function createBlobs() {
+    resizeBlobsCanvas();
+    const scale = cw < 640 ? 0.68 : 1;
+    // Composition inspired by reference: 1 large hero blob bottom-right, 1 medium upper-left,
+    // 1 small upper-right + gentle supporting organic droplets
+    const specs = [
+      { rx: 0.74, ry: 0.78, r: 178 * scale, pal: 0, wobble: 0.11 },
+      { rx: 0.23, ry: 0.34, r: 74 * scale, pal: 1, wobble: 0.12 },
+      { rx: 0.89, ry: 0.28, r: 34 * scale, pal: 2, wobble: 0.13 },
+      { rx: 0.48, ry: 0.62, r: 58 * scale, pal: 3, wobble: 0.11 },
+      { rx: 0.14, ry: 0.76, r: 44 * scale, pal: 2, wobble: 0.12 },
+      { rx: 0.62, ry: 0.24, r: 28 * scale, pal: 1, wobble: 0.14 },
+      { rx: 0.36, ry: 0.84, r: 24 * scale, pal: 0, wobble: 0.14 }
+    ];
 
-  function stepPhysics() {
-    const w = arena.clientWidth || 800;
-    const h = arena.clientHeight || 460;
-    const g = gravityOn ? 0.38 : 0;
-    const friction = gravityOn ? 0.992 : 0.996;
-    const bounce = 0.78;
+    blobs = specs.map((sp, i) => ({
+      x: cw * sp.rx,
+      y: ch * sp.ry,
+      vx: (Math.random() - 0.5) * 0.7,
+      vy: (Math.random() - 0.5) * 0.7,
+      baseR: sp.r / scale,
+      r: sp.r,
+      pal: sp.pal,
+      wobble: sp.wobble,
+      seed: i * 1.7 + Math.random() * 4,
+      speed: 0.65 + (i % 3) * 0.18,
+      squash: 0,
+      squashAngle: 0
+    }));
+  }
 
-    for (const b of bodies) {
-      if (b.dragging) continue;
-      b.vy += g;
-      if (!gravityOn) {
-        b.vx += (Math.random() - 0.5) * 0.06;
-        b.vy += (Math.random() - 0.5) * 0.06;
-      }
-      b.vx *= friction;
-      b.vy *= friction;
-      b.x += b.vx;
-      b.y += b.vy;
+  function drawOrganicBlob(ctx, b, t, palette) {
+    const p = palette[b.pal % palette.length];
+    const pts = [];
+    const steps = 18;
+    const speedMag = Math.min(18, Math.hypot(b.vx, b.vy));
+    const stretch = Math.min(0.22, speedMag * 0.012 + b.squash * 0.12);
+    const moveAngle = speedMag > 0.4 ? Math.atan2(b.vy, b.vx) : b.squashAngle;
 
-      if (b.x - b.r < 0) { b.x = b.r; b.vx = Math.abs(b.vx) * bounce; }
-      else if (b.x + b.r > w) { b.x = w - b.r; b.vx = -Math.abs(b.vx) * bounce; }
-
-      if (b.y - b.r < 0) { b.y = b.r; b.vy = Math.abs(b.vy) * bounce; }
-      else if (b.y + b.r > h) { b.y = h - b.r; b.vy = -Math.abs(b.vy) * bounce; }
+    for (let i = 0; i < steps; i++) {
+      const a = (i / steps) * Math.PI * 2;
+      const n1 = Math.sin(a * 2 + t * b.speed + b.seed) * b.wobble;
+      const n2 = Math.cos(a * 3 - t * b.speed * 0.8 + b.seed * 1.3) * (b.wobble * 0.55);
+      const n3 = Math.sin(a * 4 + t * b.speed * 0.5 + b.seed * 0.7) * (b.wobble * 0.25);
+      const directional = Math.cos((a - moveAngle) * 2) * stretch;
+      const rad = b.r * (1 + n1 + n2 + n3 + directional);
+      pts.push({
+        x: b.x + Math.cos(a) * rad,
+        y: b.y + Math.sin(a) * rad
+      });
     }
 
-    // Elastic circle-circle collisions
-    for (let i = 0; i < bodies.length; i++) {
-      for (let j = i + 1; j < bodies.length; j++) {
-        const a = bodies[i];
-        const b = bodies[j];
-        const dx = b.x - a.x;
-        const dy = b.y - a.y;
-        const dist = Math.hypot(dx, dy) || 0.001;
-        const minDist = a.r + b.r + 2;
-        if (dist < minDist) {
-          const nx = dx / dist;
-          const ny = dy / dist;
-          const overlap = (minDist - dist) * 0.5;
-          if (!a.dragging) { a.x -= nx * overlap; a.y -= ny * overlap; }
-          if (!b.dragging) { b.x += nx * overlap; b.y += ny * overlap; }
+    ctx.beginPath();
+    const firstMidX = (pts[steps - 1].x + pts[0].x) * 0.5;
+    const firstMidY = (pts[steps - 1].y + pts[0].y) * 0.5;
+    ctx.moveTo(firstMidX, firstMidY);
+    for (let i = 0; i < steps; i++) {
+      const curr = pts[i];
+      const next = pts[(i + 1) % steps];
+      ctx.quadraticCurveTo(curr.x, curr.y, (curr.x + next.x) * 0.5, (curr.y + next.y) * 0.5);
+    }
+    ctx.closePath();
 
-          const rvx = b.vx - a.vx;
-          const rvy = b.vy - a.vy;
-          const velAlongNormal = rvx * nx + rvy * ny;
-          if (velAlongNormal < 0) {
-            const impulse = -(1 + 0.72) * velAlongNormal * 0.5;
-            if (!a.dragging) { a.vx -= impulse * nx; a.vy -= impulse * ny; }
-            if (!b.dragging) { b.vx += impulse * nx; b.vy += impulse * ny; }
+    // Soft 3D clay/velvet shading
+    const gx = b.x - b.r * 0.28;
+    const gy = b.y - b.r * 0.34;
+    const grad = ctx.createRadialGradient(gx, gy, b.r * 0.06, b.x, b.y, b.r * 1.18);
+    grad.addColorStop(0, p.hi);
+    grad.addColorStop(0.56, p.mid);
+    grad.addColorStop(1, p.lo);
+
+    ctx.save();
+    ctx.shadowColor = "rgba(0, 0, 0, 0.38)";
+    ctx.shadowBlur = Math.min(44, b.r * 0.42);
+    ctx.shadowOffsetY = b.r * 0.1;
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.strokeStyle = p.rim;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+
+  function stepBlobs(now) {
+    if (!blobsCanvas) return;
+    const ctx = blobsCanvas.getContext("2d");
+    if (stageVisible && ctx) {
+      const t = prefersReduced ? 1.2 : now * 0.0012;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cw, ch);
+
+      const pad = 16;
+      for (const b of blobs) {
+        if (b !== draggedBlob) {
+          // Gentle ambient drift
+          if (!prefersReduced) {
+            b.vx += Math.sin(t * 0.55 + b.seed) * 0.014;
+            b.vy += Math.cos(t * 0.48 + b.seed * 1.4) * 0.014;
+          }
+
+          // Soft fluid cursor scatter when sweeping nearby
+          if (pointer.active && !draggedBlob) {
+            const dx = b.x - pointer.x;
+            const dy = b.y - pointer.y;
+            const dist = Math.hypot(dx, dy) || 1;
+            const reach = b.r + 115;
+            if (dist < reach) {
+              const force = (1 - dist / reach) * 0.85;
+              b.vx += (dx / dist) * force + pointer.vx * 0.045;
+              b.vy += (dy / dist) * force + pointer.vy * 0.045;
+              b.squash = Math.min(1, b.squash + 0.06);
+              b.squashAngle = Math.atan2(dy, dx);
+            }
+          }
+
+          // Viscous fluid damping
+          b.vx *= 0.965;
+          b.vy *= 0.965;
+          b.x += b.vx;
+          b.y += b.vy;
+
+          // Soft cushioned walls (allow slight edge bleed for organic cinema feel)
+          const minX = -b.r * 0.15 + pad;
+          const maxX = cw + b.r * 0.15 - pad;
+          const minY = -b.r * 0.15 + pad;
+          const maxY = ch + b.r * 0.15 - pad;
+
+          if (b.x - b.r < minX) { b.x = minX + b.r; b.vx = Math.abs(b.vx) * 0.65; }
+          else if (b.x + b.r > maxX) { b.x = maxX - b.r; b.vx = -Math.abs(b.vx) * 0.65; }
+          if (b.y - b.r < minY) { b.y = minY + b.r; b.vy = Math.abs(b.vy) * 0.65; }
+          else if (b.y + b.r > maxY) { b.y = maxY - b.r; b.vy = -Math.abs(b.vy) * 0.65; }
+        }
+        b.squash *= 0.92;
+      }
+
+      // Soft pillowy separation between blobs (no harsh billiard clack)
+      for (let i = 0; i < blobs.length; i++) {
+        for (let j = i + 1; j < blobs.length; j++) {
+          const a = blobs[i];
+          const b = blobs[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const dist = Math.hypot(dx, dy) || 0.001;
+          const minDist = (a.r + b.r) * 0.92;
+          if (dist < minDist) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            const push = (minDist - dist) * 0.045;
+            if (a !== draggedBlob) { a.vx -= nx * push; a.vy -= ny * push; }
+            if (b !== draggedBlob) { b.vx += nx * push; b.vy += ny * push; }
           }
         }
       }
-    }
 
-    for (const b of bodies) {
-      b.el.style.transform = `translate3d(${(b.x - b.r).toFixed(1)}px, ${(b.y - b.r).toFixed(1)}px, 0)`;
+      const palette = BLOB_PALETTES[blobPaletteKey];
+      // Draw smallest to largest so the hero foreground blob feels closest
+      const sorted = [...blobs].sort((a, b) => a.r - b.r);
+      for (const b of sorted) {
+        drawOrganicBlob(ctx, b, t, palette);
+      }
     }
-
-    requestAnimationFrame(stepPhysics);
+    pointer.vx *= 0.8;
+    pointer.vy *= 0.8;
+    requestAnimationFrame(stepBlobs);
   }
 
-  toggleGravityBtn.addEventListener("click", () => {
-    gravityOn = !gravityOn;
-    toggleGravityBtn.classList.toggle("is-active", gravityOn);
-    toggleGravityBtn.setAttribute("aria-pressed", String(gravityOn));
-    toggleGravityBtn.textContent = gravityOn ? "Гравитация: Вкл" : "Невесомость";
-    if (!gravityOn) {
-      bodies.forEach((b) => {
-        b.vx += (Math.random() - 0.5) * 6;
-        b.vy -= Math.random() * 5 + 2;
-      });
+  function getCanvasPos(e) {
+    const rect = blobsCanvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  blobsCanvas.addEventListener("pointerdown", (e) => {
+    const pos = getCanvasPos(e);
+    // Check largest/topmost first
+    const hitOrder = [...blobs].sort((a, b) => b.r - a.r);
+    const hit = hitOrder.find((b) => Math.hypot(pos.x - b.x, pos.y - b.y) <= b.r * 1.05);
+    if (hit) {
+      blobsCanvas.setPointerCapture(e.pointerId);
+      draggedBlob = hit;
+      dragOffsetX = hit.x - pos.x;
+      dragOffsetY = hit.y - pos.y;
+      lastPtrX = pos.x;
+      lastPtrY = pos.y;
+      hit.vx = 0;
+      hit.vy = 0;
+      blobsCanvas.classList.add("is-dragging");
+    } else {
+      // Soft radial wave push from clicked empty spot
+      for (const b of blobs) {
+        const dx = b.x - pos.x;
+        const dy = b.y - pos.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        const power = Math.max(2, 16 - dist * 0.022);
+        b.vx += (dx / dist) * power;
+        b.vy += (dy / dist) * power;
+        b.squash = 0.85;
+        b.squashAngle = Math.atan2(dy, dx);
+      }
     }
   });
 
-  shakeBubblesBtn.addEventListener("click", () => {
-    bodies.forEach((b) => {
-      b.vx += (Math.random() - 0.5) * 24;
-      b.vy -= Math.random() * 18 + 8;
-    });
+  blobsCanvas.addEventListener("pointermove", (e) => {
+    const pos = getCanvasPos(e);
+    pointer.vx = pos.x - pointer.x;
+    pointer.vy = pos.y - pointer.y;
+    pointer.x = pos.x;
+    pointer.y = pos.y;
+    pointer.active = true;
+
+    if (draggedBlob) {
+      draggedBlob.vx = (pos.x - lastPtrX) * 0.9;
+      draggedBlob.vy = (pos.y - lastPtrY) * 0.9;
+      draggedBlob.x = pos.x + dragOffsetX;
+      draggedBlob.y = pos.y + dragOffsetY;
+      draggedBlob.squash = Math.min(1, Math.hypot(draggedBlob.vx, draggedBlob.vy) * 0.04);
+      lastPtrX = pos.x;
+      lastPtrY = pos.y;
+    }
   });
 
-  resetBubblesBtn.addEventListener("click", initBubbles);
+  const endDrag = () => {
+    if (draggedBlob) {
+      draggedBlob.vx = Math.max(-24, Math.min(24, draggedBlob.vx * 1.25));
+      draggedBlob.vy = Math.max(-24, Math.min(24, draggedBlob.vy * 1.25));
+      draggedBlob = null;
+      blobsCanvas.classList.remove("is-dragging");
+    }
+  };
 
-  initBubbles();
-  requestAnimationFrame(stepPhysics);
+  blobsCanvas.addEventListener("pointerup", endDrag);
+  blobsCanvas.addEventListener("pointercancel", endDrag);
+  blobsCanvas.addEventListener("pointerleave", () => {
+    pointer.active = false;
+    endDrag();
+  });
+
+  scatterBlobsBtn.addEventListener("click", () => {
+    for (const b of blobs) {
+      const angle = Math.random() * Math.PI * 2;
+      const spd = 8 + Math.random() * 14;
+      b.vx += Math.cos(angle) * spd;
+      b.vy += Math.sin(angle) * spd;
+      b.squash = 0.9;
+      b.squashAngle = angle;
+    }
+  });
+
+  paletteBlobsBtn.addEventListener("click", () => {
+    blobPaletteKey = blobPaletteKey === "lava" ? "studio" : "lava";
+    blobsStage.classList.toggle("is-studio-pal", blobPaletteKey === "studio");
+    paletteBlobsBtn.textContent = blobPaletteKey === "lava" ? "Палитра: Лава" : "Палитра: Студия";
+  });
+
+  resetBlobsBtn.addEventListener("click", createBlobs);
+  window.addEventListener("resize", () => {
+    resizeBlobsCanvas();
+    const scale = cw < 640 ? 0.56 : 1;
+    for (const b of blobs) {
+      b.r = b.baseR * scale;
+      b.x = Math.min(cw - b.r * 0.5, Math.max(b.r * 0.5, b.x));
+      b.y = Math.min(ch - b.r * 0.5, Math.max(b.r * 0.5, b.y));
+    }
+  });
+
+  createBlobs();
+  requestAnimationFrame(stepBlobs);
 
   // ======================================================
   // 2. GENERATORS STUDIO (CINFO / KEYCARD / THEME)

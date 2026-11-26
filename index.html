@@ -115,37 +115,22 @@
       </div>
     </section>
 
-    <!-- BLOCK 2: VIVID COBALT THROWABLE PHYSICS BUBBLES ARENA -->
-    <section class="band band-cobalt" id="bubbles">
-      <div class="wrap">
-        <div class="bubbles-head" data-reveal>
-          <div>
-            <h2>Поиграйте с модулями</h2>
-            <p>
-              Хватайте пузыри мышкой или пальцем и раскидывайте их по экрану. Нажмите на любой пузырь, чтобы увидеть его возможности и добавить в корзину.
-            </p>
-          </div>
-
-          <div class="bubbles-controls">
-            <button type="button" class="preset-btn is-active" id="toggleGravityBtn" aria-pressed="true">Гравитация: Вкл</button>
-            <button type="button" class="preset-btn" id="shakeBubblesBtn">Встряхнуть</button>
-            <button type="button" class="preset-btn" id="resetBubblesBtn">Собрать заново</button>
-          </div>
+    <!-- BLOCK 2: ORGANIC 3D LIQUID BLOBS STAGE -->
+    <section class="blobs-stage" id="bubbles" aria-label="Интерактивная сцена с органичными пузырями">
+      <canvas class="blobs-canvas" id="blobsCanvas"></canvas>
+      <div class="wrap blobs-overlay">
+        <div class="blobs-top" data-reveal>
+          <h2>Живая модульная среда</h2>
+          <p>
+            Проведите курсором, чтобы разогнать пузыри, или схватите любой и бросьте его через экран.
+            Клик по свободному месту создаёт мягкую волну.
+          </p>
         </div>
 
-        <div class="bubble-arena" id="bubbleArena" aria-label="Интерактивная физическая арена с пузырями модулей">
-          <div class="arena-hint" aria-hidden="true">Перетаскивайте и бросайте пузыри</div>
-        </div>
-
-        <div class="bubble-spotlight" id="bubbleSpotlight" hidden>
-          <div class="spot-info">
-            <strong id="spotName">Subclass</strong>
-            <span id="spotDesc">Выдаёт подклассы ролей: состав, предметы, имена учёных и описание персонажа.</span>
-          </div>
-          <div class="spot-actions">
-            <strong class="spot-price" id="spotPrice">790 ₽</strong>
-            <button type="button" class="cfg-btn cfg-btn-primary" id="spotBuyBtn">+ В корзину</button>
-          </div>
+        <div class="blobs-controls">
+          <button type="button" class="blob-ctrl-btn" id="scatterBlobsBtn">Раскидать</button>
+          <button type="button" class="blob-ctrl-btn" id="paletteBlobsBtn">Палитра: Лава</button>
+          <button type="button" class="blob-ctrl-btn" id="resetBlobsBtn">Сбросить</button>
         </div>
       </div>
     </section>
