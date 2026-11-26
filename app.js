@@ -151,7 +151,7 @@
     const linkRect = link.getBoundingClientRect();
     if (linkRect.width === 0) return;
     navIndicator.style.width = `${linkRect.width}px`;
-    navIndicator.style.transform = `translate3d(${linkRect.left - navRect.left}px, -50%, 0)`;
+    navIndicator.style.transform = `translate3d(${linkRect.left - navRect.left}px, 0, 0)`;
     navIndicator.classList.add("is-visible");
   }
 
@@ -177,107 +177,47 @@
   });
   syncActiveNav();
 
-  // Scroll reveals & counters
-  function animateCounter(el) {
-    if (el.dataset.counted) return;
-    el.dataset.counted = "1";
-    const target = Number(el.dataset.count);
-    if (!Number.isFinite(target) || prefersReduced) return;
-    const duration = 650;
-    const start = performance.now();
-    const fmt = new Intl.NumberFormat("ru-RU");
-    function step(now) {
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = fmt.format(Math.round(target * eased));
-      if (p < 1) requestAnimationFrame(step);
-      else el.textContent = fmt.format(target);
-    }
-    requestAnimationFrame(step);
-  }
-
-  if (!prefersReduced && "IntersectionObserver" in window) {
-    const revealObs = new IntersectionObserver((entries, obs) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-in");
-        obs.unobserve(entry.target);
+  // Interactive WebPanel preview tabs
+  const wpBody = document.getElementById("wpBody");
+  const wpTabs = document.querySelectorAll(".wp-tab");
+  const WP_VIEWS = {
+    staff: `
+      <div class="wp-table">
+        <div class="wp-row wp-row-head"><span>Сотрудник</span><span>Должность</span><span>Статус</span></div>
+        <div class="wp-row"><span class="wp-user">K. Volkov <em>76561198042</em></span><span>Старший админ</span><span class="wp-stat">В сети</span></div>
+        <div class="wp-row"><span class="wp-user">M. Orlov <em>76561198119</em></span><span>Модератор RP</span><span class="wp-stat">В сети</span></div>
+        <div class="wp-row"><span class="wp-user">D. Sokolov <em>76561198207</em></span><span>Куратор SCP</span><span class="wp-stat wp-stat-muted">Офлайн</span></div>
+        <div class="wp-row"><span class="wp-user">A. Klimov <em>76561198355</em></span><span>Стажёр</span><span class="wp-stat wp-stat-muted">Офлайн</span></div>
+      </div>`,
+    warns: `
+      <div class="wp-table">
+        <div class="wp-row wp-row-head"><span>Игрок / админ</span><span>Причина</span><span>Срок</span></div>
+        <div class="wp-row"><span class="wp-user">A. Klimov <em>Варн 1/3</em></span><span>Нарушение регламента КПП</span><span class="wp-stat">Активен</span></div>
+        <div class="wp-row"><span class="wp-user">R. Petrov <em>Варн 2/3</em></span><span>Игнорирование заявки КИР</span><span class="wp-stat">Активен</span></div>
+        <div class="wp-row"><span class="wp-user">N. Gusev <em>Варн 1/3</em></span><span>Неверный тег подкласса</span><span class="wp-stat wp-stat-muted">Снят</span></div>
+        <div class="wp-row"><span class="wp-user">S. Belov <em>Варн 1/3</em></span><span>Превышение полномочий RA</span><span class="wp-stat wp-stat-muted">Снят</span></div>
+      </div>`,
+    sync: `
+      <div class="wp-table">
+        <div class="wp-row wp-row-head"><span>Узел</span><span>Последний обмен</span><span>Статус</span></div>
+        <div class="wp-row"><span class="wp-user">Site-02 Main <em>EU-Central</em></span><span>14 сек. назад (65 модулей)</span><span class="wp-stat">Синхр.</span></div>
+        <div class="wp-row"><span class="wp-user">Site-19 Hard RP <em>RU-MSK</em></span><span>28 сек. назад (65 модулей)</span><span class="wp-stat">Синхр.</span></div>
+        <div class="wp-row"><span class="wp-user">Event Sandbox <em>RU-SPB</em></span><span>2 мин. назад (42 модуля)</span><span class="wp-stat">Синхр.</span></div>
+        <div class="wp-row"><span class="wp-user">Backup Configs <em>SQLite</em></span><span>Автосохранение каждые 5 мин</span><span class="wp-stat wp-stat-muted">Ок</span></div>
+      </div>`
+  };
+  wpTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const key = tab.dataset.wp;
+      if (!wpBody || !WP_VIEWS[key]) return;
+      wpTabs.forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle("is-active", active);
+        t.setAttribute("aria-selected", String(active));
       });
-    }, { threshold: 0.1, rootMargin: "0px 0px -30px 0px" });
-    document.querySelectorAll("[data-reveal]").forEach((el) => revealObs.observe(el));
-
-    const countObs = new IntersectionObserver((entries, obs) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        animateCounter(entry.target);
-        obs.unobserve(entry.target);
-      });
-    }, { threshold: 0.4 });
-    document.querySelectorAll("[data-count]").forEach((el) => countObs.observe(el));
-  } else {
-    document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-in"));
-  }
-
-  // 3D tilt + magnetic buttons
-  if (!prefersReduced && finePointer) {
-    const tiltEls = Array.from(document.querySelectorAll("[data-tilt]"));
-    const states = tiltEls.map((el, i) => ({
-      el,
-      inner: el.querySelector(".tilt-inner"),
-      sheen: el.querySelector(".tilt-sheen"),
-      tx: 0, ty: 0, cx: 0, cy: 0, hovering: false, phase: i * 1.9, visible: true
-    }));
-
-    if ("IntersectionObserver" in window) {
-      const visObs = new IntersectionObserver((entries) => {
-        entries.forEach((e) => {
-          const st = states.find((s) => s.el === e.target);
-          if (st) st.visible = e.isIntersecting;
-        });
-      });
-      states.forEach((s) => visObs.observe(s.el));
-    }
-
-    states.forEach((s) => {
-      s.el.addEventListener("pointermove", (e) => {
-        const rect = s.el.getBoundingClientRect();
-        const nx = (e.clientX - rect.left) / rect.width;
-        const ny = (e.clientY - rect.top) / rect.height;
-        s.tx = (0.5 - ny) * 10;
-        s.ty = (nx - 0.5) * 12;
-        s.hovering = true;
-        if (s.sheen) {
-          s.sheen.style.setProperty("--mx", `${(nx * 100).toFixed(1)}%`);
-          s.sheen.style.setProperty("--my", `${(ny * 100).toFixed(1)}%`);
-        }
-      });
-      s.el.addEventListener("pointerleave", () => { s.tx = 0; s.ty = 0; s.hovering = false; });
+      wpBody.innerHTML = WP_VIEWS[key];
     });
-
-    function tickTilt(now) {
-      const t = now * 0.0014;
-      for (const s of states) {
-        if (!s.visible || !s.inner) continue;
-        s.cx += (s.tx - s.cx) * 0.09;
-        s.cy += (s.ty - s.cy) * 0.09;
-        const floatY = s.hovering ? 0 : Math.sin(t + s.phase) * 5;
-        const floatR = s.hovering ? 0 : Math.cos(t * 0.7 + s.phase) * 0.6;
-        s.inner.style.transform = `translate3d(0, ${floatY.toFixed(2)}px, 0) rotateX(${s.cx.toFixed(2)}deg) rotateY(${(s.cy + floatR).toFixed(2)}deg)`;
-      }
-      requestAnimationFrame(tickTilt);
-    }
-    requestAnimationFrame(tickTilt);
-
-    document.querySelectorAll(".magnetic").forEach((btn) => {
-      btn.addEventListener("pointermove", (e) => {
-        const rect = btn.getBoundingClientRect();
-        const dx = (e.clientX - (rect.left + rect.width / 2)) * 0.14;
-        const dy = (e.clientY - (rect.top + rect.height / 2)) * 0.18;
-        btn.style.transform = `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0)`;
-      });
-      btn.addEventListener("pointerleave", () => { btn.style.transform = ""; });
-    });
-  }
+  });
 
   // ======================================================
   // 1. ORGANIC 3D LIQUID BLOBS CANVAS (LAVA-LAMP STYLE)
@@ -1068,15 +1008,17 @@
       btn.classList.toggle("is-added", added);
       btn.textContent = added ? "В корзине (убрать)" : "Добавить в корзину";
     });
-    document.querySelectorAll(".mod-buy-btn").forEach((btn) => {
+    document.querySelectorAll(".mod-buy").forEach((btn) => {
       const added = isInCart(btn.dataset.buy);
-      btn.classList.toggle("is-in-cart", added);
+      btn.classList.toggle("is-added", added);
       btn.textContent = added ? "В корзине" : "+ В корзину";
+      btn.closest(".mod-row")?.classList.toggle("is-in-cart", added);
     });
   }
 
   function renderCart() {
     cartCountEl.textContent = String(cart.length);
+    document.getElementById("openCart")?.classList.toggle("has-items", cart.length > 0);
     cartItemCountEl.textContent = String(cart.length);
     const { discount, discRate, total } = calcCart();
 
@@ -1096,10 +1038,10 @@
           <div class="cart-item">
             <div class="cart-item-info">
               <strong>${esc(item.name)}</strong>
-              <small>${esc(item.desc)}</small>
+              <span>${esc(item.desc)}</span>
             </div>
             <div class="cart-item-right">
-              <span>${formatRub(item.price)}</span>
+              <span class="cart-item-price">${formatRub(item.price)}</span>
               <button type="button" class="cart-remove" data-rm="${esc(item.id)}" aria-label="Удалить ${esc(item.name)}">×</button>
             </div>
           </div>
@@ -1233,32 +1175,30 @@
       : `Найдено ${filtered.length} из ${MODULES.length} модулей`;
 
     if (filtered.length === 0) {
-      modulesList.innerHTML = `<div class="mod-empty">Ничего не найдено по запросу «${esc(q)}». Очистите поиск или выберите другую категорию.</div>`;
+      modulesList.innerHTML = `<div class="empty-state">Ничего не найдено по запросу «${esc(q)}». Очистите поиск или выберите другую категорию.</div>`;
       return;
     }
 
     const cardsHtml = visible
-      .map((m, idx) => {
+      .map((m) => {
         const meta = CATEGORY_META[m.cat];
         const cmdsHtml = m.cmds.length
           ? `<div class="mod-cmds">${m.cmds.map((c) => `<code>${esc(c)}</code>`).join("")}</div>`
           : "";
         const inCart = isInCart(m.name);
-        const enterCls = animate && !prefersReduced ? " mod-enter" : "";
-        const delayStyle = animate && !prefersReduced ? ` style="--md: ${Math.min(idx * 18, 180)}ms"` : "";
         return `
-          <article class="mod-row${enterCls}" data-mod="${esc(m.name)}"${delayStyle}>
-            <div class="mod-btn" style="cursor:default">
-              <div class="mod-top">
-                <strong class="mod-name">${esc(m.name)}</strong>
-                <span class="mod-cat"><i class="dot ${meta.dot}" aria-hidden="true"></i>${meta.label}</span>
+          <article class="mod-row${inCart ? " is-in-cart" : ""}" data-mod="${esc(m.name)}">
+            <div>
+              <div class="mod-head">
+                <h3 class="mod-name">${esc(m.name)}</h3>
+                <span class="mod-cat">${meta.label}</span>
               </div>
               <p class="mod-desc">${esc(m.desc)}</p>
               ${cmdsHtml}
             </div>
-            <div class="mod-footer-bar">
+            <div class="mod-foot">
               <span class="mod-price">${formatRub(m.price)}</span>
-              <button type="button" class="mod-buy-btn${inCart ? " is-in-cart" : ""}" data-buy="${esc(m.name)}">${inCart ? "В корзине" : "+ В корзину"}</button>
+              <button type="button" class="mod-buy${inCart ? " is-added" : ""}" data-buy="${esc(m.name)}">${inCart ? "В корзине" : "+ В корзину"}</button>
             </div>
           </article>
         `;
@@ -1266,7 +1206,7 @@
       .join("");
 
     const moreHtml = limitDefault
-      ? `<div class="mod-more-wrap"><button type="button" class="mod-more-btn" id="showAllModulesBtn">Показать все ${MODULES.length} модулей</button></div>`
+      ? `<div class="modules-more-wrap"><button type="button" class="btn btn-line btn-sm" id="showAllModulesBtn">Показать все ${MODULES.length} модулей</button></div>`
       : "";
 
     modulesList.innerHTML = cardsHtml + moreHtml;
@@ -1283,13 +1223,11 @@
     searchInput.value = modName;
     renderModules(true);
     document.getElementById("modules").scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth" });
-    const row = modulesList.querySelector(`[data-mod="${CSS.escape(modName)}"]`);
-    if (row) row.classList.add("is-flash");
   }
 
   modulesList.addEventListener("click", (e) => {
     if (e.target.closest("#showAllModulesBtn")) { expandedAll = true; renderModules(true); return; }
-    const buyBtn = e.target.closest(".mod-buy-btn");
+    const buyBtn = e.target.closest(".mod-buy");
     if (buyBtn) {
       const mod = MODULES.find((m) => m.name === buyBtn.dataset.buy);
       if (mod) toggleCartItem({ id: mod.name, name: mod.name, price: mod.price, desc: CATEGORY_META[mod.cat].label, type: "module" });
