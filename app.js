@@ -1031,7 +1031,7 @@
       return;
     }
     if (dragonEggsEarned < 15) {
-      showToast(`Нужно ещё ${15 - dragonEggsEarned} яиц дракона! Хлестните Red Dragon!`);
+      showToast(`Нужно ещё ${15 - dragonEggsEarned} яиц дракона! Накажите дракошу плёткой!`);
       return;
     }
     dragonEggsEarned -= 15;
@@ -1723,7 +1723,7 @@
   const closeCmdkBtn = document.getElementById("closeCmdk");
 
   const SECTION_ITEMS = [
-    { type: "section", title: "Накажи своего дракошу", sub: "Хлестните плёткой по Red Dragon и соберите яйца дракона", badge: "#bubbles", target: "#bubbles" },
+    { type: "section", title: "Накажи своего дракошу", sub: "Хлестните плёткой дракошу и соберите яйца дракона", badge: "#bubbles", target: "#bubbles" },
     { type: "section", title: "Студия CINFO и карточек", sub: "Служебные бейджи Subclass и ключ-карты PNG", badge: "#sandbox", target: "#sandbox" },
     { type: "section", title: "Магазин модулей", sub: "65 модулей, наборы и скидки", badge: "#modules", target: "#modules" },
     { type: "section", title: "Веб-панель администрации", sub: "Вход через Steam, роли и варны", badge: "#webpanel", target: "#webpanel" }
