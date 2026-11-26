@@ -220,7 +220,61 @@
   });
 
   // ======================================================
-  // 1. ORGANIC 3D LIQUID BLOBS CANVAS (LAVA-LAMP STYLE)
+  // 0. KIES WORM MASCOT EXPRESSIONS & RHYTHM STRIPS
+  // ======================================================
+  const wormBtn = document.getElementById("wormMascotBtn");
+  const wormEyes = document.getElementById("wormEyes");
+  const wormMouth = document.getElementById("wormMouth");
+  const wormMoodLabel = document.getElementById("wormMoodLabel");
+
+  const WORM_MOODS = [
+    {
+      label: "Фультик: игривый (X / O)",
+      eyes: `<path d="M134 89l18 18m0-18l-18 18" stroke="#1C529E" stroke-width="6.5" stroke-linecap="round"/><circle cx="209" cy="98" r="11" stroke="#1C529E" stroke-width="6"/><circle cx="209" cy="98" r="3.5" fill="#1C529E"/>`,
+      mouth: `<path d="M159 130c5 8 12 8 17 0 5 8 12 8 17 0" stroke="#E87B25" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`
+    },
+    {
+      label: "Фультик: дразнится (X / X)",
+      eyes: `<path d="M134 89l18 18m0-18l-18 18" stroke="#1C529E" stroke-width="6.5" stroke-linecap="round"/><path d="M200 89l18 18m0-18l-18 18" stroke="#1C529E" stroke-width="6.5" stroke-linecap="round"/>`,
+      mouth: `<path d="M159 129c5 8 12 8 17 0 5 8 12 8 17 0" stroke="#E87B25" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M170 133c0 12 12 12 12 0Z" fill="#DA3832"/>`
+    },
+    {
+      label: "Фультик: удивлён (O / O)",
+      eyes: `<circle cx="143" cy="98" r="11" stroke="#1C529E" stroke-width="6"/><circle cx="143" cy="98" r="3.5" fill="#1C529E"/><circle cx="209" cy="98" r="11" stroke="#1C529E" stroke-width="6"/><circle cx="209" cy="98" r="3.5" fill="#1C529E"/>`,
+      mouth: `<ellipse cx="176" cy="133" rx="9" ry="7" fill="#DA3832" stroke="#E87B25" stroke-width="4"/>`
+    },
+    {
+      label: "Фультик: хитрый взгляд",
+      eyes: `<circle cx="151" cy="98" r="9.5" fill="#1C529E"/><circle cx="154" cy="95" r="3" fill="#F9F3E2"/><circle cx="217" cy="98" r="9.5" fill="#1C529E"/><circle cx="220" cy="95" r="3" fill="#F9F3E2"/>`,
+      mouth: `<path d="M161 131c8 7 22 7 30 0" stroke="#E87B25" stroke-width="5" stroke-linecap="round"/>`
+    }
+  ];
+  let wormMoodIdx = 0;
+
+  if (wormBtn && wormEyes && wormMouth) {
+    wormBtn.addEventListener("click", () => {
+      wormMoodIdx = (wormMoodIdx + 1) % WORM_MOODS.length;
+      const m = WORM_MOODS[wormMoodIdx];
+      wormEyes.innerHTML = m.eyes;
+      wormMouth.innerHTML = m.mouth;
+      if (wormMoodLabel) wormMoodLabel.textContent = m.label;
+      wormBtn.classList.remove("is-popping");
+      void wormBtn.offsetWidth;
+      wormBtn.classList.add("is-popping");
+    });
+  }
+
+  function fillKiesStrip(el) {
+    if (!el) return;
+    const starSvg = `<svg width="24" height="24" viewBox="0 0 28 28" fill="none"><path d="M14 2l3.4 7.4 8.1 1-6 5.6 1.6 8L14 20l-7.1 4 1.6-8-6-5.6 8.1-1L14 2Z" fill="#DA3832"/></svg>`;
+    const coilSvg = `<svg width="64" height="22" viewBox="0 0 70 24" fill="none"><path d="M3 16c6-12 18-12 20 0 1 6-6 6-7 0-2-12 14-12 18 0 1 6-6 6-7 0-2-12 14-12 18 0 1 6-6 6-7 0-2-12 16-12 22 0" stroke="#1C529E" stroke-width="3.6" stroke-linecap="round"/></svg>`;
+    el.innerHTML = Array.from({ length: 12 }, (_, i) => (i % 2 === 0 ? starSvg : coilSvg)).join("");
+  }
+  fillKiesStrip(document.getElementById("heroStrip"));
+  fillKiesStrip(document.getElementById("footerStrip"));
+
+  // ======================================================
+  // 1. МЕСТО ОТДЫХА — KIES FLAT-VECTOR PLAYGROUND
   // ======================================================
   const blobsStage = document.getElementById("bubbles");
   const blobsCanvas = document.getElementById("blobsCanvas");
@@ -229,79 +283,30 @@
   const resetBlobsBtn = document.getElementById("resetBlobsBtn");
 
   const BLOB_PALETTES = {
-    lava: [
-      { hi: "#f39d82", mid: "#d46f3c", lo: "#7c3718", rim: "rgba(255, 168, 130, 0.35)" },
-      { hi: "#ff7262", mid: "#c74322", lo: "#6e1b10", rim: "rgba(255, 132, 114, 0.32)" },
-      { hi: "#f5b04f", mid: "#bf741b", lo: "#5f3208", rim: "rgba(255, 198, 110, 0.30)" },
-      { hi: "#f0855e", mid: "#b94a24", lo: "#591d0e", rim: "rgba(255, 152, 115, 0.28)" }
+    kies: [
+      { fill: "#F2B743", stroke: "#E87B25" },
+      { fill: "#DA3832", stroke: "#F9F3E2" },
+      { fill: "#8AD2D2", stroke: "#F9F3E2" },
+      { fill: "#F9F3E2", stroke: "#DA3832" }
     ],
-    amber: [
-      { hi: "#ffd185", mid: "#e08c26", lo: "#6e3809", rim: "rgba(255, 214, 138, 0.36)" },
-      { hi: "#ff9b62", mid: "#d65d24", lo: "#69220a", rim: "rgba(255, 168, 118, 0.32)" },
-      { hi: "#ffe0a3", mid: "#c78622", lo: "#593506", rim: "rgba(255, 224, 160, 0.30)" },
-      { hi: "#f2a461", mid: "#b85c22", lo: "#54220a", rim: "rgba(255, 180, 122, 0.28)" }
+    gold: [
+      { fill: "#1C529E", stroke: "#F9F3E2" },
+      { fill: "#DA3832", stroke: "#F9F3E2" },
+      { fill: "#8AD2D2", stroke: "#1C529E" },
+      { fill: "#F9F3E2", stroke: "#1C529E" }
     ],
-    ruby: [
-      { hi: "#ff8c9e", mid: "#d63854", lo: "#631022", rim: "rgba(255, 150, 170, 0.34)" },
-      { hi: "#ff7a66", mid: "#bf2e2e", lo: "#590e14", rim: "rgba(255, 138, 124, 0.32)" },
-      { hi: "#f5a078", mid: "#c44b36", lo: "#5e1a12", rim: "rgba(255, 174, 138, 0.30)" },
-      { hi: "#e8788a", mid: "#a62442", lo: "#4f0c1d", rim: "rgba(255, 136, 160, 0.28)" }
+    red: [
+      { fill: "#F2B743", stroke: "#F9F3E2" },
+      { fill: "#8AD2D2", stroke: "#1C529E" },
+      { fill: "#F9F3E2", stroke: "#1C529E" },
+      { fill: "#1C529E", stroke: "#F2B743" }
     ]
   };
 
-  const PALETTE_ORDER = ["lava", "amber", "ruby"];
-  const PALETTE_NAMES = { lava: "Оттенок: Лава", amber: "Оттенок: Янтарь", ruby: "Оттенок: Рубин" };
+  const PALETTE_ORDER = ["kies", "gold", "red"];
+  const PALETTE_NAMES = { kies: "Палитра: KIES", gold: "Палитра: Жёлтый", red: "Палитра: Красный" };
 
-  // Ambient Hero Blobs (matching unified lava-lamp style)
-  const heroCanvas = document.getElementById("heroBlobsCanvas");
-  const heroSection = document.getElementById("top");
-  let heroW = 1200;
-  let heroH = 680;
-  let heroBlobs = [];
-  let heroVisible = true;
-
-  if ("IntersectionObserver" in window && heroSection) {
-    new IntersectionObserver((entries) => {
-      heroVisible = entries[0]?.isIntersecting ?? true;
-    }).observe(heroSection);
-  }
-
-  function initHeroBlobs() {
-    if (!heroCanvas || !heroSection) return;
-    const rect = heroSection.getBoundingClientRect();
-    heroW = Math.max(320, rect.width);
-    heroH = Math.max(520, rect.height);
-    const hdpr = Math.min(window.devicePixelRatio || 1, 2);
-    heroCanvas.width = Math.round(heroW * hdpr);
-    heroCanvas.height = Math.round(heroH * hdpr);
-    const sc = heroW < 640 ? 0.52 : 1;
-    heroBlobs = [
-      { x: heroW * 0.80, y: heroH * 0.56, vx: 0, vy: 0, r: 175 * sc, pal: 0, wobble: 0.11, seed: 1.1, speed: 0.58, squash: 0, squashAngle: 0 },
-      { x: heroW * 0.64, y: heroH * 0.22, vx: 0, vy: 0, r: 62 * sc, pal: 1, wobble: 0.12, seed: 3.4, speed: 0.72, squash: 0, squashAngle: 0 },
-      { x: heroW * 0.91, y: heroH * 0.22, vx: 0, vy: 0, r: 32 * sc, pal: 2, wobble: 0.13, seed: 5.2, speed: 0.82, squash: 0, squashAngle: 0 },
-      { x: heroW * 0.54, y: heroH * 0.80, vx: 0, vy: 0, r: 42 * sc, pal: 3, wobble: 0.12, seed: 7.0, speed: 0.65, squash: 0, squashAngle: 0 }
-    ];
-  }
-
-  function stepHeroBlobs(now) {
-    if (!heroCanvas) return;
-    const ctx = heroCanvas.getContext("2d");
-    if (heroVisible && ctx) {
-      const hdpr = Math.min(window.devicePixelRatio || 1, 2);
-      const t = prefersReduced ? 1.1 : now * 0.001;
-      ctx.setTransform(hdpr, 0, 0, hdpr, 0, 0);
-      ctx.clearRect(0, 0, heroW, heroH);
-      const pal = BLOB_PALETTES[blobPaletteKey] || BLOB_PALETTES.lava;
-      for (const b of heroBlobs) {
-        const bx = b.x + (prefersReduced ? 0 : Math.sin(t * 0.55 + b.seed) * 14);
-        const by = b.y + (prefersReduced ? 0 : Math.cos(t * 0.45 + b.seed) * 12);
-        drawOrganicBlob(ctx, { ...b, x: bx, y: by }, t, pal);
-      }
-    }
-    requestAnimationFrame(stepHeroBlobs);
-  }
-
-  let blobPaletteKey = "lava";
+  let blobPaletteKey = "kies";
   let blobs = [];
   let cw = 1200;
   let ch = 600;
@@ -332,28 +337,30 @@
 
   function createBlobs() {
     resizeBlobsCanvas();
-    const scale = cw < 640 ? 0.68 : 1;
-    // Composition inspired by reference: 1 large hero blob bottom-right, 1 medium upper-left,
-    // 1 small upper-right + gentle supporting organic droplets
+    const scale = cw < 640 ? 0.64 : 1;
+    // Playful flat-vector KIES shapes: puffy stars, worm-head pins, rounded blobs & diamonds
     const specs = [
-      { rx: 0.74, ry: 0.78, r: 178 * scale, pal: 0, wobble: 0.11 },
-      { rx: 0.23, ry: 0.34, r: 74 * scale, pal: 1, wobble: 0.12 },
-      { rx: 0.89, ry: 0.28, r: 34 * scale, pal: 2, wobble: 0.13 },
-      { rx: 0.48, ry: 0.62, r: 58 * scale, pal: 3, wobble: 0.11 },
-      { rx: 0.14, ry: 0.76, r: 44 * scale, pal: 2, wobble: 0.12 },
-      { rx: 0.62, ry: 0.24, r: 28 * scale, pal: 1, wobble: 0.14 },
-      { rx: 0.36, ry: 0.84, r: 24 * scale, pal: 0, wobble: 0.14 }
+      { rx: 0.74, ry: 0.66, r: 94 * scale, pal: 0, kind: "worm" },
+      { rx: 0.52, ry: 0.34, r: 58 * scale, pal: 1, kind: "star" },
+      { rx: 0.88, ry: 0.28, r: 44 * scale, pal: 2, kind: "blob" },
+      { rx: 0.44, ry: 0.74, r: 54 * scale, pal: 2, kind: "blob" },
+      { rx: 0.18, ry: 0.66, r: 46 * scale, pal: 0, kind: "star" },
+      { rx: 0.66, ry: 0.24, r: 38 * scale, pal: 3, kind: "diamond" },
+      { rx: 0.32, ry: 0.80, r: 36 * scale, pal: 1, kind: "blob" },
+      { rx: 0.84, ry: 0.82, r: 48 * scale, pal: 3, kind: "star" }
     ];
 
     blobs = specs.map((sp, i) => ({
       x: cw * sp.rx,
       y: ch * sp.ry,
-      vx: (Math.random() - 0.5) * 0.7,
-      vy: (Math.random() - 0.5) * 0.7,
+      vx: (Math.random() - 0.5) * 0.8,
+      vy: (Math.random() - 0.5) * 0.8,
       baseR: sp.r / scale,
       r: sp.r,
       pal: sp.pal,
-      wobble: sp.wobble,
+      kind: sp.kind,
+      rot: (i * 0.5) % (Math.PI * 2),
+      vrot: (Math.random() - 0.5) * 0.012,
       seed: i * 1.7 + Math.random() * 4,
       speed: 0.65 + (i % 3) * 0.18,
       squash: 0,
@@ -361,57 +368,139 @@
     }));
   }
 
-  function drawOrganicBlob(ctx, b, t, palette) {
+  function drawKiesToken(ctx, b, t, palette) {
     const p = palette[b.pal % palette.length];
-    const pts = [];
-    const steps = 18;
-    const speedMag = Math.min(18, Math.hypot(b.vx, b.vy));
-    const stretch = Math.min(0.22, speedMag * 0.012 + b.squash * 0.12);
-    const moveAngle = speedMag > 0.4 ? Math.atan2(b.vy, b.vx) : b.squashAngle;
-
-    for (let i = 0; i < steps; i++) {
-      const a = (i / steps) * Math.PI * 2;
-      const n1 = Math.sin(a * 2 + t * b.speed + b.seed) * b.wobble;
-      const n2 = Math.cos(a * 3 - t * b.speed * 0.8 + b.seed * 1.3) * (b.wobble * 0.55);
-      const n3 = Math.sin(a * 4 + t * b.speed * 0.5 + b.seed * 0.7) * (b.wobble * 0.25);
-      const directional = Math.cos((a - moveAngle) * 2) * stretch;
-      const rad = b.r * (1 + n1 + n2 + n3 + directional);
-      pts.push({
-        x: b.x + Math.cos(a) * rad,
-        y: b.y + Math.sin(a) * rad
-      });
-    }
-
-    ctx.beginPath();
-    const firstMidX = (pts[steps - 1].x + pts[0].x) * 0.5;
-    const firstMidY = (pts[steps - 1].y + pts[0].y) * 0.5;
-    ctx.moveTo(firstMidX, firstMidY);
-    for (let i = 0; i < steps; i++) {
-      const curr = pts[i];
-      const next = pts[(i + 1) % steps];
-      ctx.quadraticCurveTo(curr.x, curr.y, (curr.x + next.x) * 0.5, (curr.y + next.y) * 0.5);
-    }
-    ctx.closePath();
-
-    // Soft 3D clay/velvet shading
-    const gx = b.x - b.r * 0.28;
-    const gy = b.y - b.r * 0.34;
-    const grad = ctx.createRadialGradient(gx, gy, b.r * 0.06, b.x, b.y, b.r * 1.18);
-    grad.addColorStop(0, p.hi);
-    grad.addColorStop(0.56, p.mid);
-    grad.addColorStop(1, p.lo);
-
     ctx.save();
-    ctx.shadowColor = "rgba(0, 0, 0, 0.38)";
-    ctx.shadowBlur = Math.min(44, b.r * 0.42);
-    ctx.shadowOffsetY = b.r * 0.1;
-    ctx.fillStyle = grad;
-    ctx.fill();
-    ctx.restore();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.rot + Math.sin(t * 0.7 + b.seed) * 0.06);
 
-    ctx.strokeStyle = p.rim;
-    ctx.lineWidth = 1.2;
-    ctx.stroke();
+    if (b.kind === "worm") {
+      // Flat-vector KIES Worm Pin Badge!
+      const r = b.r;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fillStyle = "#F2B743";
+      ctx.fill();
+      ctx.lineWidth = Math.max(3, r * 0.06);
+      ctx.strokeStyle = "#E87B25";
+      ctx.stroke();
+
+      // Cream worm face
+      ctx.beginPath();
+      ctx.ellipse(0, r * 0.06, r * 0.58, r * 0.5, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "#F9F3E2";
+      ctx.fill();
+
+      // Racing Red hood arc
+      ctx.beginPath();
+      ctx.arc(0, r * 0.04, r * 0.58, Math.PI * 1.05, Math.PI * 1.95);
+      ctx.quadraticCurveTo(0, -r * 0.2, -r * 0.57, -r * 0.05);
+      ctx.fillStyle = "#DA3832";
+      ctx.fill();
+
+      // Chunky red glasses frames
+      const gw = r * 0.44;
+      const gh = r * 0.34;
+      const gy = -r * 0.18;
+      ctx.fillStyle = "#F9F3E2";
+      ctx.strokeStyle = "#DA3832";
+      ctx.lineWidth = Math.max(3, r * 0.085);
+      ctx.beginPath();
+      ctx.roundRect(-gw - r * 0.05, gy, gw, gh, r * 0.11);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.roundRect(r * 0.05, gy, gw, gh, r * 0.11);
+      ctx.fill();
+      ctx.stroke();
+
+      // Steel Azure X and O eyes
+      ctx.strokeStyle = "#1C529E";
+      ctx.lineWidth = Math.max(2.6, r * 0.07);
+      ctx.lineCap = "round";
+      const lx = -r * 0.27;
+      const ey = gy + gh * 0.5;
+      const es = r * 0.09;
+      ctx.beginPath();
+      ctx.moveTo(lx - es, ey - es);
+      ctx.lineTo(lx + es, ey + es);
+      ctx.moveTo(lx + es, ey - es);
+      ctx.lineTo(lx - es, ey + es);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(r * 0.27, ey, r * 0.1, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Wavy smile
+      ctx.strokeStyle = "#E87B25";
+      ctx.lineWidth = Math.max(2.4, r * 0.06);
+      ctx.beginPath();
+      ctx.moveTo(-r * 0.18, r * 0.3);
+      ctx.quadraticCurveTo(-r * 0.09, r * 0.42, 0, r * 0.3);
+      ctx.quadraticCurveTo(r * 0.09, r * 0.42, r * 0.18, r * 0.3);
+      ctx.stroke();
+    } else if (b.kind === "star") {
+      // KIES puffy 5-point flat vector star
+      const spikes = 5;
+      const outer = b.r;
+      const inner = b.r * 0.52;
+      ctx.beginPath();
+      for (let i = 0; i < spikes * 2; i++) {
+        const rad = i % 2 === 0 ? outer : inner;
+        const a = (i * Math.PI) / spikes - Math.PI / 2;
+        const x = Math.cos(a) * rad;
+        const y = Math.sin(a) * rad;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.lineJoin = "round";
+      ctx.fillStyle = p.fill;
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = p.stroke;
+      ctx.stroke();
+    } else if (b.kind === "diamond") {
+      // KIES nested rotated square
+      const s = b.r * 1.15;
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = p.fill;
+      ctx.beginPath();
+      ctx.roundRect(-s * 0.5, -s * 0.5, s, s, 8);
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = p.stroke;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.roundRect(-s * 0.28, -s * 0.28, s * 0.56, s * 0.56, 4);
+      ctx.stroke();
+    } else {
+      // Flat-vector bouncy squishy blob (lineless with clean crisp edge)
+      const steps = 14;
+      const pts = [];
+      for (let i = 0; i < steps; i++) {
+        const a = (i / steps) * Math.PI * 2;
+        const wob = Math.sin(a * 2 + t * b.speed + b.seed) * 0.09 + Math.cos(a * 3 - t * 0.7 + b.seed) * 0.05;
+        const rad = b.r * (1 + wob);
+        pts.push({ x: Math.cos(a) * rad, y: Math.sin(a) * rad });
+      }
+      ctx.beginPath();
+      ctx.moveTo((pts[steps - 1].x + pts[0].x) * 0.5, (pts[steps - 1].y + pts[0].y) * 0.5);
+      for (let i = 0; i < steps; i++) {
+        const curr = pts[i];
+        const next = pts[(i + 1) % steps];
+        ctx.quadraticCurveTo(curr.x, curr.y, (curr.x + next.x) * 0.5, (curr.y + next.y) * 0.5);
+      }
+      ctx.closePath();
+      ctx.fillStyle = p.fill;
+      ctx.fill();
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = p.stroke;
+      ctx.stroke();
+    }
+
+    ctx.restore();
   }
 
   function stepBlobs(now) {
@@ -425,48 +514,41 @@
       const pad = 16;
       for (const b of blobs) {
         if (b !== draggedBlob) {
-          // Gentle ambient drift
           if (!prefersReduced) {
             b.vx += Math.sin(t * 0.55 + b.seed) * 0.014;
             b.vy += Math.cos(t * 0.48 + b.seed * 1.4) * 0.014;
+            b.rot += b.vrot;
           }
 
-          // Soft fluid cursor scatter when sweeping nearby
           if (pointer.active && !draggedBlob) {
             const dx = b.x - pointer.x;
             const dy = b.y - pointer.y;
             const dist = Math.hypot(dx, dy) || 1;
             const reach = b.r + 115;
             if (dist < reach) {
-              const force = (1 - dist / reach) * 0.85;
+              const force = (1 - dist / reach) * 0.9;
               b.vx += (dx / dist) * force + pointer.vx * 0.045;
               b.vy += (dy / dist) * force + pointer.vy * 0.045;
-              b.squash = Math.min(1, b.squash + 0.06);
-              b.squashAngle = Math.atan2(dy, dx);
             }
           }
 
-          // Viscous fluid damping
-          b.vx *= 0.965;
-          b.vy *= 0.965;
+          b.vx *= 0.968;
+          b.vy *= 0.968;
           b.x += b.vx;
           b.y += b.vy;
 
-          // Soft cushioned walls (allow slight edge bleed for organic cinema feel)
-          const minX = -b.r * 0.15 + pad;
-          const maxX = cw + b.r * 0.15 - pad;
-          const minY = -b.r * 0.15 + pad;
-          const maxY = ch + b.r * 0.15 - pad;
+          const minX = pad;
+          const maxX = cw - pad;
+          const minY = pad;
+          const maxY = ch - pad;
 
-          if (b.x - b.r < minX) { b.x = minX + b.r; b.vx = Math.abs(b.vx) * 0.65; }
-          else if (b.x + b.r > maxX) { b.x = maxX - b.r; b.vx = -Math.abs(b.vx) * 0.65; }
-          if (b.y - b.r < minY) { b.y = minY + b.r; b.vy = Math.abs(b.vy) * 0.65; }
-          else if (b.y + b.r > maxY) { b.y = maxY - b.r; b.vy = -Math.abs(b.vy) * 0.65; }
+          if (b.x - b.r < minX) { b.x = minX + b.r; b.vx = Math.abs(b.vx) * 0.72; }
+          else if (b.x + b.r > maxX) { b.x = maxX - b.r; b.vx = -Math.abs(b.vx) * 0.72; }
+          if (b.y - b.r < minY) { b.y = minY + b.r; b.vy = Math.abs(b.vy) * 0.72; }
+          else if (b.y + b.r > maxY) { b.y = maxY - b.r; b.vy = -Math.abs(b.vy) * 0.72; }
         }
-        b.squash *= 0.92;
       }
 
-      // Soft pillowy separation between blobs (no harsh billiard clack)
       for (let i = 0; i < blobs.length; i++) {
         for (let j = i + 1; j < blobs.length; j++) {
           const a = blobs[i];
@@ -474,11 +556,11 @@
           const dx = b.x - a.x;
           const dy = b.y - a.y;
           const dist = Math.hypot(dx, dy) || 0.001;
-          const minDist = (a.r + b.r) * 0.92;
+          const minDist = (a.r + b.r) * 1.04;
           if (dist < minDist) {
             const nx = dx / dist;
             const ny = dy / dist;
-            const push = (minDist - dist) * 0.045;
+            const push = (minDist - dist) * 0.06;
             if (a !== draggedBlob) { a.vx -= nx * push; a.vy -= ny * push; }
             if (b !== draggedBlob) { b.vx += nx * push; b.vy += ny * push; }
           }
@@ -486,10 +568,9 @@
       }
 
       const palette = BLOB_PALETTES[blobPaletteKey];
-      // Draw smallest to largest so the hero foreground blob feels closest
       const sorted = [...blobs].sort((a, b) => a.r - b.r);
       for (const b of sorted) {
-        drawOrganicBlob(ctx, b, t, palette);
+        drawKiesToken(ctx, b, t, palette);
       }
     }
     pointer.vx *= 0.8;
@@ -581,25 +662,22 @@
   paletteBlobsBtn.addEventListener("click", () => {
     const idx = (PALETTE_ORDER.indexOf(blobPaletteKey) + 1) % PALETTE_ORDER.length;
     blobPaletteKey = PALETTE_ORDER[idx];
-    blobsStage.classList.toggle("is-amber-pal", blobPaletteKey === "amber");
-    blobsStage.classList.toggle("is-ruby-pal", blobPaletteKey === "ruby");
+    blobsStage.classList.toggle("is-gold-pal", blobPaletteKey === "gold");
+    blobsStage.classList.toggle("is-red-pal", blobPaletteKey === "red");
     paletteBlobsBtn.textContent = PALETTE_NAMES[blobPaletteKey];
   });
 
   resetBlobsBtn.addEventListener("click", createBlobs);
   window.addEventListener("resize", () => {
-    initHeroBlobs();
     resizeBlobsCanvas();
-    const scale = cw < 640 ? 0.56 : 1;
+    const scale = cw < 640 ? 0.64 : 1;
     for (const b of blobs) {
       b.r = b.baseR * scale;
-      b.x = Math.min(cw - b.r * 0.5, Math.max(b.r * 0.5, b.x));
-      b.y = Math.min(ch - b.r * 0.5, Math.max(b.r * 0.5, b.y));
+      b.x = Math.min(cw - b.r, Math.max(b.r, b.x));
+      b.y = Math.min(ch - b.r, Math.max(b.r, b.y));
     }
   });
 
-  initHeroBlobs();
-  requestAnimationFrame(stepHeroBlobs);
   createBlobs();
   requestAnimationFrame(stepBlobs);
 
