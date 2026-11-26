@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FULT-ENGINE v2.0 | Модульная платформа для серверов SCP:SL</title>
-  <meta name="description" content="FULT-ENGINE: 65 готовых модулей для серверов SCP: Secret Laboratory, магазин модулей, студия CINFO и ключ-карт, веб-панель администрации." />
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%238AD2D2'/%3E%3Ccircle cx='16' cy='16' r='11' fill='%23DA3832'/%3E%3Ccircle cx='16' cy='17' r='8' fill='%23F9F3E2'/%3E%3Crect x='7' y='11' width='8' height='7' rx='2.5' fill='%23F9F3E2' stroke='%23DA3832' stroke-width='2'/%3E%3Crect x='17' y='11' width='8' height='7' rx='2.5' fill='%23F9F3E2' stroke='%23DA3832' stroke-width='2'/%3E%3Ccircle cx='21' cy='14.5' r='1.8' fill='none' stroke='%231C529E' stroke-width='1.8'/%3E%3Cpath d='M9.5 13l3 3m0-3l-3 3' stroke='%231C529E' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <meta name="description" content="FULT-ENGINE: 65 готовых модулей для серверов SCP: Secret Laboratory, магазин модулей, студия CINFO и ключ-карт, место отдыха с Red Dragon и яйцами дракона." />
+  <link rel="icon" type="image/png" href="assets/worm-badge.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Rubik:wght@700;800;900&family=Sofia+Sans+Condensed:wght@700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20261126e" />
+  <link rel="stylesheet" href="styles.css?v=20261126f" />
 </head>
 <body>
   <a class="skip-link" href="#main">Перейти к содержимому</a>
@@ -17,21 +17,7 @@
   <header class="site-header" id="siteHeader">
     <div class="wrap header-inner">
       <a class="brand" href="#top" aria-label="FULT-ENGINE главная">
-        <!-- Mini Worm Mascot Head Badge (KIES flat vector style) -->
-        <span class="brand-worm" aria-hidden="true">
-          <svg width="36" height="36" viewBox="0 0 64 64" fill="none">
-            <circle cx="32" cy="32" r="30" fill="#F2B743" />
-            <path d="M18 52c0-9 5-16 14-16s14 7 14 16" fill="#E87B25" />
-            <ellipse cx="32" cy="30" rx="18" ry="16" fill="#F9F3E2" />
-            <path d="M14 28c0-11 8-18 18-18s18 7 18 18c-3-4-9-6-18-6s-15 2-18 6Z" fill="#DA3832" />
-            <rect x="13" y="22" width="17" height="14" rx="5" fill="#F9F3E2" stroke="#DA3832" stroke-width="3.2" />
-            <rect x="34" y="22" width="17" height="14" rx="5" fill="#F9F3E2" stroke="#DA3832" stroke-width="3.2" />
-            <path d="M30 28h4" stroke="#DA3832" stroke-width="3.2" stroke-linecap="round" />
-            <path d="M18.5 26l6 6m0-6l-6 6" stroke="#1C529E" stroke-width="2.6" stroke-linecap="round" />
-            <circle cx="42.5" cy="29" r="3.4" stroke="#1C529E" stroke-width="2.6" />
-            <path d="M27 39c1.5 2 3.5 2 5 0 1.5 2 3.5 2 5 0" stroke="#E87B25" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
+        <img class="brand-mascot" src="assets/worm-badge.png" width="38" height="38" alt="" />
         <span class="brand-name">FULT-ENGINE</span>
       </a>
 
@@ -44,6 +30,16 @@
       </nav>
 
       <div class="header-right">
+        <a class="hdr-egg-pill" href="#bubbles" title="Перейти в Место отдыха и выбить яйца дракона">
+          <svg width="15" height="18" viewBox="0 0 20 24" fill="none" aria-hidden="true">
+            <path d="M10 1C5 1 1.5 8.5 1.5 14.5 1.5 20 5.2 23 10 23s8.5-3 8.5-8.5C18.5 8.5 15 1 10 1Z" fill="#DA3832" />
+            <circle cx="7" cy="11" r="2" fill="#F2B743" />
+            <circle cx="13" cy="15" r="2.4" fill="#F9F3E2" />
+            <circle cx="9.5" cy="18" r="1.5" fill="#F2B743" />
+          </svg>
+          <span id="headerEggCount">0</span>
+        </a>
+
         <button type="button" class="hdr-btn cmdk-trigger" id="openCmdk" aria-label="Быстрый поиск по модулям (Ctrl+K)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
             <circle cx="11" cy="11" r="8" />
@@ -62,174 +58,133 @@
   </header>
 
   <main id="main">
-    <!-- BLOCK 1: KIES PEARL AQUA HERO + STACKED LOCKUP + WORM-IN-A-BOX MASCOT -->
+    <!-- SPREAD 1: KIES BRAND-BOOK COVER LOCKUP (PEARL AQUA #8AD2D2) -->
     <section class="hero" id="top">
-      <!-- Tone-on-tone KIES Supergraphics (exact motif from Brand book Slide 7) -->
       <svg class="sg sg-tl" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-        <path d="M26 26l68 68M94 26L26 94" stroke="#75C1C1" stroke-width="20" stroke-linecap="butt" />
+        <path d="M26 26l68 68M94 26L26 94" stroke="#75C2C2" stroke-width="22" />
       </svg>
       <svg class="sg sg-tr" viewBox="0 0 220 120" fill="none" aria-hidden="true">
-        <path d="M10 30c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C1C1" stroke-width="14" stroke-linecap="round" />
-        <path d="M10 64c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C1C1" stroke-width="14" stroke-linecap="round" />
-        <path d="M10 98c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C1C1" stroke-width="14" stroke-linecap="round" />
+        <path d="M10 30c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C2C2" stroke-width="14" stroke-linecap="round" />
+        <path d="M10 64c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C2C2" stroke-width="14" stroke-linecap="round" />
+        <path d="M10 98c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C2C2" stroke-width="14" stroke-linecap="round" />
       </svg>
       <svg class="sg sg-bl" viewBox="0 0 220 120" fill="none" aria-hidden="true">
-        <path d="M10 30c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C1C1" stroke-width="14" stroke-linecap="round" />
-        <path d="M10 64c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C1C1" stroke-width="14" stroke-linecap="round" />
-        <path d="M10 98c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C1C1" stroke-width="14" stroke-linecap="round" />
+        <path d="M10 30c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C2C2" stroke-width="14" stroke-linecap="round" />
+        <path d="M10 64c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C2C2" stroke-width="14" stroke-linecap="round" />
+        <path d="M10 98c25-20 50-20 75 0s50 20 75 0 40-15 50-5" stroke="#75C2C2" stroke-width="14" stroke-linecap="round" />
       </svg>
       <svg class="sg sg-br" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-        <path d="M60 12l13 28 31 4-23 21 6 31-27-15-27 15 6-31-23-21 31-4 13-28Z" fill="#75C1C1" />
+        <path d="M60 12l68 68M94 26L26 94" stroke="#75C2C2" stroke-width="22" />
       </svg>
 
-      <div class="wrap hero-grid">
-        <div class="hero-lockup">
-          <p class="hero-kicker">СЮРПРИЗ, ЭТО</p>
+      <div class="wrap hero-poster">
+        <div class="hero-wordmark-col">
+          <p class="hero-surprise">СЮРПРИЗ, ЭТО</p>
           <h1 class="hero-wordmark" aria-label="FULT-ENGINE">
-            <span class="wm-line wm-top">FULT</span>
-            <span class="wm-line wm-bot">ENG<span class="wm-i">I</span>NE</span>
+            <span class="wm-row wm-r1">FULT</span>
+            <span class="wm-row wm-r2">ENGINE</span>
           </h1>
-          <p class="hero-lead">
-            65 готовых модулей для серверов SCP: Secret Laboratory в одной сборке:
-            137 подклассов, SCP-механики, протоколы комплекса, медицина и веб-панель администрации.
+        </div>
+
+        <div class="hero-mascot-col">
+          <button type="button" class="mascot-btn" id="wormMascotBtn" aria-label="Нажмите на маскота-червяка">
+            <img
+              class="worm-hero-img"
+              src="assets/worm-hero.png"
+              width="340"
+              height="555"
+              alt="Маскот FULT-ENGINE: червяк в красной шапке и очках выпрыгивает из жёлтой коробки"
+            />
+          </button>
+        </div>
+
+        <div class="hero-story-col">
+          <p class="hero-copy-text">
+            <strong>FULT-ENGINE</strong> собирает 65 готовых модулей для серверов SCP: Secret Laboratory
+            в одну живую платформу: 137 подклассов, SCP-объекты, протоколы комплекса, ранения и собственная
+            веб-панель администрации.
           </p>
           <div class="hero-actions">
             <a class="btn btn-red" href="#modules">Выбрать модули</a>
-            <a class="btn btn-ivory-outline" href="#sandbox">Студия CINFO и карт</a>
+            <a class="btn btn-ivory" href="#sandbox">Студия CINFO</a>
           </div>
-        </div>
-
-        <!-- CUSTOM FLAT-VECTOR WORM MASCOT POPPING OUT OF KIES BOX -->
-        <div class="hero-mascot-col">
-          <button type="button" class="mascot-stage" id="wormMascotBtn" aria-label="Нажмите на червяка Фультика, чтобы сменить его эмоцию">
-            <svg class="worm-svg" id="wormSvg" viewBox="0 0 360 390" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <!-- Puffy yellow stars around worm -->
-              <path class="m-star m-star-1" d="M54 84l6 13 14 2-10 10 2 14-12-7-12 7 2-14-10-10 14-2 6-13Z" fill="#F2B743" />
-              <path class="m-star m-star-2" d="M312 108l5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2 5-10Z" fill="#F9F3E2" />
-              <!-- Crank handle on right of box (exact KIES jack-in-the-box motif) -->
-              <path d="M242 296h24v-24h20" stroke="#1C529E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-              <rect x="282" y="260" width="28" height="22" rx="4" fill="#DA3832" />
-
-              <!-- Sunflower Gold Modular Cube Box -->
-              <rect x="92" y="236" width="154" height="142" rx="6" fill="#F2B743" />
-              <rect x="110" y="254" width="118" height="106" rx="4" fill="#F2B743" stroke="#E87B25" stroke-width="6" />
-              <!-- Box top shadow opening -->
-              <ellipse cx="169" cy="240" rx="54" ry="10" fill="#1C529E" />
-
-              <!-- WORM BODY (Playful S-curved segmented flat-vector worm!) -->
-              <g class="worm-body-group" id="wormBodyGroup">
-                <!-- Lower springy worm coil emerging from box -->
-                <path d="M166 244c0-22-46-22-46-46 0-24 58-22 58-48 0-16-8-26-10-34" stroke="#E87B25" stroke-width="58" stroke-linecap="round" />
-                <path d="M166 244c0-22-46-22-46-46 0-24 58-22 58-48 0-16-8-26-10-34" stroke="#F9F3E2" stroke-width="48" stroke-linecap="round" />
-
-                <!-- Cute segmented rings in Steel Azure & Sunflower Gold (like Kiki's blue vest!) -->
-                <path d="M138 228c16-4 32-2 46 6" stroke="#1C529E" stroke-width="11" stroke-linecap="round" />
-                <path d="M114 201c16-9 34-8 50 1" stroke="#1C529E" stroke-width="11" stroke-linecap="round" />
-                <path d="M132 174c18-5 38-2 52 8" stroke="#1C529E" stroke-width="11" stroke-linecap="round" />
-                <path d="M148 150c14-3 28-2 40 4" stroke="#F2B743" stroke-width="8" stroke-linecap="round" />
-
-                <!-- Little stubby waving worm-side-nub / scarf bow (KIES Racing Red bow!) -->
-                <path d="M118 134c-16-10-32-12-40-2-6 8 2 20 18 22 10 1 18-2 22-6Z" fill="#F9F3E2" />
-                <path d="M126 142c-10 4-16 14-8 20 8 6 24-4 34-10 10 6 26 16 34 10 8-6 2-16-8-20l-26-4-26 4Z" fill="#DA3832" />
-
-                <!-- WORM HEAD -->
-                <g class="worm-head-group">
-                  <!-- Red hood cap curving cleanly over top of worm head -->
-                  <path d="M114 102c0-38 28-64 62-64s62 26 62 64c0 24-12 42-28 48H142c-16-6-28-24-28-48Z" fill="#DA3832" />
-                  <!-- Cream worm face -->
-                  <ellipse cx="176" cy="108" rx="48" ry="42" fill="#F9F3E2" />
-                  <!-- Two playful little worm antennae / sprouts on hood! -->
-                  <path d="M150 46c-8-14-18-18-24-14" stroke="#DA3832" stroke-width="8" stroke-linecap="round" />
-                  <circle cx="122" cy="30" r="8" fill="#F2B743" />
-                  <path d="M202 46c8-14 18-18 24-14" stroke="#DA3832" stroke-width="8" stroke-linecap="round" />
-                  <circle cx="230" cy="30" r="8" fill="#F2B743" />
-
-                  <!-- Signature KIES Oversized Rounded-Rectangular Racing Red Glasses -->
-                  <rect x="116" y="76" width="54" height="44" rx="14" fill="#F9F3E2" stroke="#DA3832" stroke-width="8" />
-                  <rect x="182" y="76" width="54" height="44" rx="14" fill="#F9F3E2" stroke="#DA3832" stroke-width="8" />
-                  <path d="M170 96h12" stroke="#DA3832" stroke-width="8" stroke-linecap="round" />
-
-                  <!-- DYNAMIC EYES (cycled on click via JS!) -->
-                  <g id="wormEyes">
-                    <!-- Default: Signature KIES X + O bullseye in Steel Azure -->
-                    <path d="M134 89l18 18m0-18l-18 18" stroke="#1C529E" stroke-width="6.5" stroke-linecap="round" />
-                    <circle cx="209" cy="98" r="11" stroke="#1C529E" stroke-width="6" />
-                    <circle cx="209" cy="98" r="3.5" fill="#1C529E" />
-                  </g>
-
-                  <!-- Warm rosy cheek dots -->
-                  <circle cx="136" cy="128" r="5" fill="#F2B743" opacity="0.65" />
-                  <circle cx="216" cy="128" r="5" fill="#F2B743" opacity="0.65" />
-
-                  <!-- DYNAMIC MOUTH (KIES wavy :3 smile / open / tongue) -->
-                  <g id="wormMouth">
-                    <path d="M159 130c5 8 12 8 17 0 5 8 12 8 17 0" stroke="#E87B25" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-                  </g>
-                </g>
-              </g>
-            </svg>
-            <span class="mascot-caption" id="wormMoodLabel">Фультик (нажми на меня)</span>
-          </button>
         </div>
       </div>
 
-      <!-- KIES Signature Sunflower Gold Bottom Strip (Alternating Coils + Puffy Stars) -->
-      <div class="kies-strip kies-strip-gold" aria-hidden="true">
+      <div class="kies-strip" aria-hidden="true">
         <div class="kies-strip-track" id="heroStrip"></div>
       </div>
     </section>
 
-    <!-- BLOCK 2: МЕСТО ОТДЫХА (KIES STEEL AZURE PLAYGROUND WITH BOUNCY TOKENS) -->
-    <section class="blobs-stage" id="bubbles" aria-label="Место отдыха с интерактивными каплями и звёздами">
+    <!-- SPREAD 2: МЕСТО ОТДЫХА — RED DRAGON + ANIMATED WHIP + DRAGON EGGS -->
+    <section class="blobs-stage" id="bubbles" aria-label="Место отдыха: Red Dragon, плётка и яйца дракона">
       <canvas class="blobs-canvas" id="blobsCanvas"></canvas>
+
+      <!-- Hidden preload images & audio for canvas/SFX -->
+      <div hidden aria-hidden="true">
+        <img id="redDragonAsset" src="assets/red-dragon.png" alt="" />
+        <img id="wormBadgeAsset" src="assets/worm-badge.png" alt="" />
+        <audio id="whipAudio" preload="auto">
+          <source src="assets/whip-crack.mp3" type="audio/mpeg" />
+          <source src="assets/whip-crack.ogg" type="audio/ogg" />
+        </audio>
+      </div>
+
       <div class="wrap blobs-overlay">
-        <div class="blobs-top">
-          <p class="section-kicker kicker-gold">ПЕРЕРЫВ</p>
-          <h2>МЕСТО ОТДЫХА</h2>
-          <p>
-            Проведите курсором, чтобы разогнать капли и звёзды, схватите любую и бросьте через экран
-            или кликните в пустоту для волны.
-          </p>
+        <div class="blobs-head-bar">
+          <div class="blobs-top">
+            <h2>МЕСТО ОТДЫХА</h2>
+            <p>
+              Хлестните плёткой по медальону <strong>Red Dragon</strong> кликом или швырните в него фигуру,
+              чтобы выбить яйца дракона. Проведите по яйцам, чтобы собрать их!
+            </p>
+          </div>
+
+          <div class="dragon-hud" aria-live="polite">
+            <div class="dragon-hud-stat">
+              <svg width="24" height="28" viewBox="0 0 24 28" fill="none" aria-hidden="true">
+                <path d="M12 1C6 1 2 9.8 2 17c0 6.2 4.3 10 10 10s10-3.8 10-10C22 9.8 18 1 12 1Z" fill="#DA3832" />
+                <circle cx="8.5" cy="13" r="2.3" fill="#F2B743" />
+                <circle cx="15.5" cy="17.5" r="2.7" fill="#F9F3E2" />
+                <circle cx="11" cy="21" r="1.8" fill="#F2B743" />
+              </svg>
+              <div>
+                <span class="dh-label">Яйца дракона</span>
+                <strong class="dh-val" id="eggCountHud">0</strong>
+              </div>
+            </div>
+            <div class="dragon-hud-stat dragon-hud-whips">
+              <span class="dh-label">Ударов</span>
+              <strong class="dh-val" id="whipHitsHud">0</strong>
+            </div>
+            <button type="button" class="dragon-redeem-btn" id="redeemEggsBtn">
+              15 яиц = скидка 10%
+            </button>
+          </div>
         </div>
 
         <div class="blobs-controls">
+          <button type="button" class="blob-ctrl-btn blob-ctrl-whip" id="strikeWhipBtn">Хлестнуть плёткой!</button>
+          <button type="button" class="blob-ctrl-btn" id="modeWhipBtn">Режим: Плётка</button>
           <button type="button" class="blob-ctrl-btn" id="scatterBlobsBtn">Раскидать</button>
-          <button type="button" class="blob-ctrl-btn" id="paletteBlobsBtn">Палитра: KIES</button>
-          <button type="button" class="blob-ctrl-btn" id="resetBlobsBtn">Сбросить</button>
+          <button type="button" class="blob-ctrl-btn" id="paletteBlobsBtn">Фон: Кобальт</button>
+          <button type="button" class="blob-ctrl-btn" id="soundToggleBtn">Звук: Вкл</button>
         </div>
       </div>
     </section>
 
-    <!-- BLOCK 3: PRO STUDIO ON KIES IVORY MIST SPREAD -->
-    <section class="band band-ivory" id="sandbox">
+    <!-- SPREAD 3: BORDERLESS KIES STUDIO (IVORY MIST #F9F3E2) -->
+    <section class="spread spread-ivory" id="sandbox">
       <div class="wrap">
-        <div class="section-head-row">
+        <div class="studio-header">
           <div>
-            <p class="section-kicker kicker-red">БЕСПЛАТНЫЕ ИНСТРУМЕНТЫ</p>
             <h2>СТУДИЯ CINFO И КАРТОЧЕК</h2>
-            <p class="section-sub">
-              Оформляйте служебные бейджи <code>CINFO</code>, собирайте и скачивайте ключ-карты
-              <code>ckeycard</code> в PNG и подбирайте палитру <code>Theme.yml</code>.
+            <p class="spread-sub">
+              Готовые инструменты для сервера: служебные бейджи <code>CINFO</code>,
+              визуальные ключ-карты <code>ckeycard</code> в PNG и цветовые токены <code>Theme.yml</code>.
             </p>
           </div>
-          <!-- Mini Worm Sticker Badge (KIES Slide 21 pin-back badge style) -->
-          <div class="worm-pin-badge" aria-hidden="true">
-            <svg width="82" height="82" viewBox="0 0 88 88" fill="none">
-              <circle cx="44" cy="44" r="42" fill="#F2B743" />
-              <circle cx="44" cy="44" r="36" stroke="#E87B25" stroke-width="2.5" stroke-dasharray="5 5" />
-              <g transform="rotate(-8 44 44)">
-                <ellipse cx="44" cy="47" rx="22" ry="19" fill="#F9F3E2" />
-                <path d="M22 44c0-14 10-22 22-22s22 8 22 22c-4-5-11-7-22-7s-18 2-22 7Z" fill="#DA3832" />
-                <rect x="20" y="36" width="21" height="17" rx="6" fill="#F9F3E2" stroke="#DA3832" stroke-width="3.6" />
-                <rect x="47" y="36" width="21" height="17" rx="6" fill="#F9F3E2" stroke="#DA3832" stroke-width="3.6" />
-                <path d="M41 44h6" stroke="#DA3832" stroke-width="3.6" />
-                <path d="M26 41l8 8m0-8l-8 8" stroke="#1C529E" stroke-width="3" stroke-linecap="round" />
-                <path d="M53 41l8 8m0-8l-8 8" stroke="#1C529E" stroke-width="3" stroke-linecap="round" />
-                <path d="M36 57c3 4 6 4 8 0 2 4 5 4 8 0" stroke="#E87B25" stroke-width="2.6" stroke-linecap="round" />
-                <path d="M42 59c0 5 5 5 5 0Z" fill="#DA3832" />
-              </g>
-            </svg>
-          </div>
+          <img class="studio-sticker" src="assets/worm-badge.png" width="96" height="92" alt="" loading="lazy" />
         </div>
 
         <div class="studio-tabs" role="tablist" aria-label="Инструмент студии">
@@ -240,8 +195,8 @@
 
         <!-- TAB 1: CINFO -->
         <div class="sandbox-panel is-active" id="sbCinfo" role="tabpanel">
-          <div class="studio-frame">
-            <div class="studio-pane studio-pane-controls">
+          <div class="studio-block">
+            <div class="studio-col-form">
               <div class="field-group-label">Служба</div>
               <div class="chip-row" id="cinfoPresets" role="group" aria-label="Пресеты служб для CINFO">
                 <button type="button" class="tp-btn is-active" data-cp="science">Научная служба</button>
@@ -299,22 +254,22 @@
               </label>
             </div>
 
-            <div class="studio-pane studio-pane-preview">
-              <div class="preview-box cinfo-stage" aria-label="Превью CINFO над персонажем">
+            <div class="studio-col-stage">
+              <div class="stage-card cinfo-stage" aria-label="Превью CINFO над персонажем">
                 <div class="preview-meta">
                   <span>Превью над персонажем</span>
                   <span id="cinfoStyleLabel">Служебный бейдж v5</span>
                 </div>
                 <div class="cinfo-overhead" id="cinfoPreview"></div>
                 <div class="cinfo-silhouette" aria-hidden="true">
-                  <svg width="52" height="52" viewBox="0 0 64 64" fill="none">
-                    <circle cx="32" cy="20" r="10" fill="rgba(249,243,226,0.3)" />
-                    <path d="M14 54c0-10 8-17 18-17s18 7 18 17" fill="rgba(249,243,226,0.22)" />
+                  <svg width="48" height="48" viewBox="0 0 64 64" fill="none">
+                    <circle cx="32" cy="20" r="10" fill="rgba(249,243,226,0.28)" />
+                    <path d="M14 54c0-10 8-17 18-17s18 7 18 17" fill="rgba(249,243,226,0.2)" />
                   </svg>
                 </div>
               </div>
 
-              <div class="code-block">
+              <div class="code-panel">
                 <div class="code-top">
                   <span>CINFO для Subclass.yml</span>
                   <div class="cfg-actions">
@@ -330,8 +285,8 @@
 
         <!-- TAB 2: KEYCARD -->
         <div class="sandbox-panel" id="sbKeycard" role="tabpanel" hidden>
-          <div class="studio-frame">
-            <div class="studio-pane studio-pane-controls">
+          <div class="studio-block">
+            <div class="studio-col-form">
               <div class="field-group-label">Шаблон карты доступа</div>
               <div class="chip-row" id="kcPresets" role="group" aria-label="Шаблоны ключ-карт">
                 <button type="button" class="tp-btn is-active" data-kc="sb">СБ (MetalCase)</button>
@@ -391,8 +346,8 @@
                 <label class="studio-field">
                   <span>Корпус</span>
                   <div class="color-input-wrap">
-                    <input type="color" id="kcBg" value="#1c529e" />
-                    <span class="color-hex" id="kcBgHex">#1C529E</span>
+                    <input type="color" id="kcBg" value="#153e7a" />
+                    <span class="color-hex" id="kcBgHex">#153E7A</span>
                   </div>
                 </label>
                 <label class="studio-field">
@@ -405,7 +360,7 @@
               </div>
             </div>
 
-            <div class="studio-pane studio-pane-preview">
+            <div class="studio-col-stage">
               <div class="kc-stage">
                 <div class="visual-keycard" id="visualKeycard" aria-label="Живое превью ключ-карты">
                   <div class="vk-stripe" id="vkStripe"></div>
@@ -434,12 +389,12 @@
                 </div>
 
                 <div class="kc-export-row">
-                  <button type="button" class="btn btn-red btn-sm" id="downloadKcPng">Скачать PNG</button>
-                  <button type="button" class="btn btn-blue-outline btn-sm" id="copyKcCmd">Копировать ckeycard</button>
+                  <button type="button" class="btn btn-gold btn-sm" id="downloadKcPng">Скачать PNG</button>
+                  <button type="button" class="btn btn-ivory btn-sm" id="copyKcCmd">Копировать ckeycard</button>
                 </div>
               </div>
 
-              <div class="code-block">
+              <div class="code-panel">
                 <div class="code-top">
                   <span>Команда ckeycard</span>
                   <button type="button" class="mini-btn" id="copyKcCmd2">Копировать</button>
@@ -452,8 +407,8 @@
 
         <!-- TAB 3: THEME.YML -->
         <div class="sandbox-panel" id="sbTheme" role="tabpanel" hidden>
-          <div class="studio-frame">
-            <div class="studio-pane studio-pane-controls">
+          <div class="studio-block">
+            <div class="studio-col-form">
               <div class="field-group-label">Готовая палитра</div>
               <div class="chip-row" id="themePresets" role="group" aria-label="Готовые цветовые пресеты">
                 <button type="button" class="tp-btn is-active" data-tp="lava">KIES</button>
@@ -499,8 +454,8 @@
               </label>
             </div>
 
-            <div class="studio-pane studio-pane-preview">
-              <div class="preview-box hud-screen" aria-label="Живое превью игрового HUD и хинта">
+            <div class="studio-col-stage">
+              <div class="stage-card hud-screen" aria-label="Живое превью игрового HUD и хинта">
                 <div class="preview-meta">
                   <span id="hudRoleBadge">Доктор Феликс (Учёный)</span>
                   <span>Сектор лёгкого содержания</span>
@@ -513,7 +468,7 @@
                 </div>
               </div>
 
-              <div class="code-block">
+              <div class="code-panel">
                 <div class="code-top">
                   <span>Theme.yml</span>
                   <button type="button" class="mini-btn" id="copyThemeBtn">Копировать YAML</button>
@@ -526,16 +481,15 @@
       </div>
     </section>
 
-    <!-- BLOCK 4A: KIES SUNFLOWER GOLD BUNDLES SPREAD -->
-    <section class="band band-gold" id="modules">
+    <!-- SPREAD 4: MODULE STORE (POSTER FLAGSHIP BANNER + BORDERLESS TILES) -->
+    <section class="spread spread-store" id="modules">
       <div class="wrap">
-        <div class="modules-head">
+        <div class="store-top-row">
           <div>
-            <p class="section-kicker kicker-blue">КАТАЛОГ И НАБОРЫ</p>
             <h2>МАГАЗИН МОДУЛЕЙ</h2>
-            <p class="section-sub sub-on-gold">
-              Собирайте отдельные модули или берите готовый комплект.
-              От 5 позиций скидка 10%, от 15 позиций скидка 20%.
+            <p class="spread-sub">
+              От 5 отдельных модулей действует скидка 10%, от 15 модулей скидка 20%,
+              плюс бонус за яйца дракона из «Места отдыха».
             </p>
           </div>
 
@@ -549,43 +503,48 @@
           </div>
         </div>
 
-        <div class="bundles-grid">
-          <article class="bundle-card bundle-red">
-            <div class="bundle-top">
-              <span class="bundle-tag">Полный комплект</span>
-              <strong class="bundle-price">4 990 ₽</strong>
+        <!-- ASYMMETRIC COLOR-BLOCKED FLAGSHIP POSTER (NO 3-CARD SAAS ROW!) -->
+        <article class="flagship-poster">
+          <div class="fp-main">
+            <span class="fp-badge">ПОЛНЫЙ КОМПЛЕКТ · 65 МОДУЛЕЙ + ВЕБ-ПАНЕЛЬ</span>
+            <h3>FULT-ENGINE v2.0</h3>
+            <p>
+              Вся экосистема в одной сборке: 137 подклассов, 17 SCP-модулей, протоколы комплекса,
+              система ранений, КПК, рация, защита сервера, веб-панель администрации и помощь с первым запуском.
+            </p>
+          </div>
+          <div class="fp-action">
+            <strong class="fp-price">4 990 ₽</strong>
+            <button type="button" class="bundle-add fp-buy-btn" data-bundle="bundle_full">Добавить в корзину</button>
+          </div>
+        </article>
+
+        <div class="pack-strips">
+          <article class="pack-strip pack-strip-aqua">
+            <div class="ps-copy">
+              <span class="ps-tag">17 МОДУЛЕЙ</span>
+              <h3>Набор SCP-объектов</h3>
+              <p>SCP-008, SCP-131, перенос SCP-106, улучшения SCP-049/079, клетки и Scramble.</p>
             </div>
-            <h3>FULT-ENGINE v2.0 (все 65 модулей)</h3>
-            <p>Все 65 модулей, веб-панель администрации, обновления ветки v2 и помощь с первым запуском.</p>
-            <button type="button" class="bundle-add bundle-add-ivory" data-bundle="bundle_full">Добавить в корзину</button>
+            <div class="ps-side">
+              <strong>2 490 ₽</strong>
+              <button type="button" class="bundle-add" data-bundle="bundle_scp">Добавить в корзину</button>
+            </div>
           </article>
 
-          <article class="bundle-card bundle-ivory">
-            <div class="bundle-top">
-              <span class="bundle-tag">17 модулей</span>
-              <strong class="bundle-price">2 490 ₽</strong>
+          <article class="pack-strip pack-strip-sand">
+            <div class="ps-copy">
+              <span class="ps-tag">20 МОДУЛЕЙ</span>
+              <h3>Набор RP, ролей и механик</h3>
+              <p>137 подклассов, квоты ролей, отряды МОГ, ранения, КПК с мессенджером, рация и обыск тел.</p>
             </div>
-            <h3>Набор SCP-объектов</h3>
-            <p>Заражение SCP-008, SCP-131, перенос SCP-106, доработки SCP-049 и SCP-079, клетки и Scramble.</p>
-            <button type="button" class="bundle-add" data-bundle="bundle_scp">Добавить в корзину</button>
-          </article>
-
-          <article class="bundle-card bundle-ivory">
-            <div class="bundle-top">
-              <span class="bundle-tag">20 модулей</span>
-              <strong class="bundle-price">2 790 ₽</strong>
+            <div class="ps-side">
+              <strong>2 790 ₽</strong>
+              <button type="button" class="bundle-add" data-bundle="bundle_rp">Добавить в корзину</button>
             </div>
-            <h3>Набор RP, ролей и механик</h3>
-            <p>137 подклассов, квоты ролей, отряды МОГ, ранения по частям тела, КПК с мессенджером, рация и обыск тел.</p>
-            <button type="button" class="bundle-add" data-bundle="bundle_rp">Добавить в корзину</button>
           </article>
         </div>
-      </div>
-    </section>
 
-    <!-- BLOCK 4B: 65 MODULES CATALOG ON IVORY MIST -->
-    <section class="band band-ivory band-catalog">
-      <div class="wrap">
         <div class="cat-bar" role="tablist" aria-label="Категории модулей">
           <button type="button" class="cat-pill is-active" data-cat="all" role="tab" aria-selected="true">
             Все <span id="countAll">65</span>
@@ -602,19 +561,19 @@
           <span id="resultsMeta" aria-live="polite">Показано 14 из 65 модулей</span>
         </div>
 
-        <div class="modules-ledger" id="modulesList"></div>
+        <div class="modules-grid" id="modulesList"></div>
       </div>
     </section>
 
-    <!-- BLOCK 5: WEBPANEL ON KIES PEARL AQUA SPREAD -->
-    <section class="band band-aqua" id="webpanel">
-      <div class="wrap">
-        <div class="webpanel-split">
+    <!-- SPREAD 5: FULL-BLEED 50/50 KIES SPLIT FOR WEBPANEL (STEEL AZURE + SUNFLOWER GOLD) -->
+    <section class="wp-split-spread" id="webpanel">
+      <div class="wp-half wp-half-blue">
+        <div class="wp-half-inner">
           <div class="wp-window" aria-label="Интерактивный макет веб-панели администрации">
             <div class="wp-bar">
               <div class="wp-bar-left">
                 <span class="wp-dot" aria-hidden="true"></span>
-                <span>Веб-панель FULT-ENGINE</span>
+                <span>panel.fult-engine</span>
               </div>
               <span class="wp-steam">Steam Auth: подключён</span>
             </div>
@@ -655,43 +614,42 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <div class="webpanel-copy">
-            <p class="section-kicker kicker-ivory">В КОМПЛЕКТЕ С ПОЛНЫМ ПАКЕТОМ</p>
-            <h2>ВЕБ-ПАНЕЛЬ АДМИНИСТРАЦИИ</h2>
-            <p class="section-sub sub-on-aqua">
-              Управляйте составом прямо из браузера без ручной правки конфигов.
-              Вход через Steam, учёт должностей, история варнов и синхронизация с сервером SCP:SL.
-            </p>
-            <ul class="perk-list">
-              <li>Авторизация через Steam без лишних паролей</li>
-              <li>Единая база администраторов, должностей и варнов</li>
-              <li>Автоматическая выдача прав на игровом сервере</li>
-            </ul>
-            <button type="button" class="btn btn-red" id="addFullFromWebpanel">
-              Забрать полный пакет с панелью
-            </button>
-          </div>
+      <div class="wp-half wp-half-gold">
+        <div class="wp-half-inner">
+          <h2>ВЕБ-ПАНЕЛЬ В КОМПЛЕКТЕ</h2>
+          <p class="wp-gold-lead">
+            Никакой ручной правки текстовых файлов: администраторы входят через Steam,
+            а должности, предупреждения и права сами прилетают на игровой сервер SCP:SL.
+          </p>
+          <ul class="perk-list">
+            <li>Вход сотрудников через Steam за пару секунд</li>
+            <li>Единый журнал должностей, выговоров и снятий</li>
+            <li>Прямая синхронизация с сервером в реальном времени</li>
+          </ul>
+          <button type="button" class="btn btn-red" id="addFullFromWebpanel">
+            Забрать полный пакет с панелью
+          </button>
         </div>
       </div>
     </section>
 
-    <!-- BLOCK 6: KIES RACING RED CLOSING POSTER WITH WORM PATTERN -->
-    <section class="closing-section" id="order-cta">
-      <div class="wrap closing-inner">
-        <div class="closing-copy">
-          <p class="section-kicker kicker-gold">ВЫХОДИТЕ ЗА РАМКИ КОРОБКИ</p>
-          <h2>СОБЕРИТЕ СВОЙ СЕРВЕР НА FULT-ENGINE</h2>
-          <p>
-            Выберите отдельные модули в магазине или заберите полный комплект v2.0
-            со всеми 65 модулями, веб-панелью и помощью с первым запуском.
-          </p>
-        </div>
+    <!-- SPREAD 6: KIES RACING RED POSTER CLOSING -->
+    <section class="closing-poster" id="order-cta">
+      <div class="wrap closing-poster-inner">
+        <img class="closing-mascot" src="assets/worm-badge.png" width="112" height="108" alt="" loading="lazy" />
+        <h2>ВЫХОДИ ЗА РАМКИ КОРОБКИ КАЖДЫЙ РАУНД!</h2>
+        <p>
+          Собери отдельные модули под свой проект или возьми полный комплект FULT-ENGINE v2.0
+          со всеми 65 модулями и веб-панелью.
+        </p>
         <div class="closing-actions">
           <button type="button" class="btn btn-gold" id="orderFullNow">
             Полный пакет за 4 990 ₽
           </button>
-          <button type="button" class="btn btn-ivory-outline" id="openCartFromCta">
+          <button type="button" class="btn btn-ivory" id="openCartFromCta">
             Открыть корзину
           </button>
         </div>
@@ -699,8 +657,7 @@
     </section>
   </main>
 
-  <!-- KIES STEEL AZURE FOOTER + RHYTHM STRIP -->
-  <div class="kies-strip kies-strip-blue" aria-hidden="true">
+  <div class="kies-strip" aria-hidden="true">
     <div class="kies-strip-track" id="footerStrip"></div>
   </div>
   <footer class="site-footer">
@@ -718,7 +675,7 @@
     </div>
   </footer>
 
-  <!-- SLIDE-OVER CART DRAWER (IVORY MIST + STEEL AZURE) -->
+  <!-- SLIDE-OVER CART DRAWER -->
   <div class="drawer-backdrop" id="cartDrawer" hidden role="dialog" aria-modal="true" aria-label="Корзина модулей">
     <aside class="cart-drawer">
       <div class="drawer-head">
@@ -732,6 +689,7 @@
         <div class="cart-summary">
           <div class="sum-row"><span>Позиций</span><strong id="cartItemCount">0</strong></div>
           <div class="sum-row" id="cartDiscountRow" hidden><span>Скидка за объём</span><strong class="sum-discount" id="cartDiscountVal">0 ₽</strong></div>
+          <div class="sum-row" id="cartDragonRow" hidden><span>Бонус Red Dragon (-10%)</span><strong class="sum-discount" id="cartDragonVal">0 ₽</strong></div>
           <div class="sum-row sum-total"><span>Итого</span><strong id="cartTotal">0 ₽</strong></div>
         </div>
 
@@ -742,7 +700,7 @@
           </label>
           <div class="drawer-actions">
             <button type="submit" class="btn btn-red" id="submitOrderBtn">Сформировать заказ</button>
-            <button type="button" class="btn btn-blue-outline btn-sm" id="clearCartBtn">Очистить</button>
+            <button type="button" class="btn btn-sand btn-sm" id="clearCartBtn">Очистить</button>
           </div>
         </form>
 
@@ -779,6 +737,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-  <script src="app.js?v=20261126e"></script>
+  <script src="app.js?v=20261126f"></script>
 </body>
 </html>

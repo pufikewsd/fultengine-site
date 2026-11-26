@@ -1,14 +1,13 @@
 (() => {
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const finePointer = window.matchMedia("(pointer: fine)").matches;
 
   const CATEGORY_META = {
-    roles: { label: "Роли и отряды", dot: "dot-coral" },
-    scp: { label: "SCP", dot: "dot-amber" },
-    facility: { label: "Комплекс", dot: "dot-emerald" },
-    gameplay: { label: "Механики", dot: "dot-violet" },
-    ui: { label: "Интерфейс", dot: "dot-sky" },
-    admin: { label: "Сервер и админ", dot: "dot-rose" }
+    roles: { label: "Роли и отряды" },
+    scp: { label: "SCP" },
+    facility: { label: "Комплекс" },
+    gameplay: { label: "Механики" },
+    ui: { label: "Интерфейс" },
+    admin: { label: "Сервер и админ" }
   };
 
   const PRO_MODULES = new Set([
@@ -17,14 +16,12 @@
   ]);
 
   const MODULES = [
-    // Роли и отряды (5)
     { name: "Subclass", cat: "roles", desc: "Выдаёт подклассы ролей: состав, предметы, имена учёных и описание персонажа.", cmds: ["137 подклассов"] },
     { name: "RoleDistribution", cat: "roles", desc: "Раздаёт роли в начале раунда по квотам, вызывает Повстанцев Хаоса и Длань Змея.", cmds: ["пх", "дх"] },
     { name: "MtfSquads", cat: "roles", desc: "Вызывает отряды МОГ, включая Ню-7 «Удар молота» до 9 бойцов.", cmds: [] },
     { name: "Ro9Call", cat: "roles", desc: "Вызывает отряд Ро-9 по клавише с перезарядкой.", cmds: [] },
     { name: "CirCodes", cat: "roles", desc: "Принимает и обрабатывает заявки на вызов отряда по КИР.", cmds: ["cra list", "cra y", "cra n"] },
 
-    // SCP (17)
     { name: "Scp008", cat: "scp", desc: "Заражает SCP-008 и назначает нулевого пациента.", cmds: ["infected"] },
     { name: "Scp020", cat: "scp", desc: "Выдаёт роль SCP-020 выбранному игроку.", cmds: ["scp020"] },
     { name: "Scp066", cat: "scp", desc: "Добавляет играбельного SCP-066 с ловушками.", cmds: [] },
@@ -43,7 +40,6 @@
     { name: "DonorScp079", cat: "scp", desc: "Выдаёт SCP-079 донатерам.", cmds: ["aic"] },
     { name: "Scramble", cat: "scp", desc: "Закрывает в ПНВ голову SCP-096 цензурной кляксой и защищает от агра.", cmds: [] },
 
-    // Комплекс (16)
     { name: "Protocol", cat: "facility", desc: "Запускает протоколы комплекса с подтверждением.", cmds: ["protocol", "protocolapprove"] },
     { name: "ProtocolPanel", cat: "facility", desc: "Ставит физическую панель протоколов на карте.", cmds: [] },
     { name: "WarheadCode", cat: "facility", desc: "Управляет пультом диспетчерской и запуском протоколов.", cmds: ["warhead", "cirs", "protocols", "ro9"] },
@@ -61,7 +57,6 @@
     { name: "Camera", cat: "facility", desc: "Включает режим камер у пульта наблюдения.", cmds: ["exit_cam"] },
     { name: "CameraWatch", cat: "facility", desc: "Даёт смотреть в камеры и блокировать их.", cmds: ["cam look", "cam block", "cam off"] },
 
-    // Механики (15)
     { name: "InjurySystem", cat: "gameplay", desc: "Считает ранения по частям тела: кровотечение, переломы и влияние обвесов.", cmds: [] },
     { name: "Armory", cat: "gameplay", desc: "Задаёт аптечки с разной силой лечения.", cmds: [] },
     { name: "AllyActions", cat: "gameplay", desc: "Позволяет лечить союзника аптечкой по клавише.", cmds: [] },
@@ -78,13 +73,11 @@
     { name: "CustomSound", cat: "gameplay", desc: "Проигрывает звуки при подборе ключ-карты, брони или фонарика.", cmds: [] },
     { name: "EscapeCommand", cat: "gameplay", desc: "Засчитывает побег SCP или человека по команде.", cmds: ["escape"] },
 
-    // Интерфейс (4)
     { name: "Hud", cat: "ui", desc: "Рисует HUD игрока с названием роли и подсказками.", cmds: [] },
     { name: "Theme", cat: "ui", desc: "Задаёт тему из Theme.yml и красит тексты через цветовые токены.", cmds: ["Theme.yml"] },
     { name: "SpectatorEffects", cat: "ui", desc: "Скрывает выбранные визуальные эффекты от зрителей.", cmds: [] },
     { name: "WelcomeMessage", cat: "ui", desc: "Показывает приветствие при входе на сервер.", cmds: [] },
 
-    // Сервер и админ (8)
     { name: "AdminToggle", cat: "admin", desc: "Переключает админские режимы прямо в раунде.", cmds: ["breakdoor", "dspl", "instakill", "size"] },
     { name: "AntiRaid", cat: "admin", desc: "Защищает сервер от рейда и блокирует вход при тревоге.", cmds: ["antiraid", "lockdown", "restore"] },
     { name: "AudioDebug", cat: "admin", desc: "Проверяет работу звуковой подсистемы сервера.", cmds: [] },
@@ -112,29 +105,124 @@
     return `${new Intl.NumberFormat("ru-RU").format(val)} ₽`;
   }
 
-  // Toast
   const toastEl = document.getElementById("toast");
   let toastTimer = 0;
   function showToast(message) {
+    if (!toastEl) return;
     toastEl.textContent = message;
     toastEl.classList.add("is-shown");
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => { toastEl.classList.remove("is-shown"); }, 2200);
   }
 
-  // Scroll progress & nav indicator
-  const siteHeader = document.getElementById("siteHeader");
+  // ======================================================
+  // SOUND ENGINE (Real Internet Whip Crack + Web Audio SFX)
+  // ======================================================
+  let soundOn = true;
+  let audioCtx = null;
+  const whipSrcEl = document.getElementById("whipAudio");
+  const whipPool = Array.from({ length: 4 }, () => {
+    const a = new Audio();
+    a.preload = "auto";
+    a.src = whipSrcEl?.currentSrc || "assets/whip-crack.mp3";
+    return a;
+  });
+  let whipPoolIdx = 0;
+
+  function ensureAudioCtx() {
+    if (!soundOn) return null;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    if (!audioCtx) audioCtx = new Ctx();
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+
+  function playWhipCrackSound() {
+    if (!soundOn) return;
+    const player = whipPool[whipPoolIdx % whipPool.length];
+    whipPoolIdx++;
+    try {
+      player.currentTime = 0;
+      player.playbackRate = 0.94 + Math.random() * 0.14;
+      player.volume = 0.9;
+      const p = player.play();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => playSynthWhipBackup());
+      }
+    } catch {
+      playSynthWhipBackup();
+    }
+  }
+
+  function playSynthWhipBackup() {
+    const ctx = ensureAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    // Whoosh + sharp crack noise burst
+    const bufSize = Math.floor(ctx.sampleRate * 0.16);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      const env = i < bufSize * 0.15 ? i / (bufSize * 0.15) : Math.pow(1 - (i - bufSize * 0.15) / (bufSize * 0.85), 3);
+      data[i] = (Math.random() * 2 - 1) * env;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.setValueAtTime(1900, now);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.65, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+    noise.connect(bp).connect(gain).connect(ctx.destination);
+    noise.start(now);
+  }
+
+  function playEggChime(isGold = false) {
+    const ctx = ensureAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const notes = isGold ? [587.33, 783.99, 987.77, 1174.66] : [659.25, 880];
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(freq, now + idx * 0.055);
+      gain.gain.setValueAtTime(0.001, now + idx * 0.055);
+      gain.gain.linearRampToValueAtTime(0.22, now + idx * 0.055 + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.055 + 0.24);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + idx * 0.055);
+      osc.stop(now + idx * 0.055 + 0.25);
+    });
+  }
+
+  function playMascotBoing() {
+    const ctx = ensureAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(240, now);
+    osc.frequency.exponentialRampToValueAtTime(540, now + 0.16);
+    gain.gain.setValueAtTime(0.24, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.23);
+  }
+
+  // Header scroll & nav indicator
   const scrollProgress = document.getElementById("scrollProgress");
   let scrollRaf = 0;
-
   function updateScrollUi() {
     scrollRaf = 0;
     const y = window.scrollY;
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    scrollProgress.style.transform = `scaleX(${Math.min(1, Math.max(0, y / maxScroll))})`;
-    siteHeader.classList.toggle("is-scrolled", y > 24);
+    if (scrollProgress) scrollProgress.style.transform = `scaleX(${Math.min(1, Math.max(0, y / maxScroll))})`;
   }
-
   window.addEventListener("scroll", () => {
     if (!scrollRaf) scrollRaf = requestAnimationFrame(updateScrollUi);
   }, { passive: true });
@@ -167,15 +255,36 @@
     navLinks.forEach((a) => a.classList.toggle("is-current", a.dataset.section === activeId));
     const activeLink = navLinks.find((a) => a.dataset.section === activeId);
     if (activeLink) moveNavIndicator(activeLink);
-    else navIndicator.classList.remove("is-visible");
+    else navIndicator?.classList.remove("is-visible");
   }
-
   window.addEventListener("scroll", syncActiveNav, { passive: true });
   window.addEventListener("resize", () => {
     const activeLink = navLinks.find((a) => a.classList.contains("is-current"));
     if (activeLink) moveNavIndicator(activeLink);
   });
   syncActiveNav();
+
+  // Fill KIES Horizontal Coil + Star Strips
+  function fillKiesStrip(el) {
+    if (!el) return;
+    const starSvg = `<svg width="24" height="24" viewBox="0 0 28 28" fill="none"><path d="M14 2l3.5 7.4 8.1 1.1-5.9 5.6 1.5 8.1L14 20.2l-7.2 4 1.5-8.1-5.9-5.6 8.1-1.1L14 2Z" fill="#DA3832"/></svg>`;
+    const coilSvg = `<svg width="64" height="22" viewBox="0 0 70 24" fill="none"><path d="M3 16c6-12 18-12 20 0 1 6-6 6-7 0-2-12 14-12 18 0 1 6-6 6-7 0-2-12 14-12 18 0 1 6-6 6-7 0-2-12 16-12 22 0" stroke="#1C529E" stroke-width="3.8" stroke-linecap="round"/></svg>`;
+    el.innerHTML = Array.from({ length: 12 }, (_, i) => (i % 2 === 0 ? starSvg : coilSvg)).join("");
+  }
+  fillKiesStrip(document.getElementById("heroStrip"));
+  fillKiesStrip(document.getElementById("footerStrip"));
+
+  // Hero Worm Mascot bounce + sound
+  const wormBtn = document.getElementById("wormMascotBtn");
+  if (wormBtn) {
+    wormBtn.addEventListener("click", () => {
+      playMascotBoing();
+      wormBtn.classList.remove("is-popping");
+      void wormBtn.offsetWidth;
+      wormBtn.classList.add("is-popping");
+      showToast("Привет от червяка FULT-ENGINE!");
+    });
+  }
 
   // Interactive WebPanel preview tabs
   const wpBody = document.getElementById("wpBody");
@@ -220,104 +329,76 @@
   });
 
   // ======================================================
-  // 0. KIES WORM MASCOT EXPRESSIONS & RHYTHM STRIPS
-  // ======================================================
-  const wormBtn = document.getElementById("wormMascotBtn");
-  const wormEyes = document.getElementById("wormEyes");
-  const wormMouth = document.getElementById("wormMouth");
-  const wormMoodLabel = document.getElementById("wormMoodLabel");
-
-  const WORM_MOODS = [
-    {
-      label: "Фультик: игривый (X / O)",
-      eyes: `<path d="M134 89l18 18m0-18l-18 18" stroke="#1C529E" stroke-width="6.5" stroke-linecap="round"/><circle cx="209" cy="98" r="11" stroke="#1C529E" stroke-width="6"/><circle cx="209" cy="98" r="3.5" fill="#1C529E"/>`,
-      mouth: `<path d="M159 130c5 8 12 8 17 0 5 8 12 8 17 0" stroke="#E87B25" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`
-    },
-    {
-      label: "Фультик: дразнится (X / X)",
-      eyes: `<path d="M134 89l18 18m0-18l-18 18" stroke="#1C529E" stroke-width="6.5" stroke-linecap="round"/><path d="M200 89l18 18m0-18l-18 18" stroke="#1C529E" stroke-width="6.5" stroke-linecap="round"/>`,
-      mouth: `<path d="M159 129c5 8 12 8 17 0 5 8 12 8 17 0" stroke="#E87B25" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M170 133c0 12 12 12 12 0Z" fill="#DA3832"/>`
-    },
-    {
-      label: "Фультик: удивлён (O / O)",
-      eyes: `<circle cx="143" cy="98" r="11" stroke="#1C529E" stroke-width="6"/><circle cx="143" cy="98" r="3.5" fill="#1C529E"/><circle cx="209" cy="98" r="11" stroke="#1C529E" stroke-width="6"/><circle cx="209" cy="98" r="3.5" fill="#1C529E"/>`,
-      mouth: `<ellipse cx="176" cy="133" rx="9" ry="7" fill="#DA3832" stroke="#E87B25" stroke-width="4"/>`
-    },
-    {
-      label: "Фультик: хитрый взгляд",
-      eyes: `<circle cx="151" cy="98" r="9.5" fill="#1C529E"/><circle cx="154" cy="95" r="3" fill="#F9F3E2"/><circle cx="217" cy="98" r="9.5" fill="#1C529E"/><circle cx="220" cy="95" r="3" fill="#F9F3E2"/>`,
-      mouth: `<path d="M161 131c8 7 22 7 30 0" stroke="#E87B25" stroke-width="5" stroke-linecap="round"/>`
-    }
-  ];
-  let wormMoodIdx = 0;
-
-  if (wormBtn && wormEyes && wormMouth) {
-    wormBtn.addEventListener("click", () => {
-      wormMoodIdx = (wormMoodIdx + 1) % WORM_MOODS.length;
-      const m = WORM_MOODS[wormMoodIdx];
-      wormEyes.innerHTML = m.eyes;
-      wormMouth.innerHTML = m.mouth;
-      if (wormMoodLabel) wormMoodLabel.textContent = m.label;
-      wormBtn.classList.remove("is-popping");
-      void wormBtn.offsetWidth;
-      wormBtn.classList.add("is-popping");
-    });
-  }
-
-  function fillKiesStrip(el) {
-    if (!el) return;
-    const starSvg = `<svg width="24" height="24" viewBox="0 0 28 28" fill="none"><path d="M14 2l3.4 7.4 8.1 1-6 5.6 1.6 8L14 20l-7.1 4 1.6-8-6-5.6 8.1-1L14 2Z" fill="#DA3832"/></svg>`;
-    const coilSvg = `<svg width="64" height="22" viewBox="0 0 70 24" fill="none"><path d="M3 16c6-12 18-12 20 0 1 6-6 6-7 0-2-12 14-12 18 0 1 6-6 6-7 0-2-12 14-12 18 0 1 6-6 6-7 0-2-12 16-12 22 0" stroke="#1C529E" stroke-width="3.6" stroke-linecap="round"/></svg>`;
-    el.innerHTML = Array.from({ length: 12 }, (_, i) => (i % 2 === 0 ? starSvg : coilSvg)).join("");
-  }
-  fillKiesStrip(document.getElementById("heroStrip"));
-  fillKiesStrip(document.getElementById("footerStrip"));
-
-  // ======================================================
-  // 1. МЕСТО ОТДЫХА — KIES FLAT-VECTOR PLAYGROUND
+  // 1. МЕСТО ОТДЫХА: RED DRAGON + ANIMATED WHIP + DRAGON EGGS
   // ======================================================
   const blobsStage = document.getElementById("bubbles");
   const blobsCanvas = document.getElementById("blobsCanvas");
+  const redDragonImg = document.getElementById("redDragonAsset");
+  const wormBadgeImg = document.getElementById("wormBadgeAsset");
+
+  const strikeWhipBtn = document.getElementById("strikeWhipBtn");
+  const modeWhipBtn = document.getElementById("modeWhipBtn");
   const scatterBlobsBtn = document.getElementById("scatterBlobsBtn");
   const paletteBlobsBtn = document.getElementById("paletteBlobsBtn");
-  const resetBlobsBtn = document.getElementById("resetBlobsBtn");
+  const soundToggleBtn = document.getElementById("soundToggleBtn");
+  const redeemEggsBtn = document.getElementById("redeemEggsBtn");
+  const eggCountHud = document.getElementById("eggCountHud");
+  const headerEggCount = document.getElementById("headerEggCount");
+  const whipHitsHud = document.getElementById("whipHitsHud");
 
-  const BLOB_PALETTES = {
-    kies: [
-      { fill: "#F2B743", stroke: "#E87B25" },
-      { fill: "#DA3832", stroke: "#F9F3E2" },
-      { fill: "#8AD2D2", stroke: "#F9F3E2" },
-      { fill: "#F9F3E2", stroke: "#DA3832" }
-    ],
-    gold: [
-      { fill: "#1C529E", stroke: "#F9F3E2" },
-      { fill: "#DA3832", stroke: "#F9F3E2" },
-      { fill: "#8AD2D2", stroke: "#1C529E" },
-      { fill: "#F9F3E2", stroke: "#1C529E" }
-    ],
-    red: [
-      { fill: "#F2B743", stroke: "#F9F3E2" },
-      { fill: "#8AD2D2", stroke: "#1C529E" },
-      { fill: "#F9F3E2", stroke: "#1C529E" },
-      { fill: "#1C529E", stroke: "#F2B743" }
-    ]
-  };
+  let dragonEggsEarned = 0;
+  let whipHitsCount = 0;
+  let dragonDiscountUnlocked = false;
 
-  const PALETTE_ORDER = ["kies", "gold", "red"];
-  const PALETTE_NAMES = { kies: "Палитра: KIES", gold: "Палитра: Жёлтый", red: "Палитра: Красный" };
+  try {
+    dragonEggsEarned = Math.max(0, Number(localStorage.getItem("fult_dragon_eggs_v1")) || 0);
+    whipHitsCount = Math.max(0, Number(localStorage.getItem("fult_whip_hits_v1")) || 0);
+    dragonDiscountUnlocked = localStorage.getItem("fult_dragon_disc_v1") === "1";
+  } catch {}
 
-  let blobPaletteKey = "kies";
+  function saveDragonState() {
+    try {
+      localStorage.setItem("fult_dragon_eggs_v1", String(dragonEggsEarned));
+      localStorage.setItem("fult_whip_hits_v1", String(whipHitsCount));
+      localStorage.setItem("fult_dragon_disc_v1", dragonDiscountUnlocked ? "1" : "0");
+    } catch {}
+  }
+
+  function syncDragonHud() {
+    if (eggCountHud) eggCountHud.textContent = String(dragonEggsEarned);
+    if (headerEggCount) headerEggCount.textContent = String(dragonEggsEarned);
+    if (whipHitsHud) whipHitsHud.textContent = String(whipHitsCount);
+    if (redeemEggsBtn) {
+      redeemEggsBtn.classList.toggle("is-unlocked", dragonDiscountUnlocked);
+      redeemEggsBtn.textContent = dragonDiscountUnlocked
+        ? "Скидка -10% активна!"
+        : `15 яиц = скидка 10%`;
+    }
+  }
+  syncDragonHud();
+
+  const BG_MODES = ["blue", "aqua", "gold"];
+  const BG_NAMES = { blue: "Фон: Кобальт", aqua: "Фон: Аква", gold: "Фон: Жёлтый" };
+  let bgMode = "blue";
+  let whipMode = true;
+
   let blobs = [];
+  let spawnedEggs = [];
+  let whipStrikes = [];
+  let floatPopups = [];
+  let shockwaves = [];
+
   let cw = 1200;
-  let ch = 600;
+  let ch = 640;
   let dpr = Math.min(window.devicePixelRatio || 1, 2);
   let draggedBlob = null;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
   let lastPtrX = 0;
   let lastPtrY = 0;
-  let pointer = { x: -9999, y: -9999, vx: 0, vy: 0, active: false };
+  let pointer = { x: 900, y: 420, vx: 0, vy: 0, active: false };
   let stageVisible = true;
+  let lastCollisionEggTime = 0;
 
   if ("IntersectionObserver" in window && blobsStage) {
     new IntersectionObserver((entries) => {
@@ -329,7 +410,7 @@
     if (!blobsCanvas || !blobsStage) return;
     const rect = blobsStage.getBoundingClientRect();
     cw = Math.max(320, rect.width);
-    ch = Math.max(460, rect.height);
+    ch = Math.max(480, rect.height);
     dpr = Math.min(window.devicePixelRatio || 1, 2);
     blobsCanvas.width = Math.round(cw * dpr);
     blobsCanvas.height = Math.round(ch * dpr);
@@ -337,117 +418,206 @@
 
   function createBlobs() {
     resizeBlobsCanvas();
-    const scale = cw < 640 ? 0.64 : 1;
-    // Playful flat-vector KIES shapes: puffy stars, worm-head pins, rounded blobs & diamonds
+    const scale = cw < 640 ? 0.62 : 1;
+    const midY = cw < 640 ? 0.62 : 0.56;
     const specs = [
-      { rx: 0.74, ry: 0.66, r: 94 * scale, pal: 0, kind: "worm" },
-      { rx: 0.52, ry: 0.34, r: 58 * scale, pal: 1, kind: "star" },
-      { rx: 0.88, ry: 0.28, r: 44 * scale, pal: 2, kind: "blob" },
-      { rx: 0.44, ry: 0.74, r: 54 * scale, pal: 2, kind: "blob" },
-      { rx: 0.18, ry: 0.66, r: 46 * scale, pal: 0, kind: "star" },
-      { rx: 0.66, ry: 0.24, r: 38 * scale, pal: 3, kind: "diamond" },
-      { rx: 0.32, ry: 0.80, r: 36 * scale, pal: 1, kind: "blob" },
-      { rx: 0.84, ry: 0.82, r: 48 * scale, pal: 3, kind: "star" }
+      // Index 0: THE RED DRAGON MEDALLION BOSS!
+      { rx: 0.52, ry: midY, r: 92 * scale, kind: "dragon", fill: "#DA3832" },
+      { rx: 0.22, ry: 0.62, r: 58 * scale, kind: "worm", fill: "#F2B743" },
+      { rx: 0.80, ry: 0.34, r: 48 * scale, kind: "star", fill: "#F2B743" },
+      { rx: 0.84, ry: 0.72, r: 44 * scale, kind: "blob", fill: "#8AD2D2" },
+      { rx: 0.34, ry: 0.38, r: 42 * scale, kind: "star", fill: "#DA3832" },
+      { rx: 0.68, ry: 0.76, r: 36 * scale, kind: "diamond", fill: "#F9F3E2" },
+      { rx: 0.14, ry: 0.38, r: 34 * scale, kind: "blob", fill: "#E87B25" }
     ];
 
     blobs = specs.map((sp, i) => ({
       x: cw * sp.rx,
       y: ch * sp.ry,
-      vx: (Math.random() - 0.5) * 0.8,
-      vy: (Math.random() - 0.5) * 0.8,
+      vx: (Math.random() - 0.5) * 0.9,
+      vy: (Math.random() - 0.5) * 0.9,
       baseR: sp.r / scale,
       r: sp.r,
-      pal: sp.pal,
       kind: sp.kind,
-      rot: (i * 0.5) % (Math.PI * 2),
-      vrot: (Math.random() - 0.5) * 0.012,
-      seed: i * 1.7 + Math.random() * 4,
-      speed: 0.65 + (i % 3) * 0.18,
-      squash: 0,
-      squashAngle: 0
+      fill: sp.fill,
+      rot: 0,
+      vrot: sp.kind === "dragon" ? 0.003 : (Math.random() - 0.5) * 0.012,
+      seed: i * 1.7,
+      hitFlash: 0
     }));
+
+    // Spawn 2 starter Dragon Eggs so the player immediately sees them!
+    spawnedEggs = [];
+    spawnDragonEgg(cw * 0.66, ch * 0.46, false);
+    spawnDragonEgg(cw * 0.40, ch * 0.68, false);
   }
 
-  function drawKiesToken(ctx, b, t, palette) {
-    const p = palette[b.pal % palette.length];
+  function spawnDragonEgg(x, y, forceGold = false) {
+    if (spawnedEggs.length >= 18) spawnedEggs.shift();
+    const isGold = forceGold || Math.random() < 0.18;
+    const angle = -Math.PI * 0.15 - Math.random() * Math.PI * 0.7;
+    const spd = 4.5 + Math.random() * 6.5;
+    spawnedEggs.push({
+      x,
+      y,
+      vx: Math.cos(angle) * spd + (Math.random() - 0.5) * 4,
+      vy: Math.sin(angle) * spd,
+      r: isGold ? 24 : 20,
+      rot: (Math.random() - 0.5) * 0.5,
+      vrot: (Math.random() - 0.5) * 0.06,
+      isGold,
+      value: isGold ? 5 : 1,
+      pulse: Math.random() * Math.PI * 2
+    });
+  }
+
+  function collectEgg(idx) {
+    const egg = spawnedEggs[idx];
+    if (!egg) return;
+    spawnedEggs.splice(idx, 1);
+    dragonEggsEarned += egg.value;
+    saveDragonState();
+    syncDragonHud();
+    if (typeof renderCart === "function") renderCart();
+    playEggChime(egg.isGold);
+    floatPopups.push({
+      x: egg.x,
+      y: egg.y - 10,
+      text: egg.isGold ? `+${egg.value} ЗОЛОТОЕ ЯЙЦО!` : `+${egg.value} яйцо`,
+      color: egg.isGold ? "#F2B743" : "#F9F3E2",
+      life: 1
+    });
+    shockwaves.push({ x: egg.x, y: egg.y, r: 8, maxR: 48, color: egg.isGold ? "#F2B743" : "#8AD2D2", life: 1 });
+  }
+
+  function triggerWhipStrike(targetX, targetY) {
+    playWhipCrackSound();
+
+    // Whip handle anchor from bottom-right (or offset from target so lash always looks dramatic!)
+    const startX = Math.min(cw - 36, Math.max(targetX + 180, cw * 0.82));
+    const startY = ch - 26;
+    whipStrikes.push({
+      sx: startX,
+      sy: startY,
+      tx: targetX,
+      ty: targetY,
+      progress: 0
+    });
+
+    shockwaves.push({ x: targetX, y: targetY, r: 10, maxR: 78, color: "#F2B743", life: 1 });
+
+    // Check if the whip hit near the Red Dragon medallion (or any token)
+    const dragon = blobs.find((b) => b.kind === "dragon");
+    if (dragon) {
+      const dist = Math.hypot(dragon.x - targetX, dragon.y - targetY);
+      if (dist <= dragon.r + 64) {
+        whipHitsCount += 1;
+        dragon.hitFlash = 1;
+        const pushAngle = Math.atan2(dragon.y - startY, dragon.x - startX);
+        dragon.vx += Math.cos(pushAngle) * 11 + (Math.random() - 0.5) * 6;
+        dragon.vy += Math.sin(pushAngle) * 9 - 3;
+        dragon.vrot = (Math.random() > 0.5 ? 1 : -1) * 0.16;
+
+        // Knock out 1 to 3 Dragon Eggs!
+        const count = whipHitsCount % 5 === 0 ? 3 : 1 + (Math.random() < 0.4 ? 1 : 0);
+        for (let i = 0; i < count; i++) {
+          spawnDragonEgg(dragon.x, dragon.y, whipHitsCount % 7 === 0 && i === 0);
+        }
+        // Also award 1 direct egg for whipping Red Dragon so every hit feels instant & rewarding!
+        dragonEggsEarned += 1;
+        saveDragonState();
+        syncDragonHud();
+        floatPopups.push({
+          x: dragon.x,
+          y: dragon.y - dragon.r * 0.7,
+          text: count > 1 ? `ХРЯСЬ! +1 и выбито ${count} яйца!` : `ХРЯСЬ! +1 яйцо дракона!`,
+          color: "#F2B743",
+          life: 1
+        });
+      } else {
+        // Whip shockwave pushes nearby shapes too
+        for (const b of blobs) {
+          const d = Math.hypot(b.x - targetX, b.y - targetY) || 1;
+          if (d < 170) {
+            b.vx += ((b.x - targetX) / d) * 9;
+            b.vy += ((b.y - targetY) / d) * 9;
+          }
+        }
+      }
+    }
+  }
+
+  function drawDragonEgg(ctx, egg, t) {
+    ctx.save();
+    ctx.translate(egg.x, egg.y);
+    ctx.rotate(egg.rot + Math.sin(t * 3 + egg.pulse) * 0.08);
+    const rx = egg.r * 0.82;
+    const ry = egg.r * 1.06;
+
+    // Flat vector egg silhouette
+    ctx.beginPath();
+    ctx.moveTo(0, -ry);
+    ctx.bezierCurveTo(rx * 0.95, -ry, rx * 1.12, ry * 0.15, rx * 0.88, ry * 0.72);
+    ctx.bezierCurveTo(rx * 0.58, ry * 1.05, -rx * 0.58, ry * 1.05, -rx * 0.88, ry * 0.72);
+    ctx.bezierCurveTo(-rx * 1.12, ry * 0.15, -rx * 0.95, -ry, 0, -ry);
+    ctx.closePath();
+
+    ctx.fillStyle = egg.isGold ? "#F2B743" : "#F9F3E2";
+    ctx.fill();
+
+    // Dragon scale spots
+    ctx.fillStyle = egg.isGold ? "#DA3832" : "#DA3832";
+    ctx.beginPath();
+    ctx.arc(-rx * 0.28, -ry * 0.15, egg.r * 0.18, 0, Math.PI * 2);
+    ctx.arc(rx * 0.3, ry * 0.22, egg.r * 0.22, 0, Math.PI * 2);
+    ctx.arc(-rx * 0.1, ry * 0.48, egg.r * 0.14, 0, Math.PI * 2);
+    ctx.fill();
+
+    if (egg.isGold) {
+      ctx.fillStyle = "#F9F3E2";
+      ctx.beginPath();
+      ctx.arc(rx * 0.22, -ry * 0.35, egg.r * 0.13, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawToken(ctx, b, t) {
     ctx.save();
     ctx.translate(b.x, b.y);
-    ctx.rotate(b.rot + Math.sin(t * 0.7 + b.seed) * 0.06);
+    ctx.rotate(b.rot);
 
-    if (b.kind === "worm") {
-      // Flat-vector KIES Worm Pin Badge!
-      const r = b.r;
-      ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
-      ctx.fillStyle = "#F2B743";
-      ctx.fill();
-      ctx.lineWidth = Math.max(3, r * 0.06);
-      ctx.strokeStyle = "#E87B25";
-      ctx.stroke();
-
-      // Cream worm face
-      ctx.beginPath();
-      ctx.ellipse(0, r * 0.06, r * 0.58, r * 0.5, 0, 0, Math.PI * 2);
-      ctx.fillStyle = "#F9F3E2";
-      ctx.fill();
-
-      // Racing Red hood arc
-      ctx.beginPath();
-      ctx.arc(0, r * 0.04, r * 0.58, Math.PI * 1.05, Math.PI * 1.95);
-      ctx.quadraticCurveTo(0, -r * 0.2, -r * 0.57, -r * 0.05);
-      ctx.fillStyle = "#DA3832";
-      ctx.fill();
-
-      // Chunky red glasses frames
-      const gw = r * 0.44;
-      const gh = r * 0.34;
-      const gy = -r * 0.18;
-      ctx.fillStyle = "#F9F3E2";
-      ctx.strokeStyle = "#DA3832";
-      ctx.lineWidth = Math.max(3, r * 0.085);
-      ctx.beginPath();
-      ctx.roundRect(-gw - r * 0.05, gy, gw, gh, r * 0.11);
-      ctx.fill();
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.roundRect(r * 0.05, gy, gw, gh, r * 0.11);
-      ctx.fill();
-      ctx.stroke();
-
-      // Steel Azure X and O eyes
-      ctx.strokeStyle = "#1C529E";
-      ctx.lineWidth = Math.max(2.6, r * 0.07);
-      ctx.lineCap = "round";
-      const lx = -r * 0.27;
-      const ey = gy + gh * 0.5;
-      const es = r * 0.09;
-      ctx.beginPath();
-      ctx.moveTo(lx - es, ey - es);
-      ctx.lineTo(lx + es, ey + es);
-      ctx.moveTo(lx + es, ey - es);
-      ctx.lineTo(lx - es, ey + es);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.arc(r * 0.27, ey, r * 0.1, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Wavy smile
-      ctx.strokeStyle = "#E87B25";
-      ctx.lineWidth = Math.max(2.4, r * 0.06);
-      ctx.beginPath();
-      ctx.moveTo(-r * 0.18, r * 0.3);
-      ctx.quadraticCurveTo(-r * 0.09, r * 0.42, 0, r * 0.3);
-      ctx.quadraticCurveTo(r * 0.09, r * 0.42, r * 0.18, r * 0.3);
-      ctx.stroke();
+    if (b.kind === "dragon") {
+      const scale = 1 + b.hitFlash * 0.14;
+      ctx.scale(scale, scale);
+      if (b.hitFlash > 0.05) {
+        ctx.beginPath();
+        ctx.arc(0, 0, b.r + 8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(242, 183, 67, ${b.hitFlash * 0.65})`;
+        ctx.fill();
+      }
+      if (redDragonImg && redDragonImg.complete && redDragonImg.naturalWidth > 0) {
+        ctx.drawImage(redDragonImg, -b.r, -b.r, b.r * 2, b.r * 2);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = "#DA3832";
+        ctx.fill();
+      }
+    } else if (b.kind === "worm") {
+      if (wormBadgeImg && wormBadgeImg.complete && wormBadgeImg.naturalWidth > 0) {
+        ctx.drawImage(wormBadgeImg, -b.r, -b.r * 0.96, b.r * 2, b.r * 1.92);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = "#F2B743";
+        ctx.fill();
+      }
     } else if (b.kind === "star") {
-      // KIES puffy 5-point flat vector star
       const spikes = 5;
-      const outer = b.r;
-      const inner = b.r * 0.52;
       ctx.beginPath();
       for (let i = 0; i < spikes * 2; i++) {
-        const rad = i % 2 === 0 ? outer : inner;
+        const rad = i % 2 === 0 ? b.r : b.r * 0.52;
         const a = (i * Math.PI) / spikes - Math.PI / 2;
         const x = Math.cos(a) * rad;
         const y = Math.sin(a) * rad;
@@ -455,35 +625,22 @@
         else ctx.lineTo(x, y);
       }
       ctx.closePath();
-      ctx.lineJoin = "round";
-      ctx.fillStyle = p.fill;
+      ctx.fillStyle = b.fill;
       ctx.fill();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = p.stroke;
-      ctx.stroke();
     } else if (b.kind === "diamond") {
-      // KIES nested rotated square
-      const s = b.r * 1.15;
+      const s = b.r * 1.25;
       ctx.rotate(Math.PI / 4);
-      ctx.fillStyle = p.fill;
+      ctx.fillStyle = b.fill;
       ctx.beginPath();
       ctx.roundRect(-s * 0.5, -s * 0.5, s, s, 8);
       ctx.fill();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = p.stroke;
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.roundRect(-s * 0.28, -s * 0.28, s * 0.56, s * 0.56, 4);
-      ctx.stroke();
     } else {
-      // Flat-vector bouncy squishy blob (lineless with clean crisp edge)
       const steps = 14;
       const pts = [];
       for (let i = 0; i < steps; i++) {
         const a = (i / steps) * Math.PI * 2;
-        const wob = Math.sin(a * 2 + t * b.speed + b.seed) * 0.09 + Math.cos(a * 3 - t * 0.7 + b.seed) * 0.05;
-        const rad = b.r * (1 + wob);
-        pts.push({ x: Math.cos(a) * rad, y: Math.sin(a) * rad });
+        const wob = Math.sin(a * 2 + t * 0.8 + b.seed) * 0.08;
+        pts.push({ x: Math.cos(a) * b.r * (1 + wob), y: Math.sin(a) * b.r * (1 + wob) });
       }
       ctx.beginPath();
       ctx.moveTo((pts[steps - 1].x + pts[0].x) * 0.5, (pts[steps - 1].y + pts[0].y) * 0.5);
@@ -493,14 +650,123 @@
         ctx.quadraticCurveTo(curr.x, curr.y, (curr.x + next.x) * 0.5, (curr.y + next.y) * 0.5);
       }
       ctx.closePath();
-      ctx.fillStyle = p.fill;
+      ctx.fillStyle = b.fill;
       ctx.fill();
-      ctx.lineWidth = 3.5;
-      ctx.strokeStyle = p.stroke;
-      ctx.stroke();
     }
-
     ctx.restore();
+  }
+
+  function drawIdleWhipCursor(ctx, t) {
+    if (!whipMode || !pointer.active || whipStrikes.length > 0) return;
+    // Draw coiled KIES whip handle near cursor so the user feels the whip in hand!
+    const hx = pointer.x + 26;
+    const hy = pointer.y + 28;
+    ctx.save();
+    ctx.translate(hx, hy);
+    ctx.rotate(-0.65);
+    // Braided leather/red whip handle
+    ctx.fillStyle = "#DA3832";
+    ctx.beginPath();
+    ctx.roundRect(-6, -22, 12, 36, 5);
+    ctx.fill();
+    ctx.fillStyle = "#F2B743";
+    ctx.beginPath();
+    ctx.arc(0, 16, 7, 0, Math.PI * 2);
+    ctx.fill();
+    // Trailing whip lash ribbon
+    ctx.beginPath();
+    ctx.moveTo(0, -22);
+    const sway = Math.sin(t * 5) * 10;
+    ctx.bezierCurveTo(18 + sway, -44, -14 + sway, -62, 10, -82);
+    ctx.strokeStyle = "#F9F3E2";
+    ctx.lineWidth = 4.5;
+    ctx.lineCap = "round";
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawWhipStrikes(ctx) {
+    for (let i = whipStrikes.length - 1; i >= 0; i--) {
+      const w = whipStrikes[i];
+      w.progress += 0.085;
+      if (w.progress >= 1) {
+        whipStrikes.splice(i, 1);
+        continue;
+      }
+
+      const p = w.progress;
+      const reach = Math.min(1, p * 1.65);
+      const ex = w.sx + (w.tx - w.sx) * reach;
+      const ey = w.sy + (w.ty - w.sy) * reach;
+      const waveAmp = (1 - p * 0.72) * 95;
+      const nx = -(w.ty - w.sy);
+      const ny = w.tx - w.sx;
+      const nLen = Math.hypot(nx, ny) || 1;
+      const ux = nx / nLen;
+      const uy = ny / nLen;
+
+      const sWave = Math.cos(p * Math.PI * 1.6);
+      const c1x = w.sx + (ex - w.sx) * 0.34 + ux * waveAmp * sWave;
+      const c1y = w.sy + (ey - w.sy) * 0.34 + uy * waveAmp * sWave;
+      const c2x = w.sx + (ex - w.sx) * 0.70 - ux * waveAmp * 0.85 * sWave;
+      const c2y = w.sy + (ey - w.sy) * 0.70 - uy * waveAmp * 0.85 * sWave;
+
+      ctx.save();
+      ctx.globalAlpha = 1 - Math.max(0, (p - 0.65) / 0.35);
+
+      // Handle at start
+      const hAngle = Math.atan2(w.ty - w.sy, w.tx - w.sx);
+      ctx.save();
+      ctx.translate(w.sx, w.sy);
+      ctx.rotate(hAngle);
+      ctx.fillStyle = "#DA3832";
+      ctx.beginPath();
+      ctx.roundRect(-18, -7, 38, 14, 6);
+      ctx.fill();
+      ctx.fillStyle = "#F2B743";
+      ctx.beginPath();
+      ctx.arc(-18, 0, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Outer crimson lash stroke + inner cream cord
+      ctx.beginPath();
+      ctx.moveTo(w.sx, w.sy);
+      ctx.bezierCurveTo(c1x, c1y, c2x, c2y, ex, ey);
+      ctx.strokeStyle = "#E87B25";
+      ctx.lineWidth = 9 * (1 - p * 0.35);
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(w.sx, w.sy);
+      ctx.bezierCurveTo(c1x, c1y, c2x, c2y, ex, ey);
+      ctx.strokeStyle = "#F9F3E2";
+      ctx.lineWidth = 4.5 * (1 - p * 0.35);
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      // Sonic crack star burst at tip!
+      if (p > 0.32 && p < 0.86) {
+        ctx.save();
+        ctx.translate(w.tx, w.ty);
+        ctx.rotate(p * 6);
+        const sr = 28 * Math.sin(((p - 0.32) / 0.54) * Math.PI);
+        ctx.fillStyle = "#F2B743";
+        ctx.beginPath();
+        for (let k = 0; k < 12; k++) {
+          const rad = k % 2 === 0 ? sr : sr * 0.35;
+          const a = (k * Math.PI) / 6;
+          if (k === 0) ctx.moveTo(Math.cos(a) * rad, Math.sin(a) * rad);
+          else ctx.lineTo(Math.cos(a) * rad, Math.sin(a) * rad);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
   }
 
   function stepBlobs(now) {
@@ -511,24 +777,28 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, cw, ch);
 
-      const pad = 16;
+      const pad = 18;
       for (const b of blobs) {
         if (b !== draggedBlob) {
           if (!prefersReduced) {
-            b.vx += Math.sin(t * 0.55 + b.seed) * 0.014;
-            b.vy += Math.cos(t * 0.48 + b.seed * 1.4) * 0.014;
+            b.vx += Math.sin(t * 0.55 + b.seed) * 0.012;
+            b.vy += Math.cos(t * 0.48 + b.seed * 1.4) * 0.012;
             b.rot += b.vrot;
           }
+          if (b.kind === "dragon") {
+            b.vrot *= 0.985;
+            if (Math.abs(b.vrot) < 0.003) b.vrot = 0.003;
+          }
 
-          if (pointer.active && !draggedBlob) {
+          if (!whipMode && pointer.active && !draggedBlob) {
             const dx = b.x - pointer.x;
             const dy = b.y - pointer.y;
             const dist = Math.hypot(dx, dy) || 1;
-            const reach = b.r + 115;
+            const reach = b.r + 100;
             if (dist < reach) {
-              const force = (1 - dist / reach) * 0.9;
-              b.vx += (dx / dist) * force + pointer.vx * 0.045;
-              b.vy += (dy / dist) * force + pointer.vy * 0.045;
+              const force = (1 - dist / reach) * 0.85;
+              b.vx += (dx / dist) * force + pointer.vx * 0.04;
+              b.vy += (dy / dist) * force + pointer.vy * 0.04;
             }
           }
 
@@ -537,18 +807,16 @@
           b.x += b.vx;
           b.y += b.vy;
 
-          const minX = pad;
-          const maxX = cw - pad;
-          const minY = pad;
-          const maxY = ch - pad;
-
-          if (b.x - b.r < minX) { b.x = minX + b.r; b.vx = Math.abs(b.vx) * 0.72; }
-          else if (b.x + b.r > maxX) { b.x = maxX - b.r; b.vx = -Math.abs(b.vx) * 0.72; }
-          if (b.y - b.r < minY) { b.y = minY + b.r; b.vy = Math.abs(b.vy) * 0.72; }
-          else if (b.y + b.r > maxY) { b.y = maxY - b.r; b.vy = -Math.abs(b.vy) * 0.72; }
+          const topSafe = b.kind === "dragon" && cw < 640 ? 205 : pad;
+          if (b.x - b.r < pad) { b.x = pad + b.r; b.vx = Math.abs(b.vx) * 0.75; }
+          else if (b.x + b.r > cw - pad) { b.x = cw - pad - b.r; b.vx = -Math.abs(b.vx) * 0.75; }
+          if (b.y - b.r < topSafe) { b.y = topSafe + b.r; b.vy = Math.abs(b.vy) * 0.75; }
+          else if (b.y + b.r > ch - 76) { b.y = ch - 76 - b.r; b.vy = -Math.abs(b.vy) * 0.75; }
         }
+        b.hitFlash *= 0.88;
       }
 
+      // Collisions between tokens (slamming a shape into Red Dragon also knocks out Dragon Eggs!)
       for (let i = 0; i < blobs.length; i++) {
         for (let j = i + 1; j < blobs.length; j++) {
           const a = blobs[i];
@@ -556,23 +824,90 @@
           const dx = b.x - a.x;
           const dy = b.y - a.y;
           const dist = Math.hypot(dx, dy) || 0.001;
-          const minDist = (a.r + b.r) * 1.04;
+          const minDist = (a.r + b.r) * 1.02;
           if (dist < minDist) {
             const nx = dx / dist;
             const ny = dy / dist;
-            const push = (minDist - dist) * 0.06;
+            const relSpeed = Math.hypot(b.vx - a.vx, b.vy - a.vy);
+            const push = (minDist - dist) * 0.08;
             if (a !== draggedBlob) { a.vx -= nx * push; a.vy -= ny * push; }
             if (b !== draggedBlob) { b.vx += nx * push; b.vy += ny * push; }
+
+            if ((a.kind === "dragon" || b.kind === "dragon") && relSpeed > 3.8 && now - lastCollisionEggTime > 380) {
+              lastCollisionEggTime = now;
+              const dr = a.kind === "dragon" ? a : b;
+              dr.hitFlash = 0.85;
+              spawnDragonEgg(dr.x, dr.y, false);
+              playEggChime(false);
+            }
           }
         }
       }
 
-      const palette = BLOB_PALETTES[blobPaletteKey];
-      const sorted = [...blobs].sort((a, b) => a.r - b.r);
-      for (const b of sorted) {
-        drawKiesToken(ctx, b, t, palette);
+      // Update & draw Dragon Eggs
+      for (let i = spawnedEggs.length - 1; i >= 0; i--) {
+        const egg = spawnedEggs[i];
+        egg.vy += 0.08; // gentle floaty gravity
+        egg.vx *= 0.985;
+        egg.vy *= 0.985;
+        egg.x += egg.vx;
+        egg.y += egg.vy;
+        egg.rot += egg.vrot;
+
+        if (egg.x - egg.r < pad) { egg.x = pad + egg.r; egg.vx = Math.abs(egg.vx) * 0.75; }
+        else if (egg.x + egg.r > cw - pad) { egg.x = cw - pad - egg.r; egg.vx = -Math.abs(egg.vx) * 0.75; }
+        if (egg.y - egg.r < pad) { egg.y = pad + egg.r; egg.vy = Math.abs(egg.vy) * 0.75; }
+        else if (egg.y + egg.r > ch - 76) { egg.y = ch - 76 - egg.r; egg.vy = -Math.abs(egg.vy) * 0.68; }
+
+        // Collect when sweeping cursor over egg!
+        if (pointer.active && Math.hypot(egg.x - pointer.x, egg.y - pointer.y) <= egg.r + 22) {
+          collectEgg(i);
+          continue;
+        }
+        drawDragonEgg(ctx, egg, t);
+      }
+
+      // Draw KIES tokens & Red Dragon medallion on top
+      for (let i = blobs.length - 1; i >= 0; i--) {
+        drawToken(ctx, blobs[i], t);
+      }
+
+      // Shockwaves
+      for (let i = shockwaves.length - 1; i >= 0; i--) {
+        const sw = shockwaves[i];
+        sw.r += (sw.maxR - sw.r) * 0.18;
+        sw.life -= 0.06;
+        if (sw.life <= 0) { shockwaves.splice(i, 1); continue; }
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(sw.x, sw.y, sw.r, 0, Math.PI * 2);
+        ctx.strokeStyle = sw.color;
+        ctx.globalAlpha = sw.life;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Animated Whip Strikes & Idle Whip
+      drawWhipStrikes(ctx);
+      drawIdleWhipCursor(ctx, t);
+
+      // Floating score popups
+      for (let i = floatPopups.length - 1; i >= 0; i--) {
+        const fp = floatPopups[i];
+        fp.y -= 1.3;
+        fp.life -= 0.024;
+        if (fp.life <= 0) { floatPopups.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, fp.life * 1.4);
+        ctx.font = "900 18px Rubik, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = fp.color;
+        ctx.fillText(fp.text, fp.x, fp.y);
+        ctx.restore();
       }
     }
+
     pointer.vx *= 0.8;
     pointer.vy *= 0.8;
     requestAnimationFrame(stepBlobs);
@@ -585,9 +920,24 @@
 
   blobsCanvas.addEventListener("pointerdown", (e) => {
     const pos = getCanvasPos(e);
-    // Check largest/topmost first
-    const hitOrder = [...blobs].sort((a, b) => b.r - a.r);
-    const hit = hitOrder.find((b) => Math.hypot(pos.x - b.x, pos.y - b.y) <= b.r * 1.05);
+    pointer.x = pos.x;
+    pointer.y = pos.y;
+    pointer.active = true;
+
+    // Clicking directly on an egg always collects it
+    const eggIdx = spawnedEggs.findIndex((eg) => Math.hypot(pos.x - eg.x, pos.y - eg.y) <= eg.r + 14);
+    if (eggIdx >= 0) {
+      collectEgg(eggIdx);
+      return;
+    }
+
+    if (whipMode) {
+      triggerWhipStrike(pos.x, pos.y);
+      return;
+    }
+
+    // Grab / Fling mode
+    const hit = blobs.find((b) => Math.hypot(pos.x - b.x, pos.y - b.y) <= b.r * 1.05);
     if (hit) {
       blobsCanvas.setPointerCapture(e.pointerId);
       draggedBlob = hit;
@@ -599,17 +949,7 @@
       hit.vy = 0;
       blobsCanvas.classList.add("is-dragging");
     } else {
-      // Soft radial wave push from clicked empty spot
-      for (const b of blobs) {
-        const dx = b.x - pos.x;
-        const dy = b.y - pos.y;
-        const dist = Math.hypot(dx, dy) || 1;
-        const power = Math.max(2, 16 - dist * 0.022);
-        b.vx += (dx / dist) * power;
-        b.vy += (dy / dist) * power;
-        b.squash = 0.85;
-        b.squashAngle = Math.atan2(dy, dx);
-      }
+      triggerWhipStrike(pos.x, pos.y);
     }
   });
 
@@ -622,11 +962,10 @@
     pointer.active = true;
 
     if (draggedBlob) {
-      draggedBlob.vx = (pos.x - lastPtrX) * 0.9;
-      draggedBlob.vy = (pos.y - lastPtrY) * 0.9;
+      draggedBlob.vx = (pos.x - lastPtrX) * 0.92;
+      draggedBlob.vy = (pos.y - lastPtrY) * 0.92;
       draggedBlob.x = pos.x + dragOffsetX;
       draggedBlob.y = pos.y + dragOffsetY;
-      draggedBlob.squash = Math.min(1, Math.hypot(draggedBlob.vx, draggedBlob.vy) * 0.04);
       lastPtrX = pos.x;
       lastPtrY = pos.y;
     }
@@ -640,7 +979,6 @@
       blobsCanvas.classList.remove("is-dragging");
     }
   };
-
   blobsCanvas.addEventListener("pointerup", endDrag);
   blobsCanvas.addEventListener("pointercancel", endDrag);
   blobsCanvas.addEventListener("pointerleave", () => {
@@ -648,29 +986,66 @@
     endDrag();
   });
 
-  scatterBlobsBtn.addEventListener("click", () => {
+  strikeWhipBtn?.addEventListener("click", () => {
+    const dragon = blobs.find((b) => b.kind === "dragon");
+    const tx = dragon ? dragon.x : cw * 0.5;
+    const ty = dragon ? dragon.y : ch * 0.5;
+    triggerWhipStrike(tx, ty);
+  });
+
+  modeWhipBtn?.addEventListener("click", () => {
+    whipMode = !whipMode;
+    modeWhipBtn.textContent = whipMode ? "Режим: Плётка" : "Режим: Бросок";
+    blobsCanvas.classList.toggle("is-grab-mode", !whipMode);
+  });
+
+  scatterBlobsBtn?.addEventListener("click", () => {
+    playWhipCrackSound();
     for (const b of blobs) {
-      const angle = Math.random() * Math.PI * 2;
-      const spd = 8 + Math.random() * 14;
-      b.vx += Math.cos(angle) * spd;
-      b.vy += Math.sin(angle) * spd;
-      b.squash = 0.9;
-      b.squashAngle = angle;
+      const a = Math.random() * Math.PI * 2;
+      const spd = 9 + Math.random() * 12;
+      b.vx += Math.cos(a) * spd;
+      b.vy += Math.sin(a) * spd;
     }
+    const dragon = blobs.find((b) => b.kind === "dragon");
+    if (dragon) spawnDragonEgg(dragon.x, dragon.y, false);
   });
 
-  paletteBlobsBtn.addEventListener("click", () => {
-    const idx = (PALETTE_ORDER.indexOf(blobPaletteKey) + 1) % PALETTE_ORDER.length;
-    blobPaletteKey = PALETTE_ORDER[idx];
-    blobsStage.classList.toggle("is-gold-pal", blobPaletteKey === "gold");
-    blobsStage.classList.toggle("is-red-pal", blobPaletteKey === "red");
-    paletteBlobsBtn.textContent = PALETTE_NAMES[blobPaletteKey];
+  paletteBlobsBtn?.addEventListener("click", () => {
+    const idx = (BG_MODES.indexOf(bgMode) + 1) % BG_MODES.length;
+    bgMode = BG_MODES[idx];
+    blobsStage.classList.toggle("is-aqua-bg", bgMode === "aqua");
+    blobsStage.classList.toggle("is-gold-bg", bgMode === "gold");
+    paletteBlobsBtn.textContent = BG_NAMES[bgMode];
   });
 
-  resetBlobsBtn.addEventListener("click", createBlobs);
+  soundToggleBtn?.addEventListener("click", () => {
+    soundOn = !soundOn;
+    soundToggleBtn.textContent = soundOn ? "Звук: Вкл" : "Звук: Выкл";
+    showToast(soundOn ? "Звук включён" : "Звук выключен");
+  });
+
+  redeemEggsBtn?.addEventListener("click", () => {
+    if (dragonDiscountUnlocked) {
+      openCartDrawer();
+      return;
+    }
+    if (dragonEggsEarned < 15) {
+      showToast(`Нужно ещё ${15 - dragonEggsEarned} яиц дракона! Хлестните Red Dragon!`);
+      return;
+    }
+    dragonEggsEarned -= 15;
+    dragonDiscountUnlocked = true;
+    saveDragonState();
+    syncDragonHud();
+    playEggChime(true);
+    renderCart();
+    showToast("Бонус Red Dragon активирован: скидка -10% в корзине!");
+  });
+
   window.addEventListener("resize", () => {
     resizeBlobsCanvas();
-    const scale = cw < 640 ? 0.64 : 1;
+    const scale = cw < 640 ? 0.66 : 1;
     for (const b of blobs) {
       b.r = b.baseR * scale;
       b.x = Math.min(cw - b.r, Math.max(b.r, b.x));
@@ -682,7 +1057,7 @@
   requestAnimationFrame(stepBlobs);
 
   // ======================================================
-  // 2. GENERATORS STUDIO (CINFO / KEYCARD / THEME)
+  // 2. STUDIO (CINFO / KEYCARD / THEME)
   // ======================================================
   const sbTabs = document.querySelectorAll(".sb-tab");
   const sbPanels = {
@@ -700,12 +1075,13 @@
         t.setAttribute("aria-selected", String(active));
       });
       Object.entries(sbPanels).forEach(([key, panel]) => {
-        if (panel) panel.hidden = key !== target;
+        const show = key === target;
+        panel.hidden = !show;
+        panel.classList.toggle("is-active", show);
       });
     });
   });
 
-  // 2A. CINFO GENERATOR
   const CINFO_PRESETS = {
     science: { name: "Доктор Феликс", dept: "Научная служба", role: "Старший исследователь", extra: "A(II)+ | Пропуск 3 ур.", look: "Белый халат | На груди бейдж и КПК", color: "#58a6ff" },
     security: { name: "Агент Рейнольдс", dept: "Служба безопасности", role: "Лейтенант СБ", extra: "O(I)+ | Мини-камера", look: "Тактический бронежилет | На груди жетон СБ", color: "#a8c7fa" },
@@ -729,7 +1105,6 @@
   const cinfoPresetBtns = document.querySelectorAll("#cinfoPresets .tp-btn");
 
   let lastCinfoRaw = "";
-
   function renderCinfo() {
     const st = cinfoStyle.value;
     const col = cinfoColor.value.toUpperCase();
@@ -742,7 +1117,6 @@
 
     let raw = "";
     let previewHtml = "";
-
     if (st === "badge") {
       cinfoStyleLabel.textContent = "Служебный бейдж v5";
       const line2 = [dept, role].filter(Boolean).join(" | ");
@@ -800,20 +1174,18 @@
     try { await navigator.clipboard.writeText(lastCinfoRaw); showToast("CINFO тег скопирован"); }
     catch { showToast("Не удалось скопировать"); }
   });
-
   document.getElementById("copyCinfoYaml").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(cinfoCodeOut.textContent); showToast("Строка YAML скопирована"); }
     catch { showToast("Не удалось скопировать"); }
   });
-
   renderCinfo();
 
-  // 2B. KEYCARD GENERATOR
+  // Keycard generator
   const KC_PRESETS = {
-    sb: { type: "KeycardCustomMetalCase", dept: "Служба Безопасности", role: "Лейтенант СБ", callsign: "Агент Рейнольдс", c: "2", a: "2", m: "2", cls: "C", bg: "#262b36", acc: "#7cc4ff" },
-    sci: { type: "KeycardCustomSite02", dept: "Научная служба", role: "Доктор Феликс", callsign: "Сектор B-04", c: "3", a: "0", m: "1", cls: "B", bg: "#1e293b", acc: "#facc15" },
-    mtf: { type: "KeycardCustomTaskForce", dept: "МОГ Ню-7", role: "Командир отряда", callsign: "Молот-1", c: "3", a: "3", m: "2", cls: "A", bg: "#172038", acc: "#3b82f6" },
-    admin: { type: "KeycardCustomManagement", dept: "Администрация комплекса", role: "Директор Зоны", callsign: "O5-Допуск", c: "3", a: "3", m: "3", cls: "A", bg: "#1c1917", acc: "#ff6428" }
+    sb: { type: "KeycardCustomMetalCase", dept: "Служба Безопасности", role: "Лейтенант СБ", callsign: "Агент Рейнольдс", c: "2", a: "2", m: "2", cls: "C", bg: "#153e7a", acc: "#f2b743" },
+    sci: { type: "KeycardCustomSite02", dept: "Научная Служба", role: "Ведущий Учёный", callsign: "Д-р Феликс", c: "3", a: "0", m: "1", cls: "B", bg: "#1c529e", acc: "#8ad2d2" },
+    mtf: { type: "KeycardCustomTaskForce", dept: "МОГ Ню-7", role: "Оперативник", callsign: "Молот-1", c: "2", a: "3", m: "2", cls: "A", bg: "#143d78", acc: "#da3832" },
+    dir: { type: "KeycardCustomManagement", dept: "Дирекция Зоны", role: "Директор Комплекса", callsign: "Код O5-4", c: "3", a: "3", m: "3", cls: "O5", bg: "#da3832", acc: "#f2b743" }
   };
 
   const kcType = document.getElementById("kcType");
@@ -903,77 +1275,71 @@
   document.getElementById("copyKcCmd2").addEventListener("click", copyKc);
 
   document.getElementById("downloadKcPng").addEventListener("click", () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 960;
-    canvas.height = 560;
-    const ctx = canvas.getContext("2d");
+    const c = document.createElement("canvas");
+    c.width = 760;
+    c.height = 440;
+    const ctx = c.getContext("2d");
     const bg = kcBg.value;
     const acc = kcAccent.value;
 
     ctx.fillStyle = bg;
     ctx.beginPath();
-    ctx.roundRect(0, 0, 960, 560, 32);
+    ctx.roundRect(0, 0, 760, 440, 28);
     ctx.fill();
 
     ctx.fillStyle = acc;
-    ctx.fillRect(0, 0, 20, 560);
+    ctx.fillRect(0, 0, 18, 440);
 
     ctx.fillStyle = "rgba(255,255,255,0.68)";
-    ctx.font = "600 22px monospace";
-    ctx.fillText("КАРТА ДОСТУПА / FULT-ENGINE", 54, 68);
-    ctx.textAlign = "right";
-    ctx.fillText(kcType.value.replace("KeycardCustom", ""), 906, 68);
-    ctx.textAlign = "left";
+    ctx.font = "600 18px JetBrains Mono, monospace";
+    ctx.fillText("КАРТА ДОСТУПА  /  FULT-ENGINE", 48, 56);
+    ctx.fillText(kcType.value.replace("KeycardCustom", ""), 580, 56);
 
     ctx.fillStyle = acc;
-    ctx.font = "700 42px sans-serif";
-    ctx.fillText(kcDept.value.trim() || "Служба", 54, 140);
+    ctx.font = "900 34px Rubik, sans-serif";
+    ctx.fillText(kcDept.value || "Служба", 48, 114);
 
-    ctx.strokeStyle = "rgba(255,255,255,0.28)";
-    ctx.lineWidth = 3;
-    ctx.strokeRect(54, 190, 120, 140);
+    ctx.fillStyle = "rgba(255,255,255,0.14)";
+    ctx.beginPath();
+    ctx.roundRect(48, 152, 108, 108, 16);
+    ctx.fill();
     ctx.fillStyle = "#ffffff";
-    ctx.font = "700 32px monospace";
-    ctx.fillText("ID", 92, 272);
+    ctx.font = "700 28px JetBrains Mono, monospace";
+    ctx.fillText("ID", 84, 216);
 
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "700 34px sans-serif";
-    ctx.fillText(kcRole.value.trim() || "Сотрудник", 206, 232);
-    ctx.fillStyle = "#d1d5db";
-    ctx.font = "500 26px monospace";
-    ctx.fillText(`Допуск: ${kcPermCont.value} / ${kcPermArm.value} / ${kcPermAdm.value}`, 206, 282);
-    ctx.fillText(`Класс:  ${kcClass.value}`, 206, 322);
+    ctx.font = "700 28px Golos Text, sans-serif";
+    ctx.fillText(kcRole.value || "Сотрудник", 184, 184);
+    ctx.fillStyle = "rgba(255,255,255,0.88)";
+    ctx.font = "500 22px JetBrains Mono, monospace";
+    ctx.fillText(`Допуск: ${kcPermCont.value} / ${kcPermArm.value} / ${kcPermAdm.value}`, 184, 222);
+    ctx.fillText(`Класс: ${kcClass.value}`, 184, 256);
 
     for (let r = 0; r < 4; r++) {
-      for (let c = 0; c < 4; c++) {
-        ctx.fillStyle = (r + c) % 2 === 0 ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.18)";
-        ctx.fillRect(770 + c * 32, 196 + r * 32, 24, 24);
+      for (let col = 0; col < 4; col++) {
+        ctx.fillStyle = (r + col) % 2 === 0 ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.22)";
+        ctx.fillRect(610 + col * 24, 160 + r * 24, 18, 18);
       }
     }
 
-    ctx.fillStyle = "rgba(255,255,255,0.16)";
-    ctx.fillRect(54, 444, 852, 2);
-    ctx.fillStyle = "rgba(255,255,255,0.78)";
-    ctx.font = "500 24px monospace";
-    ctx.fillText("Срок: до 01.01.2028", 54, 500);
-    ctx.textAlign = "right";
-    ctx.fillText(kcCallsign.value.trim() || "Позывной", 906, 500);
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.font = "500 20px JetBrains Mono, monospace";
+    ctx.fillText("Срок: до 01.01.2028", 48, 392);
+    ctx.fillText(`Владелец: ${kcCallsign.value || "Агент"}`, 400, 392);
 
     const a = document.createElement("a");
-    a.download = `fult-keycard-${(kcRole.value || "card").toLowerCase().replace(/[^a-zа-я0-9]+/gi, "-")}.png`;
-    a.href = canvas.toDataURL("image/png");
+    a.download = `keycard-${(kcCallsign.value || "fult").replace(/\s+/g, "-").toLowerCase()}.png`;
+    a.href = c.toDataURL("image/png");
     a.click();
-    showToast("Карточка сохранена в PNG");
+    showToast("Карточка PNG скачана");
   });
-
   renderKeycard();
 
-  // 2C. THEME.YML DESIGNER
+  // Theme.yml Studio
   const THEME_PRESETS = {
-    lava: { accent: "#f26849", good: "#34d399", warn: "#e59838", bad: "#fb7185" },
-    tactical: { accent: "#38bdf8", good: "#22c55e", warn: "#f59e0b", bad: "#ef4444" },
-    contrast: { accent: "#facc15", good: "#4ade80", warn: "#fb923c", bad: "#f43f5e" },
-    mint: { accent: "#2dd4bf", good: "#34d399", warn: "#a78bfa", bad: "#fb7185" }
+    lava: { accent: "#da3832", good: "#8ad2d2", warn: "#f2b743", bad: "#e87b25" },
+    cobalt: { accent: "#60a5fa", good: "#34d399", warn: "#fbbf24", bad: "#fb7185" },
+    emerald: { accent: "#8ad2d2", good: "#4ade80", warn: "#facc15", bad: "#f87171" },
+    amber: { accent: "#f2b743", good: "#34d399", warn: "#fde047", bad: "#da3832" }
   };
 
   const colAccent = document.getElementById("colAccent");
@@ -988,7 +1354,7 @@
   const hudPreview = document.getElementById("hudPreview");
   const hudRoleBadge = document.getElementById("hudRoleBadge");
   const themeYamlOut = document.getElementById("themeYamlOut");
-  const tpBtns = document.querySelectorAll("#sbTheme .tp-btn");
+  const tpBtns = document.querySelectorAll("#themePresets .tp-btn");
 
   function renderThemePreview() {
     const colors = {
@@ -1001,13 +1367,14 @@
     hexGood.textContent = colors.good;
     hexWarn.textContent = colors.warn;
     hexBad.textContent = colors.bad;
-    hudRoleBadge.style.borderLeft = `3px solid ${colors.accent}`;
+    hudRoleBadge.style.borderLeft = `4px solid ${colors.accent}`;
+    hudRoleBadge.style.paddingLeft = "8px";
 
     const raw = esc(hintInput.value);
     hudPreview.innerHTML = raw.replace(
       /&lt;color=@(accent|good|warn|bad)&gt;([\s\S]*?)&lt;\/color&gt;/gi,
-      (_, key, inner) => `<span style="color:${colors[key.toLowerCase()]};font-weight:600">${inner}</span>`
-    ) || "<span style='opacity:0.5'>Введите текст хинта слева...</span>";
+      (_, key, inner) => `<span style="color:${colors[key.toLowerCase()]};font-weight:700">${inner}</span>`
+    ) || "<span style='opacity:0.6'>Введите текст хинта слева...</span>";
 
     themeYamlOut.textContent = [
       "is_enabled: true",
@@ -1039,31 +1406,35 @@
     });
   });
   document.getElementById("copyThemeBtn").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(themeYamlOut.textContent); showToast("Theme.yml скопирован в буфер"); }
+    try { await navigator.clipboard.writeText(themeYamlOut.textContent); showToast("Theme.yml скопирован"); }
     catch { showToast("Не удалось скопировать"); }
   });
   renderThemePreview();
 
   // ======================================================
-  // 3. MODULE SHOP & CART DRAWER
+  // 3. MODULE SHOP & CART DRAWER (+ DRAGON EGG DISCOUNT)
   // ======================================================
-  const CART_KEY = "fult_engine_cart_v2";
-  let cart = [];
-  try { cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]"); } catch { cart = []; }
-
-  const cartCountEl = document.getElementById("cartCount");
   const cartDrawer = document.getElementById("cartDrawer");
   const cartItemsEl = document.getElementById("cartItems");
+  const cartCountEl = document.getElementById("cartCount");
   const cartItemCountEl = document.getElementById("cartItemCount");
   const cartDiscountRow = document.getElementById("cartDiscountRow");
   const cartDiscountVal = document.getElementById("cartDiscountVal");
+  const cartDragonRow = document.getElementById("cartDragonRow");
+  const cartDragonVal = document.getElementById("cartDragonVal");
   const cartTotalEl = document.getElementById("cartTotal");
   const orderReceipt = document.getElementById("orderReceipt");
   const receiptId = document.getElementById("receiptId");
   const receiptText = document.getElementById("receiptText");
 
+  let cart = [];
+  try {
+    const saved = JSON.parse(localStorage.getItem("fult_cart_v1") || "[]");
+    if (Array.isArray(saved)) cart = saved;
+  } catch {}
+
   function saveCart() {
-    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch {}
+    try { localStorage.setItem("fult_cart_v1", JSON.stringify(cart)); } catch {}
   }
 
   function isInCart(id) {
@@ -1077,7 +1448,9 @@
     const discount = Math.round(
       cart.filter((it) => it.type === "module").reduce((a, b) => a + b.price, 0) * discRate
     );
-    return { subtotal, discount, discRate, total: Math.max(0, subtotal - discount) };
+    const afterVol = Math.max(0, subtotal - discount);
+    const dragonDiscount = dragonDiscountUnlocked ? Math.round(afterVol * 0.1) : 0;
+    return { subtotal, discount, discRate, dragonDiscount, total: Math.max(0, afterVol - dragonDiscount) };
   }
 
   function syncShopButtons() {
@@ -1098,7 +1471,7 @@
     cartCountEl.textContent = String(cart.length);
     document.getElementById("openCart")?.classList.toggle("has-items", cart.length > 0);
     cartItemCountEl.textContent = String(cart.length);
-    const { discount, discRate, total } = calcCart();
+    const { discount, discRate, dragonDiscount, total } = calcCart();
 
     if (discount > 0) {
       cartDiscountRow.hidden = false;
@@ -1106,10 +1479,20 @@
     } else {
       cartDiscountRow.hidden = true;
     }
+
+    if (cartDragonRow && cartDragonVal) {
+      if (dragonDiscount > 0) {
+        cartDragonRow.hidden = false;
+        cartDragonVal.textContent = `-${formatRub(dragonDiscount)}`;
+      } else {
+        cartDragonRow.hidden = true;
+      }
+    }
+
     cartTotalEl.textContent = formatRub(total);
 
     if (cart.length === 0) {
-      cartItemsEl.innerHTML = `<div class="cart-empty">Корзина пуста. Выберите модули или готовый набор в магазине.</div>`;
+      cartItemsEl.innerHTML = `<div class="cart-empty">Корзина пуста. Выберите модули или готовый комплект в магазине.</div>`;
     } else {
       cartItemsEl.innerHTML = cart
         .map((item) => `
@@ -1136,6 +1519,7 @@
       showToast(`Убрано: ${item.name}`);
     } else {
       cart.push(item);
+      playEggChime(false);
       showToast(`Добавлено: ${item.name}`);
     }
     orderReceipt.hidden = true;
@@ -1200,7 +1584,7 @@
       return;
     }
     const contact = document.getElementById("orderContact").value.trim();
-    const { discount, total } = calcCart();
+    const { discount, dragonDiscount, total } = calcCart();
     const code = `FULT-${Math.floor(1000 + Math.random() * 9000)}`;
     const lines = [
       `Заказ: #${code}`,
@@ -1208,6 +1592,7 @@
       `Позиции (${cart.length}):`,
       ...cart.map((it) => `  - ${it.name} (${formatRub(it.price)})`),
       discount > 0 ? `Скидка за объём: -${formatRub(discount)}` : null,
+      dragonDiscount > 0 ? `Бонус Red Dragon (-10%): -${formatRub(dragonDiscount)}` : null,
       `Итого: ${formatRub(total)}`,
       `Отправьте эту заявку менеджеру FULT-ENGINE для получения сборки.`
     ].filter(Boolean);
@@ -1215,16 +1600,17 @@
     receiptId.textContent = `Заказ #${code}`;
     receiptText.textContent = lines.join("\n");
     orderReceipt.hidden = false;
+    playEggChime(true);
     showToast(`Заявка #${code} сформирована`);
   });
 
   document.getElementById("copyReceiptBtn").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(receiptText.textContent); showToast("Заявка скопирована в буфер"); }
+    try { await navigator.clipboard.writeText(receiptText.textContent); showToast("Заявка скопирована"); }
     catch { showToast("Не удалось скопировать"); }
   });
 
   // ======================================================
-  // 4. MODULE STORE CATALOG
+  // 4. MODULE CATALOG
   // ======================================================
   const modulesList = document.getElementById("modulesList");
   const resultsMeta = document.getElementById("resultsMeta");
@@ -1236,13 +1622,12 @@
   let query = "";
   let expandedAll = false;
 
-  function renderModules(animate = false) {
+  function renderModules() {
     const q = query.trim().toLowerCase();
     const filtered = MODULES.filter((m) => {
       if (activeCat !== "all" && m.cat !== activeCat) return false;
       if (!q) return true;
-      const meta = CATEGORY_META[m.cat];
-      return `${m.name} ${m.desc} ${m.cmds.join(" ")} ${meta.label}`.toLowerCase().includes(q);
+      return `${m.name} ${m.desc} ${m.cmds.join(" ")} ${CATEGORY_META[m.cat].label}`.toLowerCase().includes(q);
     });
 
     const limitDefault = activeCat === "all" && !q && !expandedAll;
@@ -1284,7 +1669,7 @@
       .join("");
 
     const moreHtml = limitDefault
-      ? `<div class="modules-more-wrap"><button type="button" class="btn btn-line btn-sm" id="showAllModulesBtn">Показать все ${MODULES.length} модулей</button></div>`
+      ? `<div class="modules-more-wrap"><button type="button" class="btn btn-sand btn-sm" id="showAllModulesBtn">Показать все ${MODULES.length} модулей</button></div>`
       : "";
 
     modulesList.innerHTML = cardsHtml + moreHtml;
@@ -1299,12 +1684,12 @@
     });
     query = modName;
     searchInput.value = modName;
-    renderModules(true);
+    renderModules();
     document.getElementById("modules").scrollIntoView({ behavior: prefersReduced ? "auto" : "smooth" });
   }
 
   modulesList.addEventListener("click", (e) => {
-    if (e.target.closest("#showAllModulesBtn")) { expandedAll = true; renderModules(true); return; }
+    if (e.target.closest("#showAllModulesBtn")) { expandedAll = true; renderModules(); return; }
     const buyBtn = e.target.closest(".mod-buy");
     if (buyBtn) {
       const mod = MODULES.find((m) => m.name === buyBtn.dataset.buy);
@@ -1320,12 +1705,12 @@
         p.classList.toggle("is-active", active);
         p.setAttribute("aria-selected", String(active));
       });
-      renderModules(true);
+      renderModules();
     });
   });
 
-  searchInput.addEventListener("input", (e) => { query = e.target.value; renderModules(false); });
-  renderModules(false);
+  searchInput.addEventListener("input", (e) => { query = e.target.value; renderModules(); });
+  renderModules();
   renderCart();
 
   // ======================================================
@@ -1338,9 +1723,9 @@
   const closeCmdkBtn = document.getElementById("closeCmdk");
 
   const SECTION_ITEMS = [
-    { type: "section", title: "Место отдыха", sub: "Хватайте и раскидывайте органичные 3D-пузыри", badge: "#bubbles", target: "#bubbles" },
-    { type: "section", title: "Генератор CINFO и карточек", sub: "Служебные бейджи Subclass и ключ-карты PNG", badge: "#sandbox", target: "#sandbox" },
-    { type: "section", title: "Магазин модулей", sub: "65 модулей, наборы и скидки за объём", badge: "#modules", target: "#modules" },
+    { type: "section", title: "Место отдыха (Red Dragon)", sub: "Хлестните плёткой по Red Dragon и соберите яйца дракона", badge: "#bubbles", target: "#bubbles" },
+    { type: "section", title: "Студия CINFO и карточек", sub: "Служебные бейджи Subclass и ключ-карты PNG", badge: "#sandbox", target: "#sandbox" },
+    { type: "section", title: "Магазин модулей", sub: "65 модулей, наборы и скидки", badge: "#modules", target: "#modules" },
     { type: "section", title: "Веб-панель администрации", sub: "Вход через Steam, роли и варны", badge: "#webpanel", target: "#webpanel" }
   ];
 
@@ -1356,8 +1741,7 @@
         type: "module",
         title: m.name,
         sub: m.desc,
-        badge: formatRub(m.price),
-        dot: CATEGORY_META[m.cat].dot
+        badge: formatRub(m.price)
       }));
 
     const secMatches = SECTION_ITEMS.filter((s) => !q || `${s.title} ${s.sub}`.toLowerCase().includes(q));
@@ -1365,7 +1749,7 @@
     cmdkSel = 0;
 
     if (cmdkList.length === 0) {
-      cmdkResults.innerHTML = `<div style="padding:20px;color:#565c6b;font-size:0.9rem">Ничего не найдено по запросу «${esc(q)}»</div>`;
+      cmdkResults.innerHTML = `<div style="padding:20px;font-weight:600">Ничего не найдено по запросу «${esc(q)}»</div>`;
       return;
     }
 
@@ -1373,7 +1757,7 @@
       .map((item, i) => `
         <button type="button" class="cmdk-item${i === 0 ? " is-selected" : ""}" data-idx="${i}" role="option" aria-selected="${i === 0}">
           <span class="cmdk-item-main">
-            <span class="cmdk-item-title">${item.dot ? `<i class="dot ${item.dot}" aria-hidden="true"></i>` : ""}${esc(item.title)}</span>
+            <span class="cmdk-item-title">${esc(item.title)}</span>
             <span class="cmdk-item-sub">${esc(item.sub)}</span>
           </span>
           <span class="cmdk-item-badge">${esc(item.badge)}</span>
